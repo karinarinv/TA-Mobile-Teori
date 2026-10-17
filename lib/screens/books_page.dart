@@ -18,6 +18,7 @@ class _BooksPageState extends State<BooksPage> {
   final _q = TextEditingController(text: 'flutter');
   List _books = [];
   bool _loading = false;
+  String _status = '';
   StreamSubscription? _sub;
   DateTime _lastShake = DateTime.now();
 
@@ -44,13 +45,31 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   Future<void> _search() async {
-    setState(() => _loading = true);
+    FocusScope.of(context).unfocus();
+    final q = _q.text.trim();
+    if (q.isEmpty) {
+      setState(() => _status = 'Ketik judul atau penulis dulu');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _status = '';
+    });
     try {
-      final r = await http.get(Uri.parse(
-          'https://www.googleapis.com/books/v1/volumes?q=${Uri.encodeQueryComponent(_q.text)}&maxResults=20'));
-      _books = (jsonDecode(r.body)['items'] ?? []) as List;
+      final r = await http
+          .get(Uri.parse(
+              'https://www.googleapis.com/books/v1/volumes?q=${Uri.encodeQueryComponent(q)}&maxResults=20&printType=books'))
+          .timeout(const Duration(seconds: 15));
+      if (r.statusCode != 200) {
+        _books = [];
+        _status = 'Gagal memuat (kode ${r.statusCode}). Coba lagi sebentar lagi.';
+      } else {
+        _books = (jsonDecode(r.body)['items'] ?? []) as List;
+        if (_books.isEmpty) _status = 'Tidak ada hasil untuk "$q"';
+      }
     } catch (_) {
       _books = [];
+      _status = 'Gagal terhubung. Cek koneksi internet.';
     }
     if (mounted) setState(() => _loading = false);
   }
@@ -71,6 +90,7 @@ class _BooksPageState extends State<BooksPage> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               controller: _q,
+              textInputAction: TextInputAction.search,
               onSubmitted: (_) => _search(),
               decoration: InputDecoration(
                 hintText: 'Judul / penulis',
@@ -80,15 +100,20 @@ class _BooksPageState extends State<BooksPage> {
             ),
           ),
           if (_loading) const LinearProgressIndicator(),
+          if (_status.isNotEmpty)
+            Padding(padding: const EdgeInsets.all(16), child: Text(_status)),
           Expanded(
             child: ListView.builder(
               itemCount: _books.length,
               itemBuilder: (_, i) {
                 final v = _books[i]['volumeInfo'] ?? {};
-                final img = v['imageLinks']?['thumbnail'];
+                final String? img = (v['imageLinks']?['thumbnail'] as String?)?.replaceFirst('http://', 'https://');
                 final title = v['title'] ?? '-';
                 return ListTile(
-                  leading: img != null ? TiltCover(child: Image.network(img)) : const Icon(Icons.book),
+                  leading: img != null
+                      ? TiltCover(
+                          child: Image.network(img, errorBuilder: (_, __, ___) => const Icon(Icons.book)))
+                      : const Icon(Icons.book),
                   title: Text(title),
                   subtitle: Text((v['authors'] ?? ['-']).join(', ')),
                   trailing: TextButton(onPressed: () => _rent(title), child: const Text('Sewa')),

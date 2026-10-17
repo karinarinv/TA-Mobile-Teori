@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../services/blockchain_service.dart';
 import 'books_page.dart';
 import 'converter_page.dart';
 import 'map_page.dart';
 import 'ai_page.dart';
 import 'quiz_page.dart';
+import 'blockchain_page.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -17,12 +17,7 @@ class MenuPage extends StatelessWidget {
       (Icons.map, 'Perpustakaan Terdekat', () => go(const MapPage())),
       (Icons.smart_toy, 'Asisten AI Buku', () => go(const AiPage())),
       (Icons.quiz, 'Kuis Buku', () => go(const QuizPage())),
-      (Icons.verified, 'Cek Blockchain', () async {
-        final ok = await BlockchainService.verify();
-        if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(ok ? 'Rantai transaksi VALID' : 'Rantai TERMANIPULASI!')));
-      }),
+      (Icons.verified, 'Riwayat Blockchain', () => go(const BlockchainPage())),
     ];
     return Scaffold(
       appBar: AppBar(title: const Text('RentBook')),
