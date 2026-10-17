@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'services/auth_service.dart';
+import 'services/notification_service.dart';
+import 'screens/login_page.dart';
+import 'screens/home_shell.dart';
 
-void main() {
-  runApp(const MainApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService.init();
+  final user = await AuthService.currentSession();
+  runApp(MyApp(startLoggedIn: user != null));
 }
 
-// This is a basic Flutter application that displays "Hello World!" in the center of the screen.
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
+class MyApp extends StatelessWidget {
+  final bool startLoggedIn;
+  const MyApp({super.key, required this.startLoggedIn});
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(body: Center(child: Text('Hello World!'))),
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'RentBook',
+        theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+        home: startLoggedIn ? const HomeShell() : const LoginPage(),
+      );
 }
