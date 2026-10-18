@@ -18,13 +18,18 @@ class NotificationService {
       android: AndroidNotificationDetails('rentbook', 'Pengingat Buku',
           importance: Importance.high, priority: Priority.high));
 
-  /// Notifikasi langsung + pengingat jatuh tempo (demo: 1 menit; ganti ke days: 3 untuk produksi).
-  static Future<void> scheduleReturn(String title) async {
-    await _n.show(1, 'Peminjaman berhasil', '"$title" harus dikembalikan 3 hari lagi', _d);
+  /// Notifikasi langsung + pengingat jatuh tempo (demo: 1 menit; durasi hari: days).
+  static Future<void> scheduleReturn(String title, {int days = 3}) async {
+    await _n.show(
+      1,
+      'Peminjaman Berhasil',
+      '"$title" berhasil disewa untuk $days hari ke depan.',
+      _d,
+    );
     await _n.zonedSchedule(
       title.hashCode,
-      'Jatuh tempo!',
-      'Segera kembalikan "$title" agar tidak kena denda',
+      'Pengingat Jatuh Tempo!',
+      'Masa sewa "$title" ($days hari) hampir habis. Segera kembalikan tepat waktu.',
       tz.TZDateTime.now(tz.UTC).add(const Duration(minutes: 1)),
       _d,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,

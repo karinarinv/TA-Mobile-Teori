@@ -5,6 +5,7 @@ import 'map_page.dart';
 import 'ai_page.dart';
 import 'quiz_page.dart';
 import 'blockchain_page.dart';
+import 'saved_books_page.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
@@ -13,6 +14,7 @@ class MenuPage extends StatelessWidget {
     void go(Widget w) => Navigator.push(context, MaterialPageRoute(builder: (_) => w));
     final items = <(IconData, String, VoidCallback)>[
       (Icons.book, 'Cari & Sewa Buku', () => go(const BooksPage())),
+      (Icons.collections_bookmark, 'Buku Tersimpan', () => go(const SavedBooksPage())),
       (Icons.currency_exchange, 'Konversi Kurs & Waktu', () => go(const ConverterPage())),
       (Icons.map, 'Perpustakaan Terdekat', () => go(const MapPage())),
       (Icons.smart_toy, 'Asisten AI Buku', () => go(const AiPage())),

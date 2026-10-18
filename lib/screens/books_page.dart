@@ -4,9 +4,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sensors_plus/sensors_plus.dart';
-import '../services/blockchain_service.dart';
-import '../services/notification_service.dart';
-import '../widgets/tilt_cover.dart';
+import '../widgets/rental_bottom_sheet.dart';
+import 'book_detail_page.dart';
+import 'saved_books_page.dart';
 
 class BooksPage extends StatefulWidget {
   const BooksPage({super.key});
@@ -61,6 +61,17 @@ class _BooksPageState extends State<BooksPage> {
     super.dispose();
   }
 
+  int _calcPrice(String title) {
+    final hash = title.hashCode.abs();
+    return ((hash % 10) + 3) * 1000;
+  }
+
+  String _formatNumber(int n) {
+    final s = n.toString();
+    if (s.length <= 3) return s;
+    return s.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.');
+  }
+
   Future<void> _search() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -96,11 +107,25 @@ class _BooksPageState extends State<BooksPage> {
           if (img != null) img = img.replaceFirst('http://', 'https://');
 
           final authorsList = (v['authors'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
+          final title = v['title'] as String? ?? 'Tanpa Judul';
+          final categories = (v['categories'] as List?)?.cast<String>() ?? ['Pilihan Populer'];
+          final desc = v['description'] as String? ?? 'Buku ini menceritakan kisah yang memikat dengan wawasan mendalam. Cocok untuk dibaca dalam mengisi waktu luang dan memperluas wawasan Anda.';
+          final publisher = v['publisher'] as String? ?? 'Penerbit Mitra RentBook';
+          final publishedDate = v['publishedDate'] as String? ?? '2023';
+          final pageCount = (v['pageCount'] as num?)?.toInt() ?? 260;
+          final rating = ((v['averageRating'] as num?)?.toDouble() ?? (4.0 + (title.hashCode.abs() % 10) / 10)).clamp(3.8, 5.0);
 
           return {
-            'title': v['title'] as String? ?? 'Tanpa Judul',
+            'title': title,
             'authors': authorsList.join(', '),
             'image': img,
+            'description': desc,
+            'publisher': publisher,
+            'publishedDate': publishedDate,
+            'pageCount': pageCount,
+            'category': categories.first,
+            'rating': double.parse(rating.toStringAsFixed(1)),
+            'pricePerDay': _calcPrice(title),
           };
         }).toList();
 
@@ -152,11 +177,23 @@ class _BooksPageState extends State<BooksPage> {
           if (coverId != null) {
             img = 'https://covers.openlibrary.org/b/id/$coverId-M.jpg';
           }
+          final firstYear = doc['first_publish_year']?.toString() ?? '2022';
+          final publisher = (doc['publisher'] as List?)?.firstOrNull?.toString() ?? 'Penerbit Mitra';
+          final pageCount = (doc['number_of_pages_median'] as num?)?.toInt() ?? 280;
+          final subjects = (doc['subject'] as List?)?.cast<String>() ?? ['Koleksi Unggulan'];
+          final rating = (4.0 + (title.hashCode.abs() % 9) / 10).clamp(4.0, 5.0);
 
           return {
             'title': title,
             'authors': authorsList.join(', '),
             'image': img,
+            'description': 'Buku "$title" karya ${authorsList.join(", ")} adalah salah satu koleksi unggulan di RentBook.',
+            'publisher': publisher,
+            'publishedDate': firstYear,
+            'pageCount': pageCount,
+            'category': subjects.first,
+            'rating': double.parse(rating.toStringAsFixed(1)),
+            'pricePerDay': _calcPrice(title),
           };
         }).toList();
 
@@ -186,17 +223,6 @@ class _BooksPageState extends State<BooksPage> {
     }
   }
 
-  Future<void> _rent(String title) async {
-    await BlockchainService.addTransaction('PINJAM:$title');
-    await NotificationService.scheduleReturn(title);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('"$title" dipinjam. Transaksi dicatat di blockchain.'),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -212,6 +238,18 @@ class _BooksPageState extends State<BooksPage> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.collections_bookmark_outlined),
+            tooltip: 'Buku Tersimpan',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SavedBooksPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -250,44 +288,112 @@ class _BooksPageState extends State<BooksPage> {
                 final title = item['title'] as String;
                 final authors = item['authors'] as String;
                 final img = item['image'] as String?;
+                final pricePerDay = (item['pricePerDay'] as num?)?.toInt() ?? 5000;
+                final rating = item['rating']?.toString() ?? '4.5';
 
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(8),
-                    leading: SizedBox(
-                      width: 50,
-                      height: 70,
-                      child: img != null
-                          ? TiltCover(
-                              child: Image.network(
-                                img,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: Colors.grey[300],
-                                  child: const Icon(Icons.book, color: Colors.grey),
-                                ),
-                              ),
-                            )
-                          : Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.book, color: Colors.grey),
+                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 1.5,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BookDetailPage(book: item),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SizedBox(
+                              width: 52,
+                              height: 76,
+                              child: img != null
+                                  ? Image.network(
+                                      img,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        color: Colors.grey[200],
+                                        child: const Icon(Icons.book, color: Colors.grey),
+                                      ),
+                                    )
+                                  : Container(
+                                      color: Colors.grey[200],
+                                      child: const Icon(Icons.book, color: Colors.grey),
+                                    ),
                             ),
-                    ),
-                    title: Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      authors,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: ElevatedButton(
-                      onPressed: () => _rent(title),
-                      child: const Text('Sewa'),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  authors,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.indigo.shade50,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        'Rp ${_formatNumber(pricePerDay)}/hari',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.indigo.shade800,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Icon(Icons.star, size: 13, color: Colors.amber.shade800),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      rating,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey.shade700,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.indigo,
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            onPressed: () => RentalBottomSheet.show(context, item),
+                            child: const Text('Sewa', style: TextStyle(fontSize: 13)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );

@@ -23,6 +23,7 @@ class _ConverterPageState extends State<ConverterPage> {
     } catch (_) {
       _err = 'Gagal mengambil kurs (cek internet)';
     }
+    if (!mounted) return;
     setState(() {});
   }
 
