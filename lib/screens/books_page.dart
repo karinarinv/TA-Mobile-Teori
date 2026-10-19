@@ -16,7 +16,6 @@ class BooksPage extends StatefulWidget {
 }
 
 class _BooksPageState extends State<BooksPage> {
-  // Controller diawali kosong agar hintText "Cari judul..." muncul rapi
   final _q = TextEditingController();
   List _books = [];
   bool _loading = false;
@@ -27,13 +26,10 @@ class _BooksPageState extends State<BooksPage> {
   @override
   void initState() {
     super.initState();
-    
-    // Memuat daftar buku default secara otomatis saat pertama kali halaman dibuka
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _search();
     });
 
-    // Sensor Shake HP untuk rekomendasi acak
     _sub = userAccelerometerEventStream().listen((e) {
       final g = sqrt(e.x * e.x + e.y * e.y + e.z * e.z);
       if (g > 16 && DateTime.now().difference(_lastShake).inSeconds > 3 && !_loading) {
@@ -72,10 +68,15 @@ class _BooksPageState extends State<BooksPage> {
     return s.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.');
   }
 
+  // Membersihkan tag HTML bawaan Google Books (<p>, <b>, <i>, dll)
+  String _cleanHtml(String htmlString) {
+    RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
+    return htmlString.replaceAll(exp, '').trim();
+  }
+
   Future<void> _search() async {
     FocusManager.instance.primaryFocus?.unfocus();
 
-    // Jika input kosong, gunakan pencarian default 'bestseller' agar buku langsung muncul
     final queryText = _q.text.trim();
     final q = queryText.isEmpty ? 'bestseller' : queryText;
 
@@ -85,7 +86,6 @@ class _BooksPageState extends State<BooksPage> {
     });
 
     try {
-      // 1. Coba panggil Google Books API
       final uri = Uri.https('www.googleapis.com', '/books/v1/volumes', {
         'q': q,
         'maxResults': '30',
@@ -107,19 +107,39 @@ class _BooksPageState extends State<BooksPage> {
           if (img != null) img = img.replaceFirst('http://', 'https://');
 
           final authorsList = (v['authors'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
+          final authors = authorsList.join(', ');
           final title = v['title'] as String? ?? 'Tanpa Judul';
-          final categories = (v['categories'] as List?)?.cast<String>() ?? ['Pilihan Populer'];
-          final desc = v['description'] as String? ?? 'Buku ini menceritakan kisah yang memikat dengan wawasan mendalam. Cocok untuk dibaca dalam mengisi waktu luang dan memperluas wawasan Anda.';
-          final publisher = v['publisher'] as String? ?? 'Penerbit Mitra RentBook';
-          final publishedDate = v['publishedDate'] as String? ?? '2023';
-          final pageCount = (v['pageCount'] as num?)?.toInt() ?? 260;
+          final categories = (v['categories'] as List?)?.cast<String>() ?? ['Novel & Fiksi'];
+          
+          // Ambil deskripsi asli & bersihkan dari tag HTML
+          String rawDesc = (v['description'] as String?) ?? '';
+          String cleanDesc = _cleanHtml(rawDesc);
+
+          // Jika API tidak memberikan deskripsi, buat sinopsis khusus berdasarkan judul & penulis
+          if (cleanDesc.isEmpty) {
+            cleanDesc = 'Buku "$title" karya $authors menyajikan narasi yang mendalam dan penuh wawasan. Karya ini menjadi salah satu bacaan yang paling diminati dalam kategori ${categories.first} dan sangat direkomendasikan untuk Anda sewa di RentBook.';
+          }
+
+          // Ambil penerbit & tanggal rilis asli
+          String publisher = (v['publisher'] as String?) ?? '';
+          if (publisher.isEmpty) {
+            publisher = 'Penerbit Utama';
+          }
+
+          String publishedDate = (v['publishedDate'] as String?) ?? '';
+          if (publishedDate.isEmpty) {
+            final yearHash = 2016 + (title.hashCode.abs() % 8);
+            publishedDate = '$yearHash';
+          }
+
+          final pageCount = (v['pageCount'] as num?)?.toInt() ?? (180 + (title.hashCode.abs() % 160));
           final rating = ((v['averageRating'] as num?)?.toDouble() ?? (4.0 + (title.hashCode.abs() % 10) / 10)).clamp(3.8, 5.0);
 
           return {
             'title': title,
-            'authors': authorsList.join(', '),
+            'authors': authors,
             'image': img,
-            'description': desc,
+            'description': cleanDesc,
             'publisher': publisher,
             'publishedDate': publishedDate,
             'pageCount': pageCount,
@@ -129,7 +149,7 @@ class _BooksPageState extends State<BooksPage> {
           };
         }).toList();
 
-        // Mengurutkan daftar buku secara alfabetis (A sampai Z) berdasarkan judul
+        // Urutkan A - Z
         parsedBooks.sort((a, b) => (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase()));
 
         setState(() {
@@ -139,7 +159,6 @@ class _BooksPageState extends State<BooksPage> {
           }
         });
       } else {
-        // Jika Google API mengalami limit/error (misal HTTP 429), gunakan OpenLibrary
         await _searchOpenLibrary(q);
       }
     } catch (_) {
@@ -153,7 +172,6 @@ class _BooksPageState extends State<BooksPage> {
     }
   }
 
-  // Backup API: Open Library
   Future<void> _searchOpenLibrary(String q) async {
     try {
       final uri = Uri.https('openlibrary.org', '/search.json', {
@@ -172,22 +190,24 @@ class _BooksPageState extends State<BooksPage> {
         final parsedBooks = docs.map((doc) {
           final title = doc['title'] as String? ?? 'Tanpa Judul';
           final authorsList = (doc['author_name'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
+          final authors = authorsList.join(', ');
           final coverId = doc['cover_i'];
           String? img;
           if (coverId != null) {
             img = 'https://covers.openlibrary.org/b/id/$coverId-M.jpg';
           }
-          final firstYear = doc['first_publish_year']?.toString() ?? '2022';
-          final publisher = (doc['publisher'] as List?)?.firstOrNull?.toString() ?? 'Penerbit Mitra';
-          final pageCount = (doc['number_of_pages_median'] as num?)?.toInt() ?? 280;
-          final subjects = (doc['subject'] as List?)?.cast<String>() ?? ['Koleksi Unggulan'];
+
+          final firstYear = doc['first_publish_year']?.toString() ?? '${2015 + (title.hashCode.abs() % 9)}';
+          final publisher = (doc['publisher'] as List?)?.firstOrNull?.toString() ?? 'Penerbit Pilihan';
+          final pageCount = (doc['number_of_pages_median'] as num?)?.toInt() ?? (200 + (title.hashCode.abs() % 150));
+          final subjects = (doc['subject'] as List?)?.cast<String>() ?? ['Koleksi Popular'];
           final rating = (4.0 + (title.hashCode.abs() % 9) / 10).clamp(4.0, 5.0);
 
           return {
             'title': title,
-            'authors': authorsList.join(', '),
+            'authors': authors,
             'image': img,
-            'description': 'Buku "$title" karya ${authorsList.join(", ")} adalah salah satu koleksi unggulan di RentBook.',
+            'description': 'Buku "$title" merupakan karya populer dari $authors. Novel ini menghadirkan alur cerita yang unik dan memikat, menjadikannya pilihan favorit para pembaca di RentBook.',
             'publisher': publisher,
             'publishedDate': firstYear,
             'pageCount': pageCount,
@@ -197,7 +217,6 @@ class _BooksPageState extends State<BooksPage> {
           };
         }).toList();
 
-        // Mengurutkan daftar buku secara alfabetis (A sampai Z) berdasarkan judul
         parsedBooks.sort((a, b) => (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase()));
 
         setState(() {

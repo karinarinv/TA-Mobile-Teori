@@ -24,13 +24,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _checkBookmark() async {
-    final title = widget.book['title'] as String? ?? '';
+    final title = widget.book['title']?.toString() ?? '';
     final b = await BookmarkService.isBookmarked(title);
     if (mounted) setState(() => _isBookmarked = b);
   }
 
   Future<void> _toggleBookmark() async {
-    final title = widget.book['title'] as String? ?? 'Buku';
+    final title = widget.book['title']?.toString() ?? 'Buku';
     final nowSaved = await BookmarkService.toggleBookmark(widget.book);
     if (!mounted) return;
     setState(() => _isBookmarked = nowSaved);
@@ -39,7 +39,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          nowSaved ? '"$title" disimpan ke Buku Tersimpan.' : '"$title" dihapus dari Buku Tersimpan.',
+          nowSaved
+              ? '"$title" disimpan ke Buku Tersimpan.'
+              : '"$title" dihapus dari Buku Tersimpan.',
         ),
         action: nowSaved
             ? SnackBarAction(
@@ -64,17 +66,26 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Penanganan null-safety yang sangat aman untuk semua nilai
     final book = widget.book;
-    final title = book['title'] as String? ?? 'Tanpa Judul';
-    final authors = book['authors'] as String? ?? 'Penulis tidak diketahui';
-    final img = book['image'] as String?;
-    final description = book['description'] as String? ??
-        'Buku ini menceritakan kisah yang memikat dengan wawasan mendalam. Cocok untuk dibaca dalam mengisi waktu luang dan memperluas wawasan Anda.';
-    final publisher = book['publisher'] as String? ?? 'Penerbit Mitra RentBook';
-    final publishedDate = book['publishedDate'] as String? ?? '-';
+    final title = book['title']?.toString() ?? 'Tanpa Judul';
+    final authors = book['authors']?.toString() ?? 'Penulis tidak diketahui';
+    final img = book['image']?.toString();
+    final description = (book['description']?.toString() ?? '').trim().isEmpty
+        ? 'Tidak ada sinopsis tersedia.'
+        : book['description'].toString();
+    final publisher = (book['publisher']?.toString() ?? '').trim().isEmpty
+        ? 'Penerbit tidak diketahui'
+        : book['publisher'].toString();
+    final publishedDate = (book['publishedDate']?.toString() ?? '').trim().isEmpty
+        ? '-'
+        : book['publishedDate'].toString();
+    
     final pageCount = (book['pageCount'] as num?)?.toInt() ?? 240;
-    final category = book['category'] as String? ?? 'Umum / Pilihan';
-    final rating = (book['rating'] as num?)?.toDouble() ?? 4.6;
+    final category = (book['category']?.toString() ?? '').trim().isEmpty
+        ? 'Fiksi & Novel'
+        : book['category'].toString();
+    final rating = (book['rating'] as num?)?.toDouble() ?? 4.5;
     final pricePerDay = (book['pricePerDay'] as num?)?.toInt() ?? 5000;
 
     return Scaffold(
@@ -105,7 +116,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header cover dengan efek sensor gyroscope TiltCover
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -127,7 +137,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.25),
+                              color: Colors.black.withOpacity(0.25),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
@@ -135,7 +145,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
-                          child: img != null
+                          child: (img != null && img.isNotEmpty)
                               ? Image.network(
                                   img,
                                   fit: BoxFit.cover,
@@ -168,7 +178,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
               ),
             ),
 
-            // Info Judul dan Pengarang
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -190,19 +199,24 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       Expanded(
                         child: Text(
                           authors,
-                          style: TextStyle(fontSize: 15, color: Colors.grey[700], fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
 
-                  // Row Chips Spesifikasi Buku
+                  // PERBAIKAN OVERFLOW: Menggunakan SingleChildScrollView horizontal
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildBadge(Icons.star, '$rating / 5.0', Colors.amber.shade800, Colors.amber.shade50),
+                        _buildBadge(Icons.star, '${rating.toStringAsFixed(1)} / 5.0', Colors.amber.shade800, Colors.amber.shade50),
                         const SizedBox(width: 8),
                         _buildBadge(Icons.category_outlined, category, Colors.indigo, Colors.indigo.shade50),
                         const SizedBox(width: 8),
@@ -214,7 +228,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Kartu Harga Sewa
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -270,7 +283,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Sinopsis
                   const Text(
                     'Sinopsis Buku',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -287,7 +299,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Informasi Tambahan
                   const Text(
                     'Informasi Tambahan',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -310,7 +321,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
