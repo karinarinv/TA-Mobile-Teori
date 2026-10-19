@@ -79,24 +79,42 @@ class _AiPageState extends State<AiPage> {
       });
     }
 
-    String ans;
-    try {
-      final r = await http
-          .post(
-            Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/$geminiModel:generateContent?key=$geminiKey'),
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode({'contents': contents}),
-          )
-          .timeout(const Duration(seconds: 15));
+    String ans = '';
+    final modelsToTry = [
+      geminiModel,
+      'gemini-flash-lite-latest',
+      'gemini-3.1-flash-lite',
+      'gemini-3.5-flash',
+    ];
 
-      if (!mounted) return;
+    for (final model in modelsToTry) {
+      try {
+        final r = await http
+            .post(
+              Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$geminiKey'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({'contents': contents}),
+            )
+            .timeout(const Duration(seconds: 25));
 
-      final j = jsonDecode(r.body);
-      ans = j['candidates']?[0]?['content']?['parts']?[0]?['text'] ??
-          'Maaf, terjadi kendala: ${j['error']?['message'] ?? 'Format respons tidak dikenal.'}';
-    } catch (e) {
+        if (!mounted) return;
+
+        if (r.statusCode == 200) {
+          final j = jsonDecode(r.body);
+          final text = j['candidates']?[0]?['content']?['parts']?[0]?['text'] as String?;
+          if (text != null && text.trim().isNotEmpty) {
+            ans = text.trim();
+            break;
+          }
+        }
+      } catch (_) {
+        continue;
+      }
+    }
+
+    if (ans.isEmpty) {
       if (!mounted) return;
-      ans = 'Gagal terhubung ke layanan AI ($e). Pastikan perangkat terhubung ke internet.';
+      ans = 'Maaf, asisten AI sedang mengalami antrean tinggi. Silakan coba kirim kembali dalam beberapa detik.';
     }
 
     if (!mounted) return;

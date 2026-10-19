@@ -137,7 +137,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
+                              color: const Color(0x40000000),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
                             ),
@@ -321,7 +321,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: const Color(0x14000000),
               blurRadius: 10,
               offset: const Offset(0, -4),
             ),
