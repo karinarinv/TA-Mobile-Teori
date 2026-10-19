@@ -145,19 +145,33 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             Row(
               children: [3, 7, 14, 30].map((d) {
                 final isSelected = _duration == d;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: ChoiceChip(
-                    label: Text('$d Hari'),
-                    selected: isSelected,
-                    selectedColor: Colors.indigo,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black87,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () => setState(() => _duration = d),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.indigo : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: isSelected ? Colors.indigo : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$d Hari',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isSelected ? Colors.white : Colors.black87,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    onSelected: (val) {
-                      if (val) setState(() => _duration = d);
-                    },
                   ),
                 );
               }).toList(),

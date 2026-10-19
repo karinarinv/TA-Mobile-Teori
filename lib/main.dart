@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'screens/login_page.dart';
@@ -6,6 +7,7 @@ import 'screens/home_shell.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
   await NotificationService.init();
   final user = await AuthService.currentSession();
   runApp(MyApp(startLoggedIn: user != null));
