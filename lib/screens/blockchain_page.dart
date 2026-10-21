@@ -153,17 +153,17 @@ class _BlockchainPageState extends State<BlockchainPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.indigo.shade50,
+                  color: const Color(0xFFF7EDED),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.timer_outlined, size: 14, color: Colors.indigo),
+                    const Icon(Icons.timer_outlined, size: 14, color: Color(0xFF67343A)),
                     const SizedBox(width: 4),
                     Text(
                       duration,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.indigo),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF67343A)),
                     ),
                   ],
                 ),
@@ -245,17 +245,17 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.indigo.shade50,
+                          color: const Color(0xFFF7EDED),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Total Blok', style: TextStyle(fontSize: 11, color: Colors.indigo.shade700)),
+                            Text('Total Blok', style: TextStyle(fontSize: 11, color: const Color(0xFF67343A))),
                             const SizedBox(height: 2),
                             Text(
                               '${_rows.length} Blok',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.indigo),
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
                             ),
                           ],
                         ),
@@ -319,7 +319,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     Expanded(
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
-                          backgroundColor: Colors.indigo,
+                          backgroundColor: const Color(0xFF67343A),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         ),
                         onPressed: _verify,
@@ -420,7 +420,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: Colors.indigo.shade50,
+                                      color: const Color(0xFFF7EDED),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
@@ -428,7 +428,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
-                                        color: Colors.indigo.shade800,
+                                        color: const Color(0xFF5A2A38),
                                       ),
                                     ),
                                   ),
@@ -475,12 +475,12 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                           onTap: () => _copyHash(hashStr, blockId),
                                           child: const Row(
                                             children: [
-                                              Icon(Icons.copy, size: 12, color: Colors.indigo),
+                                              Icon(Icons.copy, size: 12, color: Color(0xFF67343A)),
                                               SizedBox(width: 3),
                                               Text('Salin Hash',
                                                   style: TextStyle(
                                                       fontSize: 11,
-                                                      color: Colors.indigo,
+                                                      color: Color(0xFF67343A),
                                                       fontWeight: FontWeight.w600)),
                                             ],
                                           ),

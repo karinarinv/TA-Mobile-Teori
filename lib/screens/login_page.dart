@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/auth_service.dart';
 import 'home_shell.dart';
 
@@ -15,6 +16,15 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscure = true;
   bool _loading = false;
 
+  // Palet Warna Old Library
+  static const Color _cWalnut = Color(0xFF302622);
+  static const Color _cOxblood = Color(0xFF67343A);
+  static const Color _cTobacco = Color(0xFF9A704F);
+  static const Color _cAgedPaper = Color(0xFFD4BE9D);
+  static const Color _cParchment = Color(0xFFEDE2CF);
+  static const Color _cCardBg = Color(0xFFD8C7B0); // Warna kartu buku klasik
+  static const Color _cTabInactive = Color(0xFFC7B197);
+
   @override
   void dispose() {
     _u.dispose();
@@ -27,10 +37,14 @@ class _LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(s),
-        backgroundColor: isError ? Colors.red.shade700 : Colors.indigo.shade800,
+        content: Text(
+          s,
+          style: GoogleFonts.poppins(color: _cParchment, fontWeight: FontWeight.w500),
+        ),
+        backgroundColor: isError ? _cOxblood : _cWalnut,
+        duration: const Duration(milliseconds: 2000),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -100,229 +114,370 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Header Logo
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.indigo.withAlpha(40),
-                        blurRadius: 18,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.menu_book_rounded,
-                    size: 64,
-                    color: Colors.indigo,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'RentBook',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Sewa Buku Cerdas & Terdesentralisasi',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 28),
+      backgroundColor: _cWalnut,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // 1. Gambar Latar Belakang Perpustakaan Kayu Asli
+          Image.asset(
+            'assets/images/library_bg.jpg',
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(color: _cWalnut),
+          ),
 
-                // Card Container Form
-                Card(
-                  elevation: 2,
-                  shadowColor: Colors.black12,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(22),
-                    child: Column(
-                      children: [
-                        // Segmented Switcher (Masuk vs Daftar)
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12),
+          // 2. Lapisan Vignette Hangat & Gelap Alami (Vintage Library Atmosphere)
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.52),
+                  Colors.black.withValues(alpha: 0.32),
+                  Colors.black.withValues(alpha: 0.68),
+                ],
+              ),
+            ),
+          ),
+
+          // 3. Konten Utama: Logo RentBook, Tagline, dan Kartu Form Login
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Logo RentBook Resmi (Ukuran Lebih Besar & Jelas)
+                    Image.asset(
+                      'assets/images/rentbook_logo.png',
+                      height: 85,
+                      color: _cParchment,
+                      colorBlendMode: BlendMode.srcIn,
+                      errorBuilder: (_, __, ___) => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.menu_book_rounded, color: _cParchment, size: 42),
+                          const SizedBox(width: 10),
+                          Text(
+                            'RENT\nBOOK',
+                            style: GoogleFonts.poppins(
+                              color: _cParchment,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 22,
+                              height: 1.0,
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () => setState(() => _isRegister = false),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: !_isRegister ? Colors.white : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: !_isRegister
-                                          ? [const BoxShadow(color: Colors.black12, blurRadius: 4)]
-                                          : null,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Masuk',
-                                        style: TextStyle(
-                                          fontWeight: !_isRegister ? FontWeight.bold : FontWeight.w500,
-                                          color: !_isRegister ? Colors.indigo : Colors.grey.shade600,
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Tagline Elegan dengan Font Poppins
+                    Text(
+                      'Sewa Buku Cerdas & Terdesentralisasi',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: _cParchment.withValues(alpha: 0.95),
+                        letterSpacing: 0.3,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.8),
+                            blurRadius: 6,
+                            offset: const Offset(0, 1.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Kartu Form Buku Kuno (Aged Parchment Card)
+                    Container(
+                      padding: const EdgeInsets.all(22),
+                      decoration: BoxDecoration(
+                        color: _cCardBg,
+                        borderRadius: BorderRadius.circular(26),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.4),
+                            blurRadius: 28,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Tab Segmented Capsule (Masuk vs Daftar Baru)
+                          Container(
+                            height: 44,
+                            padding: const EdgeInsets.all(3.5),
+                            decoration: BoxDecoration(
+                              color: _cTabInactive,
+                              borderRadius: BorderRadius.circular(22),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(() => _isRegister = false),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      decoration: BoxDecoration(
+                                        color: !_isRegister ? _cOxblood : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(18),
+                                        boxShadow: !_isRegister
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.black.withValues(alpha: 0.18),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Masuk',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 13.5,
+                                            color: !_isRegister ? _cParchment : _cWalnut,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Expanded(
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(10),
-                                  onTap: () => setState(() => _isRegister = true),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: _isRegister ? Colors.white : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(10),
-                                      boxShadow: _isRegister
-                                          ? [const BoxShadow(color: Colors.black12, blurRadius: 4)]
-                                          : null,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Daftar Baru',
-                                        style: TextStyle(
-                                          fontWeight: _isRegister ? FontWeight.bold : FontWeight.w500,
-                                          color: _isRegister ? Colors.indigo : Colors.grey.shade600,
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(() => _isRegister = true),
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 200),
+                                      decoration: BoxDecoration(
+                                        color: _isRegister ? _cOxblood : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(18),
+                                        boxShadow: _isRegister
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.black.withValues(alpha: 0.18),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ]
+                                            : null,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Daftar Baru',
+                                          style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 13.5,
+                                            color: _isRegister ? _cParchment : _cWalnut,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+
+                          // Field Username
+                          TextField(
+                            controller: _u,
+                            style: GoogleFonts.poppins(
+                              color: _cWalnut,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                            cursorColor: _cOxblood,
+                            decoration: InputDecoration(
+                              hintText: 'Username',
+                              hintStyle: GoogleFonts.poppins(
+                                color: _cWalnut.withValues(alpha: 0.6),
+                                fontSize: 13.5,
+                              ),
+                              prefixIcon: const Icon(
+                                Icons.person_outline_rounded,
+                                color: _cWalnut,
+                                size: 21,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                              filled: true,
+                              fillColor: _cAgedPaper.withValues(alpha: 0.35),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: const BorderSide(color: _cTobacco, width: 1.1),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: const BorderSide(color: _cOxblood, width: 1.8),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+
+                          // Field Password
+                          TextField(
+                            controller: _p,
+                            obscureText: _obscure,
+                            style: GoogleFonts.poppins(
+                              color: _cWalnut,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                            cursorColor: _cOxblood,
+                            decoration: InputDecoration(
+                              hintText: 'Password',
+                              hintStyle: GoogleFonts.poppins(
+                                color: _cWalnut.withValues(alpha: 0.6),
+                                fontSize: 13.5,
+                              ),
+                              prefixIcon: const Icon(
+                                Icons.lock_outline_rounded,
+                                color: _cWalnut,
+                                size: 21,
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                                  color: _cWalnut,
+                                  size: 20,
+                                ),
+                                onPressed: () => setState(() => _obscure = !_obscure),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                              filled: true,
+                              fillColor: _cAgedPaper.withValues(alpha: 0.35),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: const BorderSide(color: _cTobacco, width: 1.1),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: const BorderSide(color: _cOxblood, width: 1.8),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+
+                          // Tombol Aksi Utama (Oxblood Pill)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _cOxblood,
+                                foregroundColor: _cParchment,
+                                elevation: 3,
+                                shadowColor: Colors.black26,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              onPressed: _loading ? null : _submit,
+                              child: _loading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: _cParchment,
+                                      ),
+                                    )
+                                  : Text(
+                                      _isRegister ? 'Daftar Akun Baru' : 'Masuk ke Aplikasi',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14.5,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+
+                          // Divider Or
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Divider(
+                                  color: _cTobacco.withValues(alpha: 0.5),
+                                  thickness: 0.9,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12),
+                                child: Text(
+                                  'atau',
+                                  style: GoogleFonts.poppins(
+                                    color: _cWalnut.withValues(alpha: 0.7),
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Divider(
+                                  color: _cTobacco.withValues(alpha: 0.5),
+                                  thickness: 0.9,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 16),
 
-                        // Username Field
-                        TextField(
-                          controller: _u,
-                          decoration: InputDecoration(
-                            labelText: 'Username',
-                            hintText: 'Masukkan nama pengguna',
-                            prefixIcon: const Icon(Icons.person_outline, color: Colors.indigo),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            filled: true,
-                            fillColor: Colors.grey.shade50,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-
-                        // Password Field
-                        TextField(
-                          controller: _p,
-                          obscureText: _obscure,
-                          decoration: InputDecoration(
-                            labelText: 'Password',
-                            hintText: _isRegister ? 'Minimal 6 karakter' : 'Masukkan password',
-                            prefixIcon: const Icon(Icons.lock_outline, color: Colors.indigo),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscure ? Icons.visibility_off : Icons.visibility,
-                                color: Colors.grey.shade600,
-                              ),
-                              onPressed: () => setState(() => _obscure = !_obscure),
-                            ),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            filled: true,
-                            fillColor: Colors.grey.shade50,
-                          ),
-                        ),
-                        const SizedBox(height: 22),
-
-                        // Tombol Aksi Utama
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: Colors.indigo,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          // Tombol Masuk dengan Biometrik (Outlined Aged Style)
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: _loading ? null : _bio,
+                              child: Container(
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(color: _cTobacco, width: 1.1),
+                                  color: _cAgedPaper.withValues(alpha: 0.3),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.fingerprint,
+                                      size: 24,
+                                      color: _cWalnut,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      'Masuk dengan Biometrik',
+                                      style: GoogleFonts.poppins(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13.5,
+                                        color: _cWalnut,
+                                        letterSpacing: 0.2,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            onPressed: _loading ? null : _submit,
-                            child: _loading
-                                ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                  )
-                                : Text(
-                                    _isRegister ? 'Daftar Akun Baru' : 'Masuk ke Aplikasi',
-                                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                                  ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // Divider Or
-                Row(
-                  children: [
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        'ATAU',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.w600),
+                        ],
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey.shade300)),
                   ],
                 ),
-                const SizedBox(height: 20),
-
-                // Tombol Login Biometrik Modern
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: BorderSide(color: Colors.indigo.shade200),
-                  ),
-                  onPressed: _loading ? null : _bio,
-                  icon: const Icon(Icons.fingerprint, size: 24, color: Colors.indigo),
-                  label: const Text(
-                    'Masuk Cepat dengan Biometrik',
-                    style: TextStyle(fontWeight: FontWeight.w600, color: Colors.indigo),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

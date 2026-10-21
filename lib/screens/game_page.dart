@@ -5,6 +5,21 @@ import 'package:flutter/services.dart';
 import '../services/game_audio_service.dart';
 import 'books_page.dart';
 
+class _MazeBookItem {
+  final int id;
+  final int col;
+  final int row;
+  final String title;
+  bool isCollected;
+
+  _MazeBookItem({
+    required this.id,
+    required this.col,
+    required this.row,
+    required this.title,
+  }) : isCollected = false;
+}
+
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
 
@@ -15,16 +30,17 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   int _currentLevel = 0; // 0 = Level 1, 1 = Level 2, 2 = Level 3
   int _wallHits = 0;
-  bool _useDpad = false;
-  bool _isGameOver = false; // When all 3 levels are finished
+  bool _useDpad = true; // D-Pad aktif secara default
+  bool _isGameOver = false;
   String? _statusMessage;
   bool _isFlashingRed = false;
 
-  // Player position in grid units (column, row)
+  // Posisi pemain & riwayat jalur untuk membawa buku (collecting books train)
   double _playerCol = 1.5;
   double _playerRow = 1.5;
+  final List<Offset> _playerTrail = [const Offset(1.5, 1.5)];
 
-  // Level 3 Chaser & Jumpscare State
+  // Level 3: Monster Wikwok
   bool _hasStartedMoving = false;
   int _countdown = 5;
   Timer? _countdownTimer;
@@ -32,16 +48,29 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   double _chaserCol = 1.5;
   double _chaserRow = 1.5;
   bool _isChaserActive = false;
+
+  // Jumpscare Wikwok (2 Detik Saja) & Defeat State
   bool _isJumpscareActive = false;
+  bool _isDefeatActive = false;
+  int _jumpscareRemainingSeconds = 2;
+  Timer? _jumpscareTimer;
+
+  // Titik Koleksi Buku Pac-Man
+  late List<List<_MazeBookItem>> _allLevelBooks;
+  String? _lastCollectedBookTitle;
+  Timer? _collectedBannerTimer;
 
   late final AnimationController _pulseController;
   late final AnimationController _shakeController;
+  late final AnimationController _jawController;
+  late final AnimationController _jumpscareProgressController;
+  late final AnimationController _itemFloatController;
 
   static const int _cols = 11;
   static const int _rows = 15;
 
   static const List<List<String>> _levelMaps = [
-    // Level 1: "Lorong Fiksi & Komik" - Jalur S-Curve Lebar Ramah Pemula
+    // Level 1: "Lorong Fiksi & Komik" - Jalur S-Curve Lebar
     [
       '00000000000',
       '02111111110',
@@ -77,7 +106,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       '01111111330',
       '00000000000',
     ],
-    // Level 3: "Ruang Rahasia Arsip Buku Emas" - Jalur Sempit Menantang dengan Penjaga Misterius!
+    // Level 3: "Ruang Rahasia Arsip Buku Kuno" - Lorong Gelap Tempat Wikwok Berada
     [
       '00000000000',
       '02111100000',
@@ -103,9 +132,34 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     'Ruang Rahasia Arsip Buku Kuno',
   ];
 
+  void _initLevelBooks() {
+    _allLevelBooks = [
+      // Level 1: 3 buku koleksi
+      [
+        _MazeBookItem(id: 1, col: 5, row: 1, title: 'Islam Ala Prabowo'),
+        _MazeBookItem(id: 2, col: 5, row: 7, title: 'Filosofi Teras'),
+        _MazeBookItem(id: 3, col: 4, row: 13, title: 'Atomic Habits'),
+      ],
+      // Level 2: 3 buku koleksi
+      [
+        _MazeBookItem(id: 4, col: 6, row: 1, title: 'Bumi Manusia'),
+        _MazeBookItem(id: 5, col: 5, row: 7, title: 'Gadis Kretek'),
+        _MazeBookItem(id: 6, col: 4, row: 13, title: 'Laut Bercerita'),
+      ],
+      // Level 3: 3 buku koleksi
+      [
+        _MazeBookItem(id: 7, col: 3, row: 1, title: 'Kitab Arsip Emas'),
+        _MazeBookItem(id: 8, col: 6, row: 5, title: 'Ensiklopedia Kegelapan'),
+        _MazeBookItem(id: 9, col: 4, row: 9, title: 'Catatan Penjaga Malam'),
+      ],
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
+    _initLevelBooks();
+
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -113,8 +167,23 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     _shakeController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 70),
+      duration: const Duration(milliseconds: 60),
     );
+
+    _jawController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 80),
+    );
+
+    _jumpscareProgressController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2), // Jumpscare tepat 2 detik
+    );
+
+    _itemFloatController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
 
     _startLevelAudio();
     _resetToLevelStart();
@@ -123,15 +192,19 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _stopLevelTimers();
-    GameAudioService.stopBgm();
+    _jumpscareTimer?.cancel();
+    _collectedBannerTimer?.cancel();
+    GameAudioService.stopAll();
     _pulseController.dispose();
     _shakeController.dispose();
+    _jawController.dispose();
+    _jumpscareProgressController.dispose();
+    _itemFloatController.dispose();
     super.dispose();
   }
 
   void _startLevelAudio() {
-    // Lagu efek aktif hanya sampai Level 2! Pada Level 3 hening menegangkan.
-    if (_currentLevel < 2 && !_isGameOver) {
+    if (_currentLevel < 2 && !_isGameOver && !_isJumpscareActive && !_isDefeatActive) {
       GameAudioService.playBgm();
     } else {
       GameAudioService.stopBgm();
@@ -147,15 +220,26 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   void _resetToLevelStart() {
     _stopLevelTimers();
+    _jumpscareTimer?.cancel();
+    _collectedBannerTimer?.cancel();
+    _shakeController.stop();
+    _jawController.stop();
+    _jumpscareProgressController.stop();
+    GameAudioService.stopChase();
+
     setState(() {
+      _lastCollectedBookTitle = null;
       _playerCol = 1.5;
       _playerRow = 1.5;
+      _playerTrail.clear();
+      _playerTrail.add(const Offset(1.5, 1.5));
       _statusMessage = null;
       _isFlashingRed = false;
       _hasStartedMoving = false;
       _countdown = 5;
       _isChaserActive = false;
       _isJumpscareActive = false;
+      _isDefeatActive = false;
       _chaserCol = 1.5;
       _chaserRow = 1.5;
     });
@@ -184,18 +268,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   void _spawnChaser() {
     if (!mounted || _currentLevel != 2) return;
     HapticFeedback.heavyImpact();
+
+    // Suara Dikejar Wikwok: Tegang & Menyeramkan
+    GameAudioService.playChase();
+
     setState(() {
       _countdown = 0;
       _isChaserActive = true;
       _chaserCol = 1.5;
       _chaserRow = 1.5;
-      _statusMessage = '🚨 PENJAGA ARSIP BANGUN! LARI MENUJU BUKU EMAS!';
+      _statusMessage = 'PERINGATAN: WIKWOK BANGUN! LARI MENUJU RAK BUKU EMAS!';
     });
 
-    // Chaser mengejar setiap 360ms
     _chaserTimer?.cancel();
     _chaserTimer = Timer.periodic(const Duration(milliseconds: 360), (timer) {
-      if (!mounted || !_isChaserActive || _isGameOver || _isJumpscareActive) {
+      if (!mounted || !_isChaserActive || _isGameOver || _isJumpscareActive || _isDefeatActive) {
         timer.cancel();
         return;
       }
@@ -216,15 +303,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       _chaserRow = nextPos.$2;
     });
 
-    // Cek tabrakan antara chaser dan player
     final dist = sqrt(pow(_chaserCol - _playerCol, 2) + pow(_chaserRow - _playerRow, 2));
     if (dist < 0.65) {
-      _triggerJumpscare();
+      _triggerWikwokJumpscare();
     }
   }
 
   (double, double) _getNextChaserStep(int chaserR, int chaserC, int playerR, int playerC) {
-    // BFS pathfinding shortest route
     final queue = <(int, int)>[(playerR, playerC)];
     final visited = <(int, int)>{(playerR, playerC)};
     final parent = <(int, int), (int, int)>{};
@@ -252,14 +337,52 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     return (chaserC + 0.5, chaserR + 0.5);
   }
 
-  void _triggerJumpscare() {
+  // Jumpscare Wikwok 2 Detik
+  void _triggerWikwokJumpscare() {
     _stopLevelTimers();
+    GameAudioService.stopChase();
     GameAudioService.playJumpscare();
+
     _shakeController.repeat(reverse: true);
+    _jawController.repeat(reverse: true);
+    _jumpscareProgressController.forward(from: 0.0);
 
     setState(() {
       _isJumpscareActive = true;
+      _isDefeatActive = false;
       _isChaserActive = false;
+      _jumpscareRemainingSeconds = 2;
+    });
+
+    _jumpscareTimer?.cancel();
+    _jumpscareTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_jumpscareRemainingSeconds > 1) {
+        setState(() {
+          _jumpscareRemainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        _onJumpscareFinished();
+      }
+    });
+  }
+
+  void _onJumpscareFinished() {
+    _jumpscareTimer?.cancel();
+    _shakeController.stop();
+    _jawController.stop();
+    _jumpscareProgressController.stop();
+
+    GameAudioService.stopJumpscare();
+    GameAudioService.playLose();
+
+    setState(() {
+      _isJumpscareActive = false;
+      _isDefeatActive = true;
     });
   }
 
@@ -303,13 +426,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     setState(() {
       _wallHits++;
       _isFlashingRed = true;
-      _statusMessage = 'Aduh! Menabrak rak buku. Kembali ke titik awal.';
+      _statusMessage = 'Menabrak rak buku. Kembali ke titik awal.';
       _playerCol = 1.5;
       _playerRow = 1.5;
+      _playerTrail.clear();
+      _playerTrail.add(const Offset(1.5, 1.5));
     });
 
     if (_currentLevel == 2) {
       _stopLevelTimers();
+      GameAudioService.stopChase();
       _hasStartedMoving = false;
       _countdown = 5;
       _isChaserActive = false;
@@ -326,7 +452,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   void _onGoalReached() {
     _stopLevelTimers();
+    GameAudioService.stopChase();
     HapticFeedback.heavyImpact();
+
+    // Suara menang saat berhasil mencapai pintu keluar / rak buku emas
+    GameAudioService.playWin();
 
     if (_currentLevel < _levelMaps.length - 1) {
       showDialog(
@@ -340,8 +470,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Level ${_currentLevel + 1} Berhasil!',
+                  'Level ${_currentLevel + 1} Selesai',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -351,33 +483,33 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Anda berhasil melewati "${_levelNames[_currentLevel]}"!',
+                'Anda berhasil mencapai pintu keluar "${_levelNames[_currentLevel]}"!',
                 style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.cyan.shade50,
+                  color: Colors.amber.shade50,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.cyan.shade200),
+                  border: Border.all(color: Colors.amber.shade300),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      _currentLevel == 1 ? Icons.warning_rounded : Icons.directions_walk_rounded,
-                      color: _currentLevel == 1 ? Colors.orange.shade800 : Colors.cyan.shade800,
+                      _currentLevel == 1 ? Icons.warning_amber_rounded : Icons.door_front_door_outlined,
+                      color: _currentLevel == 1 ? Colors.red.shade800 : Colors.amber.shade800,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _currentLevel == 1
-                            ? 'PERINGATAN: Level 3 hening dan ada penjaga arsip yang mengejar!'
+                            ? 'PERINGATAN: Di Ruang Arsip Level 3, Wikwok akan terbangun dan mengejar Anda menuju Rak Buku Emas!'
                             : 'Tantangan berikutnya: ${_levelNames[_currentLevel + 1]}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: _currentLevel == 1 ? Colors.orange.shade900 : Colors.cyan.shade900,
+                          color: _currentLevel == 1 ? Colors.red.shade900 : Colors.amber.shade900,
                         ),
                       ),
                     ),
@@ -389,7 +521,8 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           actions: [
             FilledButton.icon(
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.indigo,
+                backgroundColor: const Color(0xFFD97706),
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () {
@@ -400,7 +533,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 });
               },
               icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-              label: const Text('Lanjut ke Lorong Berikutnya'),
+              label: const Text('Buka Pintu Berikutnya', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -413,8 +546,38 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     }
   }
 
+  void _checkCollectBooks(double col, double row) {
+    final currentBooks = _allLevelBooks[_currentLevel];
+    for (final book in currentBooks) {
+      if (!book.isCollected) {
+        final dist = sqrt(pow((book.col + 0.5) - col, 2) + pow((book.row + 0.5) - row, 2));
+        if (dist < 0.55) {
+          book.isCollected = true;
+          HapticFeedback.lightImpact();
+
+          // Suara Ting saat mengoleksi buku
+          GameAudioService.playTing();
+
+          setState(() {
+            _lastCollectedBookTitle = book.title;
+          });
+
+          _collectedBannerTimer?.cancel();
+          _collectedBannerTimer = Timer(const Duration(milliseconds: 2200), () {
+            if (mounted) {
+              setState(() {
+                _lastCollectedBookTitle = null;
+              });
+            }
+          });
+          break;
+        }
+      }
+    }
+  }
+
   void _movePlayer(double targetCol, double targetRow) {
-    if (_isGameOver || _isJumpscareActive) return;
+    if (_isGameOver || _isJumpscareActive || _isDefeatActive) return;
 
     if (_currentLevel == 2 && !_hasStartedMoving) {
       _startLevel3ChaserCountdown();
@@ -433,13 +596,22 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     setState(() {
       _playerCol = targetCol;
       _playerRow = targetRow;
+      if (_playerTrail.isEmpty ||
+          (_playerTrail.first.dx - targetCol).abs() > 0.04 ||
+          (_playerTrail.first.dy - targetRow).abs() > 0.04) {
+        _playerTrail.insert(0, Offset(targetCol, targetRow));
+        if (_playerTrail.length > 50) {
+          _playerTrail.removeLast();
+        }
+      }
     });
 
-    // Cek tabrakan dengan chaser jika sedang aktif
+    _checkCollectBooks(targetCol, targetRow);
+
     if (_isChaserActive) {
       final dist = sqrt(pow(_chaserCol - _playerCol, 2) + pow(_chaserRow - _playerRow, 2));
       if (dist < 0.65) {
-        _triggerJumpscare();
+        _triggerWikwokJumpscare();
         return;
       }
     }
@@ -450,7 +622,110 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _moveDpad(double dCol, double dRow) {
-    _movePlayer(_playerCol + dCol, _playerRow + dRow);
+    double targetCol = _playerCol + dCol;
+    double targetRow = _playerRow + dRow;
+
+    // Corner alignment halus: luruskan koordinat tegak lurus ke tengah lorong
+    // agar pemain tidak tersangkut di sudut belokan dinding labirin
+    if (dCol != 0 && dRow == 0) {
+      final centerRow = _playerRow.floor() + 0.5;
+      if (!_isWall(_playerCol, centerRow)) {
+        targetRow = centerRow;
+      }
+    } else if (dRow != 0 && dCol == 0) {
+      final centerCol = _playerCol.floor() + 0.5;
+      if (!_isWall(centerCol, _playerRow)) {
+        targetCol = centerCol;
+      }
+    }
+
+    if (!_isWall(targetCol, targetRow)) {
+      _movePlayer(targetCol, targetRow);
+    } else {
+      // Coba langkah mikro setengah jarak agar gerakan tetap responsif
+      final halfCol = _playerCol + (dCol * 0.5);
+      final halfRow = _playerRow + (dRow * 0.5);
+      if (!_isWall(halfCol, halfRow)) {
+        _movePlayer(halfCol, halfRow);
+      } else {
+        _onWallHit();
+      }
+    }
+  }
+
+  // Buku-buku yang telah diambil & dibawa oleh pemain sepanjang jalan menuju ending (Collecting Book Train)
+  List<Widget> _buildCarriedBooksTrail(double cellW, double cellH) {
+    final collected = _allLevelBooks[_currentLevel].where((b) => b.isCollected).toList();
+    if (collected.isEmpty) return const [];
+
+    final widgets = <Widget>[];
+
+    // Gradien warna sampul buku-buku yang dibawa
+    final bookGradients = [
+      const [Color(0xFFFBBF24), Color(0xFFD97706)], // Emas / Amber
+      const [Color(0xFF34D399), Color(0xFF059669)], // Zamrud / Emerald
+      const [Color(0xFFF87171), Color(0xFFDC2626)], // Merah Rubi
+    ];
+
+    for (int i = 0; i < collected.length; i++) {
+      // Posisi mengikuti jejak pemain (trailing train)
+      final trailIdx = (i + 1) * 3;
+      Offset pos;
+      if (trailIdx < _playerTrail.length) {
+        pos = _playerTrail[trailIdx];
+      } else if (_playerTrail.isNotEmpty) {
+        pos = _playerTrail.last;
+      } else {
+        pos = Offset(_playerCol, _playerRow);
+      }
+
+      final colors = bookGradients[i % bookGradients.length];
+
+      widgets.add(
+        Positioned(
+          left: (pos.dx * cellW) - (cellW * 0.28),
+          top: (pos.dy * cellH) - (cellH * 0.28),
+          child: AnimatedBuilder(
+            animation: _itemFloatController,
+            builder: (context, child) {
+              final floatY = sin((_itemFloatController.value * 2 * pi) + (i * 1.3)) * 2.5;
+              return Transform.translate(
+                offset: Offset(0, floatY),
+                child: child,
+              );
+            },
+            child: Container(
+              width: cellW * 0.56,
+              height: cellH * 0.56,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: colors,
+                ),
+                border: Border.all(color: Colors.white, width: 1.4),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.first.withValues(alpha: 0.65),
+                    blurRadius: 6,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.menu_book_rounded,
+                  size: cellW * 0.34,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    return widgets;
   }
 
   void _copyVoucher() {
@@ -462,7 +737,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           children: [
             Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
             SizedBox(width: 8),
-            Expanded(child: Text('Kode voucher "DISKON10" disalin!')),
+            Expanded(child: Text('Kode voucher "DISKON10" disalin! Gunakan saat sewa buku.')),
           ],
         ),
         backgroundColor: Colors.green.shade700,
@@ -472,89 +747,298 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildJumpscareOverlay() {
+  // Jumpscare Wikwok 2 Detik
+  Widget _buildWikwokJumpscareView() {
     return AnimatedBuilder(
-      animation: _shakeController,
+      animation: Listenable.merge([
+        _shakeController,
+        _jawController,
+        _jumpscareProgressController,
+      ]),
       builder: (context, child) {
-        final offset = (_shakeController.value - 0.5) * 16;
+        final shakeX = (_shakeController.value - 0.5) * 16;
+        final shakeY = (Random().nextDouble() - 0.5) * 14;
+        final scale = 1.0 + (_jumpscareProgressController.value * 1.5);
+
         return Transform.translate(
-          offset: Offset(offset, (Random().nextDouble() - 0.5) * 12),
-          child: child,
+          offset: Offset(shakeX, shakeY),
+          child: Container(
+            color: const Color(0xFF090B04),
+            width: double.infinity,
+            height: double.infinity,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _CrtScanlinesPainter(
+                      strobeColor: (_shakeController.value > 0.5)
+                          ? const Color(0x334D5E1F)
+                          : const Color(0x11000000),
+                    ),
+                  ),
+                ),
+
+                // Wajah Wikwok (Animatronik Kelinci Rusak Bergaya Springtrap)
+                Center(
+                  child: Transform.scale(
+                    scale: scale,
+                    child: SizedBox(
+                      width: 220,
+                      height: 220,
+                      child: CustomPaint(
+                        painter: _LargeWikwokJumpscarePainter(
+                          jawOpenProgress: _jawController.value,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Header Peringatan Bebas Emojis
+                Positioned(
+                  top: 24,
+                  left: 16,
+                  right: 16,
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF384517).withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFF84A333), width: 2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF5E7522).withValues(alpha: 0.6),
+                              blurRadius: 16,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  'WIKWOK MENYERANG ($_jumpscareRemainingSeconds detik)',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    letterSpacing: 1.1,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: SizedBox(
+                          width: 200,
+                          height: 5,
+                          child: LinearProgressIndicator(
+                            value: _jumpscareProgressController.value,
+                            backgroundColor: Colors.black,
+                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF84A333)),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                Positioned(
+                  bottom: 24,
+                  right: 20,
+                  child: TextButton.icon(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey.shade400,
+                      backgroundColor: Colors.black54,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    ),
+                    onPressed: _onJumpscareFinished,
+                    icon: const Icon(Icons.skip_next_rounded, size: 18),
+                    label: const Text('Lewati >>', style: TextStyle(fontSize: 12)),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
-      child: Container(
-        color: const Color(0xFF180202),
-        width: double.infinity,
-        height: double.infinity,
-        padding: const EdgeInsets.all(24),
+    );
+  }
+
+  // Halaman Kalah (Bebas Emojis, Desain Rapi & Bersih)
+  Widget _buildDefeatView() {
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Ikon Horor Penjaga Arsip
             Container(
-              padding: const EdgeInsets.all(28),
+              width: 96,
+              height: 96,
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.red.shade900.withValues(alpha: 0.4),
+                color: const Color(0xFF1B220B),
+                border: Border.all(color: const Color(0xFF6E882B), width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.redAccent.withValues(alpha: 0.6),
-                    blurRadius: 40,
-                    spreadRadius: 10,
+                    color: const Color(0xFF4C5E1E).withValues(alpha: 0.4),
+                    blurRadius: 24,
+                    spreadRadius: 4,
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.warning_amber_rounded,
-                size: 96,
-                color: Colors.redAccent,
+              child: CustomPaint(
+                painter: _WikwokPixelPainter(),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
             const Text(
-              'TERTANGKAP! 👻',
+              'KAMU TERTANGKAP',
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-                color: Colors.redAccent,
+                letterSpacing: 1.5,
+                color: Color(0xFFE2E8F0),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
+
             const Text(
-              'Penjaga Arsip Kegelapan Menemukanmu!',
+              'Wikwok Menemukanmu di Ruang Arsip',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Color(0xFF94A3B8),
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Jangan ragu-ragu di Level 3! Anda memiliki 5 detik sebelum penjaga bangun. Lari terus menuju Buku Emas!',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
-              textAlign: TextAlign.center,
+            const SizedBox(height: 14),
+
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: const Color(0xFF334155)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.lightbulb_outline_rounded, color: Colors.amber.shade400, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Strategi Menghadapi Wikwok',
+                        style: TextStyle(
+                          color: Colors.amber.shade300,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '1. Anda memiliki waktu 5 detik sebelum Wikwok bangun mengejar.\n'
+                    '2. Setelah Wikwok bangun, larilah secepat mungkin menuju Rak Buku Emas di pojok kanan bawah!\n'
+                    '3. Gunakan mode D-Pad jika kontrol sentuh terasa sulit di lorong sempit.',
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: Colors.grey.shade300,
+                      height: 1.45,
+                    ),
+                  ),
+                  const Divider(color: Color(0xFF334155), height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Lorong: ${_levelNames[2]}',
+                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Tabrakan: $_wallHits kali',
+                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        maxLines: 1,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 36),
+            const SizedBox(height: 24),
+
             SizedBox(
               width: double.infinity,
-              height: 50,
+              height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.red.shade700,
+                  backgroundColor: const Color(0xFF4C5E1E),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: _resetToLevelStart,
+                icon: const Icon(Icons.replay_rounded, size: 20),
+                label: const Text(
+                  'COBA KABUR LAGI DARI WIKWOK',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white70,
+                  side: const BorderSide(color: Color(0xFF475569)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () {
-                  _shakeController.stop();
-                  _resetToLevelStart();
+                  setState(() {
+                    _currentLevel = 0;
+                    _wallHits = 0;
+                    _initLevelBooks();
+                    _resetToLevelStart();
+                  });
                 },
-                icon: const Icon(Icons.replay_rounded, size: 22),
-                label: const Text(
-                  'COBA KABUR LAGI',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
-                ),
+                icon: const Icon(Icons.refresh_rounded, size: 18),
+                label: const Text('Ulangi Dari Level 1'),
               ),
+            ),
+            const SizedBox(height: 8),
+
+            TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: Colors.grey.shade400),
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BooksPage()),
+                );
+              },
+              icon: const Icon(Icons.arrow_back_rounded, size: 16),
+              label: const Text('Kembali ke Katalog Buku'),
             ),
           ],
         ),
@@ -590,7 +1074,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 20),
             const Text(
-              'SELAMAT! 🏆',
+              'SELAMAT',
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -600,11 +1084,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Anda Berhasil Menemukan Buku Emas!',
+              'Anda Berhasil Menemukan Rak Buku Emas',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Colors.indigo,
+                color: Color(0xFFD97706),
               ),
               textAlign: TextAlign.center,
             ),
@@ -612,7 +1096,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Luar biasa! Anda berhasil lolos dari kejaran penjaga arsip dan menyelesaikan 3 lorong labirin RentBook.',
+                'Lolos dari kejaran Wikwok dan menuntaskan 3 lorong labirin perpustakaan RentBook.',
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
@@ -661,7 +1145,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 3,
-                              color: Colors.indigo,
+                              color: Color(0xFFB45309),
                               fontFamily: 'monospace',
                             ),
                           ),
@@ -678,13 +1162,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        side: const BorderSide(color: Colors.indigo),
+                        side: const BorderSide(color: Color(0xFFD97706)),
                       ),
                       onPressed: _copyVoucher,
-                      icon: const Icon(Icons.copy_rounded, size: 16, color: Colors.indigo),
+                      icon: const Icon(Icons.copy_rounded, size: 16, color: Color(0xFFD97706)),
                       label: const Text(
                         'Salin Kode Voucher',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
                       ),
                     ),
                   ],
@@ -698,7 +1182,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: const Color(0xFFD97706),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () {
@@ -718,6 +1202,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   _currentLevel = 0;
                   _wallHits = 0;
                   _isGameOver = false;
+                  _initLevelBooks();
                   _resetToLevelStart();
                 });
               },
@@ -734,8 +1219,25 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (_isJumpscareActive) {
       return Scaffold(
+        backgroundColor: Colors.black,
         body: SafeArea(
-          child: _buildJumpscareOverlay(),
+          child: _buildWikwokJumpscareView(),
+        ),
+      );
+    }
+
+    if (_isDefeatActive) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF0F172A),
+        appBar: AppBar(
+          title: const Text('Misi Gagal', style: TextStyle(fontWeight: FontWeight.bold)),
+          elevation: 0,
+          backgroundColor: const Color(0xFF0F172A),
+          foregroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+        ),
+        body: SafeArea(
+          child: _buildDefeatView(),
         ),
       );
     }
@@ -753,15 +1255,25 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       );
     }
 
+    final Color pageBgColor = _currentLevel == 0
+        ? const Color(0xFF26170E) // Level 1: Perpustakaan kayu terang
+        : _currentLevel == 1
+            ? const Color(0xFF0C1424) // Level 2: Perpustakaan temaram malam
+            : const Color(0xFF0E0303); // Level 3: Arsip horor gelap & anxious
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0B1120),
+      backgroundColor: pageBgColor,
       appBar: AppBar(
-        title: const Text(
-          'Labirin Perpustakaan',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          _currentLevel == 0
+              ? 'Perpustakaan Terang (Level 1)'
+              : _currentLevel == 1
+                  ? 'Perpustakaan Temaram (Level 2)'
+                  : 'Ruang Arsip Gelap (Level 3)',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -776,32 +1288,32 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           children: [
             // Status Bar & Level Header
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              color: const Color(0xFF0F172A),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              color: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: _currentLevel == 2
-                          ? Colors.red.shade900.withValues(alpha: 0.6)
-                          : Colors.cyan.shade900.withValues(alpha: 0.6),
+                          ? const Color(0xFF384517).withValues(alpha: 0.6)
+                          : Colors.amber.shade900.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: _currentLevel == 2 ? Colors.redAccent : Colors.cyan.shade400,
+                        color: _currentLevel == 2 ? const Color(0xFF84A333) : Colors.amber.shade400,
                         width: 1.2,
                       ),
                     ),
                     child: Text(
                       'Level ${_currentLevel + 1}/3',
                       style: TextStyle(
-                        color: _currentLevel == 2 ? Colors.redAccent : const Color(0xFF00E5FF),
+                        color: _currentLevel == 2 ? const Color(0xFFA3C742) : const Color(0xFFFBBF24),
                         fontWeight: FontWeight.bold,
-                        fontSize: 12,
+                        fontSize: 11,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -811,17 +1323,17 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                            fontSize: 12,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           _currentLevel == 2 && _countdown > 0 && _hasStartedMoving
-                              ? '⚠️ Penjaga bangun: $_countdown detik!'
-                              : 'Menabrak Rak: $_wallHits kali',
+                              ? 'Wikwok bangun: $_countdown detik'
+                              : 'Tabrakan: $_wallHits | Koleksi: ${_allLevelBooks[_currentLevel].where((b) => b.isCollected).length}/${_allLevelBooks[_currentLevel].length}',
                           style: TextStyle(
-                            color: _currentLevel == 2 && _hasStartedMoving ? Colors.orangeAccent : Colors.grey.shade400,
+                            color: _currentLevel == 2 && _hasStartedMoving ? const Color(0xFFFACC15) : Colors.grey.shade400,
                             fontSize: 11,
                             fontWeight: _currentLevel == 2 && _hasStartedMoving ? FontWeight.bold : FontWeight.normal,
                           ),
@@ -833,18 +1345,18 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   ),
                   const SizedBox(width: 6),
                   ActionChip(
-                    padding: const EdgeInsets.all(0),
+                    padding: EdgeInsets.zero,
                     visualDensity: VisualDensity.compact,
-                    backgroundColor: _useDpad ? Colors.indigo.shade800 : const Color(0xFF1E293B),
-                    side: BorderSide(color: _useDpad ? Colors.indigo.shade400 : Colors.grey.shade700),
+                    backgroundColor: _useDpad ? Colors.amber.shade800 : const Color(0xFF1E293B),
+                    side: BorderSide(color: _useDpad ? Colors.amber.shade400 : Colors.grey.shade700),
                     avatar: Icon(
                       _useDpad ? Icons.gamepad_rounded : Icons.touch_app_rounded,
-                      size: 16,
+                      size: 15,
                       color: Colors.white,
                     ),
                     label: Text(
                       _useDpad ? 'D-Pad' : 'Sentuh',
-                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontSize: 10.5, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () => setState(() => _useDpad = !_useDpad),
                   ),
@@ -856,7 +1368,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                color: _isChaserActive ? Colors.red.shade900 : Colors.red.shade800,
+                color: _isChaserActive ? const Color(0xFF4C5E1E) : Colors.red.shade800,
                 child: Text(
                   _statusMessage!,
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
@@ -866,11 +1378,118 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 ),
               ),
 
-            // Papan Labirin
+            // Banner Notifikasi Titik Koleksi Pac-Man (Besar, Jelas, & di Bagian Atas Labirin - Sentuh untuk Tutup Cepat)
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 250),
+              child: _lastCollectedBookTitle == null
+                  ? const SizedBox.shrink()
+                  : GestureDetector(
+                      key: ValueKey(_lastCollectedBookTitle),
+                      onTap: () {
+                        _collectedBannerTimer?.cancel();
+                        setState(() => _lastCollectedBookTitle = null);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFB45309), Color(0xFFD97706), Color(0xFF78350F)],
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFFDE047), width: 1.8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.amber.withValues(alpha: 0.5),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(7),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: const Color(0xFFFDE047), width: 1.4),
+                              ),
+                              child: const Icon(
+                                Icons.auto_stories_rounded,
+                                color: Color(0xFFFEF08A),
+                                size: 24,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          borderRadius: BorderRadius.circular(5),
+                                        ),
+                                        child: const Text(
+                                          '+1 BUKU BERHASIL DIKOLEKSI!',
+                                          style: TextStyle(
+                                            color: Color(0xFFFEF08A),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w900,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    '"$_lastCollectedBookTitle"',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF15803D),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: const Color(0xFF86EFAC)),
+                              ),
+                              child: const Text(
+                                '+POIN',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+            ),
+
+            // Papan Labirin Pixel Perpustakaan Asli
             Expanded(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   child: AspectRatio(
                     aspectRatio: _cols / _rows,
                     child: LayoutBuilder(
@@ -896,20 +1515,32 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
-                              color: _isFlashingRed ? const Color(0xFF450A0A) : const Color(0xFF0F172A),
+                              color: _isFlashingRed
+                                  ? const Color(0xFF450A0A)
+                                  : (_currentLevel == 0
+                                      ? const Color(0xFF2A190F)
+                                      : _currentLevel == 1
+                                          ? const Color(0xFF0F172A)
+                                          : const Color(0xFF120303)),
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: _isFlashingRed
                                     ? Colors.redAccent
                                     : (_currentLevel == 2
-                                        ? Colors.redAccent.withValues(alpha: 0.6)
-                                        : const Color(0xFF00E5FF).withValues(alpha: 0.5)),
+                                        ? const Color(0xFF84A333)
+                                        : _currentLevel == 1
+                                            ? Colors.cyan.shade400.withValues(alpha: 0.6)
+                                            : Colors.amber.shade400.withValues(alpha: 0.6)),
                                 width: 2,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: (_currentLevel == 2 ? Colors.redAccent : const Color(0xFF00E5FF))
-                                      .withValues(alpha: 0.15),
+                                  color: (_currentLevel == 2
+                                          ? const Color(0xFF6E882B)
+                                          : _currentLevel == 1
+                                              ? Colors.cyanAccent
+                                              : Colors.amberAccent)
+                                      .withValues(alpha: 0.2),
                                   blurRadius: 16,
                                   spreadRadius: 2,
                                 ),
@@ -919,71 +1550,89 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                               borderRadius: BorderRadius.circular(14),
                               child: Stack(
                                 children: [
+                                  // Kanvas Perpustakaan Pixel (Lantai Parket Kayu, Meja Lampu Hijau, Pintu/Rak Buku)
                                   CustomPaint(
                                     size: Size(constraints.maxWidth, constraints.maxHeight),
-                                    painter: _MazePainter(
+                                    painter: _PixelLibraryMazePainter(
                                       gridStr: _levelMaps[_currentLevel],
                                       isFlashing: _isFlashingRed,
-                                      isLevel3: _currentLevel == 2,
+                                      level: _currentLevel,
                                     ),
                                   ),
 
-                                  // Chaser Ghost (Hanya aktif di Level 3 setelah 5 detik)
+                                  // Titik Koleksi Buku Pac-Man
+                                  ..._allLevelBooks[_currentLevel]
+                                      .where((b) => !b.isCollected)
+                                      .map((book) {
+                                    return Positioned(
+                                      left: (book.col * cellW) + (cellW * 0.15),
+                                      top: (book.row * cellH) + (cellH * 0.15),
+                                      child: AnimatedBuilder(
+                                        animation: _itemFloatController,
+                                        builder: (context, child) {
+                                          final floatY = sin(_itemFloatController.value * pi) * 2.5;
+                                          return Transform.translate(
+                                            offset: Offset(0, floatY),
+                                            child: child,
+                                          );
+                                        },
+                                        child: Container(
+                                          width: cellW * 0.7,
+                                          height: cellH * 0.7,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.amber.shade400.withValues(alpha: 0.25),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.amber.withValues(alpha: 0.6),
+                                                blurRadius: 6,
+                                                spreadRadius: 1,
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.menu_book_rounded,
+                                              size: cellW * 0.52,
+                                              color: const Color(0xFFFEF08A),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+
+                                  // Monster Wikwok di Level 3 (Kelinci Animatronik Rusak Springtrap)
                                   if (_isChaserActive)
                                     Positioned(
                                       left: (_chaserCol * cellW) - (cellW * 0.45),
                                       top: (_chaserRow * cellH) - (cellH * 0.45),
-                                      child: Container(
-                                        width: cellW * 0.9,
-                                        height: cellH * 0.9,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.redAccent.withValues(alpha: 0.85),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.red.withValues(alpha: 0.9),
-                                              blurRadius: 12,
-                                              spreadRadius: 3,
-                                            ),
-                                          ],
-                                        ),
-                                        child: const Center(
-                                          child: Icon(
-                                            Icons.warning_amber_rounded,
-                                            size: 15,
-                                            color: Colors.white,
-                                          ),
-                                        ),
+                                      child: _WikwokMazeIcon(
+                                        size: cellW * 1.05,
                                       ),
                                     ),
 
-                                  // Player Book Icon (MURNI ICON BUKU TANPA BULATAN!)
+                                  // Buku-buku yang telah diambil & dibawa oleh pemain sepanjang jalan menuju ending
+                                  ..._buildCarriedBooksTrail(cellW, cellH),
+
+                                  // Pemain: Karakter Orang Membawa Buku-buku Koleksi
                                   Positioned(
                                     left: (_playerCol * cellW) - (cellW * 0.45),
                                     top: (_playerRow * cellH) - (cellH * 0.45),
                                     child: AnimatedBuilder(
                                       animation: _pulseController,
                                       builder: (context, child) {
-                                        final scale = 1.0 + (_pulseController.value * 0.2);
+                                        final scale = 1.0 + (_pulseController.value * 0.12);
                                         return Transform.scale(
                                           scale: scale,
                                           child: child,
                                         );
                                       },
-                                      child: Icon(
-                                        Icons.auto_stories_rounded,
-                                        size: cellW * 0.9,
-                                        color: const Color(0xFF38BDF8),
-                                        shadows: [
-                                          Shadow(
-                                            color: const Color(0xFF00E5FF).withValues(alpha: 0.9),
-                                            blurRadius: 12,
-                                          ),
-                                          const Shadow(
-                                            color: Colors.white,
-                                            blurRadius: 4,
-                                          ),
-                                        ],
+                                      child: _PersonPlayerIcon(
+                                        size: cellW * 0.95,
+                                        carriedBooksCount: _allLevelBooks[_currentLevel]
+                                            .where((b) => b.isCollected)
+                                            .length,
                                       ),
                                     ),
                                   ),
@@ -999,11 +1648,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               ),
             ),
 
-            // Kontrol D-Pad Tekan Lama (Continuous Hold to Move)
+
+            // Kontrol D-Pad / Panduan Bawah
             if (_useDpad)
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-                color: const Color(0xFF0F172A),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                color: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1019,7 +1669,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           icon: Icons.keyboard_arrow_up_rounded,
                           onStep: () => _moveDpad(0, -0.35),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         _HoldDpadButton(
                           icon: Icons.keyboard_arrow_down_rounded,
                           onStep: () => _moveDpad(0, 0.35),
@@ -1036,20 +1686,20 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               )
             else
               Padding(
-                padding: const EdgeInsets.only(bottom: 10, left: 16, right: 16),
+                padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.touch_app_rounded, color: Colors.cyan.shade300, size: 16),
-                    const SizedBox(width: 8),
+                    Icon(Icons.touch_app_rounded, color: Colors.amber.shade300, size: 15),
+                    const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         _currentLevel == 2
-                            ? 'Lari dari kejaran penjaga arsip menuju BUKU EMAS!'
-                            : 'Geser jari menelusuri jalur biru sampai BUKU EMAS!',
+                            ? 'Lari dari kejaran Wikwok menuju RAK BUKU EMAS!'
+                            : 'Koleksi buku-buku di lorong dan bawa menuju PINTU KELUAR!',
                         style: TextStyle(
                           fontSize: 11,
-                          color: _currentLevel == 2 ? Colors.orange.shade200 : Colors.cyan.shade200,
+                          color: _currentLevel == 2 ? const Color(0xFFFDE047) : Colors.amber.shade200,
                           fontWeight: FontWeight.w500,
                         ),
                         textAlign: TextAlign.center,
@@ -1067,7 +1717,301 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 }
 
-// Tombol D-Pad yang mendukung Tekan Sekali ATAU Tekan Lama (Hold to Move continuously)
+// Icon Player: Karakter Orang yang Mengumpulkan dan Membawa Buku-buku Labirin
+class _PersonPlayerIcon extends StatelessWidget {
+  final double size;
+  final int carriedBooksCount;
+
+  const _PersonPlayerIcon({required this.size, required this.carriedBooksCount});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // Badan Karakter Orang
+          Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const RadialGradient(
+                colors: [
+                  Color(0xFFFEF08A),
+                  Color(0xFFF59E0B),
+                  Color(0xFFB45309),
+                ],
+              ),
+              border: Border.all(color: Colors.white, width: 1.6),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.85),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                ),
+                const BoxShadow(
+                  color: Colors.white,
+                  blurRadius: 3,
+                  spreadRadius: 0.5,
+                ),
+              ],
+            ),
+            child: Center(
+              child: Icon(
+                Icons.person_rounded,
+                size: size * 0.72,
+                color: const Color(0xFF302622),
+              ),
+            ),
+          ),
+
+          // Indikator Buku-buku yang Sedang Dibawa oleh Karakter Orang
+          if (carriedBooksCount > 0)
+            Positioned(
+              right: -3,
+              bottom: -2,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF67343A),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white, width: 1.2),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black45,
+                      blurRadius: 4,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.menu_book_rounded,
+                      size: 10,
+                      color: Color(0xFFFEF08A),
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      '$carriedBooksCount',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// Monster Wikwok di Labirin (Sprite Kelinci Animatronik Rusak Springtrap)
+class _WikwokMazeIcon extends StatelessWidget {
+  final double size;
+
+  const _WikwokMazeIcon({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF84A333).withValues(alpha: 0.9),
+            blurRadius: 12,
+            spreadRadius: 3,
+          ),
+        ],
+      ),
+      child: CustomPaint(
+        painter: _WikwokPixelPainter(),
+      ),
+    );
+  }
+}
+
+// Sprite Pixel Art Wikwok: Kelinci Animatronik Hijau Zaitun Busuk (Springtrap style)
+// Telinga kanan putus dengan kawat mencuat, mata melotot pucat, seringai gigi kotak animatronik
+class _WikwokPixelPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 11;
+    const int rows = 11;
+    final pixelW = size.width / cols;
+    final pixelH = size.height / rows;
+
+    // 0: transparan
+    // 1: hijau zaitun lumut busuk (badan kelinci)
+    // 2: telinga kanan yang patah
+    // 3: kawat mencuat abu-abu/merah
+    // 4: rongga mata hitam
+    // 5: pupil perak/putih melotot dingin
+    // 6: moncong / rongga mulut gelap
+    // 7: taring / gigi kotak animatronik bernoda
+    const List<List<int>> matrix = [
+      [0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0], // Telinga kiri panjang
+      [0, 1, 1, 0, 0, 0, 0, 3, 0, 0, 0], // Kawat telinga kanan mencuat
+      [0, 1, 1, 0, 0, 0, 0, 2, 2, 0, 0], // Pangkal telinga kanan patah
+      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], // Kepala atas
+      [1, 1, 4, 4, 1, 1, 1, 4, 4, 1, 1], // Rongga mata hitam
+      [1, 1, 5, 4, 1, 1, 1, 5, 4, 1, 1], // Bola mata pucat melotot
+      [1, 1, 1, 1, 6, 6, 1, 1, 1, 1, 1], // Hidung kelinci
+      [0, 1, 7, 1, 7, 1, 7, 1, 7, 1, 0], // Gigi atas
+      [0, 6, 0, 0, 0, 0, 0, 0, 0, 6, 0], // Mulut menganga
+      [0, 1, 7, 1, 7, 1, 7, 1, 7, 1, 0], // Gigi bawah
+      [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0], // Dagu
+    ];
+
+    final Map<int, Paint> palette = {
+      1: Paint()..color = const Color(0xFF5C6F2B), // Hijau zaitun busuk Springtrap
+      2: Paint()..color = const Color(0xFF3E4D1A), // Pangkal telinga patah gelap
+      3: Paint()..color = const Color(0xFF94A3B8), // Kawat logam mencuat
+      4: Paint()..color = const Color(0xFF0F120A), // Rongga mata hitam
+      5: Paint()..color = const Color(0xFFF1F5F9), // Pupil perak pucat
+      6: Paint()..color = const Color(0xFF0D1007), // Moncong / rongga mulut
+      7: Paint()..color = const Color(0xFFFEF08A), // Gigi bernoda kuning
+    };
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final val = matrix[r][c];
+        if (val != 0 && palette.containsKey(val)) {
+          final rect = Rect.fromLTWH(c * pixelW, r * pixelH, pixelW + 0.4, pixelH + 0.4);
+          canvas.drawRect(rect, palette[val]!);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+// Jumpscare Wikwok Besar (Rahang Animatronik Menganga Cepat)
+class _LargeWikwokJumpscarePainter extends CustomPainter {
+  final double jawOpenProgress;
+
+  _LargeWikwokJumpscarePainter({required this.jawOpenProgress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 15;
+    const int rows = 15;
+    final pixelW = size.width / cols;
+    final pixelH = size.height / rows;
+
+    final suitPaint = Paint()..color = const Color(0xFF536329);
+    final darkSuit = Paint()..color = const Color(0xFF2E3814);
+    final wirePaint = Paint()..color = const Color(0xFF94A3B8);
+    final eyeVoid = Paint()..color = const Color(0xFF0B0E07);
+    final pupilPaint = Paint()..color = const Color(0xFFF8FAFC);
+    final teethPaint = Paint()..color = const Color(0xFFFEF08A);
+    final mouthVoid = Paint()..color = Colors.black;
+
+    // Telinga Kiri Utuh
+    canvas.drawRect(Rect.fromLTWH(2 * pixelW, 0, 2.5 * pixelW, 3.5 * pixelH), suitPaint);
+    canvas.drawRect(Rect.fromLTWH(2.5 * pixelW, 0.5 * pixelH, 1.5 * pixelW, 2.5 * pixelH), darkSuit);
+
+    // Telinga Kanan Buntung dengan Kawat Logam Mencuat
+    canvas.drawRect(Rect.fromLTWH(10 * pixelW, 2 * pixelH, 2.5 * pixelW, 1.5 * pixelH), suitPaint);
+    canvas.drawRect(Rect.fromLTWH(11 * pixelW, 0.5 * pixelH, 0.6 * pixelW, 1.5 * pixelH), wirePaint); // Kawat baja
+    canvas.drawRect(Rect.fromLTWH(12 * pixelW, 1.0 * pixelH, 0.5 * pixelW, 1.0 * pixelH), Paint()..color = Colors.red);
+
+    // Batok Kepala Kelinci Animatronik
+    canvas.drawRect(Rect.fromLTWH(1 * pixelW, 3 * pixelH, 13 * pixelW, 4.5 * pixelH), suitPaint);
+
+    // Lubang-lubang pembusukan di kostum
+    canvas.drawRect(Rect.fromLTWH(2 * pixelW, 3.5 * pixelH, 1.5 * pixelW, 1.5 * pixelH), darkSuit);
+    canvas.drawRect(Rect.fromLTWH(11 * pixelW, 4 * pixelH, 1.2 * pixelW, 1.2 * pixelH), darkSuit);
+
+    // Rongga Mata Hitam Lebar
+    canvas.drawRect(Rect.fromLTWH(2 * pixelW, 4.5 * pixelH, 4 * pixelW, 3 * pixelH), eyeVoid);
+    canvas.drawRect(Rect.fromLTWH(9 * pixelW, 4.5 * pixelH, 4 * pixelW, 3 * pixelH), eyeVoid);
+
+    // Bola Mata Melotot Dingin
+    canvas.drawRect(Rect.fromLTWH(3.2 * pixelW, 5.2 * pixelH, 1.8 * pixelW, 1.8 * pixelH), pupilPaint);
+    canvas.drawRect(Rect.fromLTWH(10.2 * pixelW, 5.2 * pixelH, 1.8 * pixelW, 1.8 * pixelH), pupilPaint);
+    // Titik pupil hitam di tengah
+    canvas.drawRect(Rect.fromLTWH(4.0 * pixelW, 6.0 * pixelH, 0.6 * pixelW, 0.6 * pixelH), eyeVoid);
+    canvas.drawRect(Rect.fromLTWH(11.0 * pixelW, 6.0 * pixelH, 0.6 * pixelW, 0.6 * pixelH), eyeVoid);
+
+    // Hidung Hitam Kelinci
+    canvas.drawRect(Rect.fromLTWH(6.5 * pixelW, 6.5 * pixelH, 2 * pixelW, 1.2 * pixelH), eyeVoid);
+
+    // Deretan Gigi Atas Kotak Bernoda
+    for (int i = 2; i <= 12; i += 2) {
+      canvas.drawRect(Rect.fromLTWH(i * pixelW, 7.8 * pixelH, 1.3 * pixelW, 1.3 * pixelH), teethPaint);
+    }
+
+    // Rongga Mulut Menganga Dinamis
+    final jawDrop = jawOpenProgress * (pixelH * 2.4);
+    canvas.drawRect(
+      Rect.fromLTWH(2 * pixelW, 8.8 * pixelH, 11 * pixelW, 2.5 * pixelH + jawDrop),
+      mouthVoid,
+    );
+
+    // Rahang Bawah Wikwok yang Berderak
+    final lowerJawY = 9.8 * pixelH + jawDrop;
+
+    // Gigi Bawah
+    for (int i = 2; i <= 12; i += 2) {
+      canvas.drawRect(
+        Rect.fromLTWH(i * pixelW, lowerJawY - (0.9 * pixelH), 1.3 * pixelW, 1.3 * pixelH),
+        teethPaint,
+      );
+    }
+
+    // Dagu
+    canvas.drawRect(
+      Rect.fromLTWH(2 * pixelW, lowerJawY, 11 * pixelW, 2.5 * pixelH),
+      suitPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _LargeWikwokJumpscarePainter oldDelegate) =>
+      oldDelegate.jawOpenProgress != jawOpenProgress;
+}
+
+// CRT Scanlines
+class _CrtScanlinesPainter extends CustomPainter {
+  final Color strobeColor;
+
+  _CrtScanlinesPainter({required this.strobeColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = const Color(0x22000000)
+      ..strokeWidth = 1.0;
+
+    for (double y = 0; y < size.height; y += 3.5) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
+    }
+
+    final strobePaint = Paint()..color = strobeColor;
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), strobePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CrtScanlinesPainter oldDelegate) =>
+      oldDelegate.strobeColor != strobeColor;
+}
+
+// Tombol D-Pad
 class _HoldDpadButton extends StatefulWidget {
   final IconData icon;
   final VoidCallback onStep;
@@ -1107,25 +2051,26 @@ class _HoldDpadButtonState extends State<_HoldDpadButton> {
       onTapUp: (_) => _stopHolding(),
       onTapCancel: () => _stopHolding(),
       child: Container(
-        width: 48,
-        height: 48,
+        width: 46,
+        height: 46,
         decoration: BoxDecoration(
           color: const Color(0xFF1E293B),
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xFF334155), width: 1.5),
         ),
-        child: Icon(widget.icon, color: const Color(0xFF00E5FF), size: 28),
+        child: Icon(widget.icon, color: const Color(0xFFFBBF24), size: 26),
       ),
     );
   }
 }
 
-class _MazePainter extends CustomPainter {
+// Painter Perpustakaan Pixel Sejati (Desain Lantai Parket Kayu, Meja Lampu Hijau, Pintu/Rak Buku Emas)
+class _PixelLibraryMazePainter extends CustomPainter {
   final List<String> gridStr;
   final bool isFlashing;
-  final bool isLevel3;
+  final int level;
 
-  _MazePainter({required this.gridStr, required this.isFlashing, required this.isLevel3});
+  _PixelLibraryMazePainter({required this.gridStr, required this.isFlashing, required this.level});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1134,26 +2079,40 @@ class _MazePainter extends CustomPainter {
     final cellW = size.width / cols;
     final cellH = size.height / rows;
 
-    final wallPaint = Paint()
-      ..color = isFlashing ? const Color(0xFF7F1D1D) : const Color(0xFF0F172A)
-      ..style = PaintingStyle.fill;
+    // Palet Kayu Rak Perpustakaan Pixel
+    final Color woodShelfBg = isFlashing
+        ? const Color(0xFF7F1D1D)
+        : (level == 0
+            ? const Color(0xFF2E1508) // Level 1: Rak kayu oak tua pekat
+            : level == 1
+                ? const Color(0xFF0F172A) // Level 2: Rak mahogani midnight gelap
+                : const Color(0xFF0C0507)); // Level 3: Rak tua terkutuk hitam pekat
 
-    final wallDetailPaint = Paint()
-      ..color = const Color(0xFF1E293B)
-      ..style = PaintingStyle.stroke
+    // Warna Lorong Jalan (Sangat kontras, tidak nyatu dengan background map!)
+    final Color pathColor = level == 0
+        ? const Color(0xFFEBD8B8) // Level 1: Parket kayu krem terang benderang
+        : level == 1
+            ? const Color(0xFF64748B) // Level 2: Ubin batu abu-abu kebiruan terang jelas
+            : const Color(0xFF5A4452); // Level 3: Jalur lantai arsip bertekstur jelas terlihat
+
+    final shelfPaint = Paint()..color = woodShelfBg;
+    final pathPaint = Paint()..color = pathColor;
+
+    final plankLinePaint = Paint()
+      ..color = (level == 0
+          ? const Color(0xFF1B0B04)
+          : level == 1
+              ? const Color(0xFF020617)
+              : const Color(0xFF260505))
       ..strokeWidth = 1.0;
 
-    final pathPaint = Paint()
-      ..color = isLevel3 ? const Color(0xFF06B6D4) : const Color(0xFF00E5FF)
-      ..style = PaintingStyle.fill;
-
-    final startPaint = Paint()
-      ..color = const Color(0xFFEF4444)
-      ..style = PaintingStyle.fill;
-
-    final goalPaint = Paint()
-      ..color = const Color(0xFFF59E0B)
-      ..style = PaintingStyle.fill;
+    final bookSpinePaints = [
+      Paint()..color = const Color(0xFFDC2626), // Merah
+      Paint()..color = const Color(0xFF16A34A), // Hijau
+      Paint()..color = const Color(0xFF2563EB), // Biru
+      Paint()..color = const Color(0xFFD97706), // Emas
+      Paint()..color = const Color(0xFF9333EA), // Ungu
+    ];
 
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
@@ -1161,14 +2120,181 @@ class _MazePainter extends CustomPainter {
         final rect = Rect.fromLTWH(c * cellW, r * cellH, cellW + 0.5, cellH + 0.5);
 
         if (cell == '0') {
-          canvas.drawRect(rect, wallPaint);
-          canvas.drawRect(rect, wallDetailPaint);
+          // --- RAK BUKU PERPUSTAKAAN PIXEL ---
+          canvas.drawRect(rect, shelfPaint);
+
+          // Papan pembatas rak kayu
+          canvas.drawLine(
+            Offset(c * cellW, (r + 0.5) * cellH),
+            Offset((c + 1) * cellW, (r + 0.5) * cellH),
+            plankLinePaint,
+          );
+
+          if (level == 0) {
+            // Level 1: Buku tersusun rapi berjajar penuh warna
+            final p1 = bookSpinePaints[(r * 2 + c) % bookSpinePaints.length];
+            final p2 = bookSpinePaints[(r * 2 + c + 1) % bookSpinePaints.length];
+            final p3 = bookSpinePaints[(r * 2 + c + 2) % bookSpinePaints.length];
+            canvas.drawRect(Rect.fromLTWH(c * cellW + 2, r * cellH + 2, cellW * 0.25, cellH * 0.4), p1);
+            canvas.drawRect(Rect.fromLTWH(c * cellW + cellW * 0.35, r * cellH + 2, cellW * 0.25, cellH * 0.38), p2);
+            canvas.drawRect(Rect.fromLTWH(c * cellW + cellW * 0.68, r * cellH + 2, cellW * 0.25, cellH * 0.42), p3);
+
+            // Rak baris bawah
+            canvas.drawRect(Rect.fromLTWH(c * cellW + 3, (r + 0.5) * cellH + 2, cellW * 0.3, cellH * 0.4), p2);
+            canvas.drawRect(Rect.fromLTWH(c * cellW + cellW * 0.5, (r + 0.5) * cellH + 2, cellW * 0.35, cellH * 0.38), p1);
+          } else if (level == 1) {
+            // Level 2: Suasana temaram malam, bayangan gelap
+            final p = bookSpinePaints[(r + c) % bookSpinePaints.length];
+            canvas.drawRect(Rect.fromLTWH(c * cellW + 3, r * cellH + 3, cellW * 0.3, cellH * 0.38), p);
+          } else {
+            // Level 3: Iblis-iblis Pixel Latar Belakang (Mengintai di Rak Gelap, Tapi Tidak Mengejar!)
+            final isDemonCell = (r == 2 && c == 2) ||
+                (r == 2 && c == 8) ||
+                (r == 4 && c == 4) ||
+                (r == 6 && c == 6) ||
+                (r == 8 && c == 4) ||
+                (r == 10 && c == 5) ||
+                (r == 12 && c == 3);
+
+            if (isDemonCell) {
+              int demonId = 1;
+              if (r == 2 && c == 2) {
+                demonId = 1;
+              } else if (r == 2 && c == 8) {
+                demonId = 2;
+              } else if (r == 4 && c == 4) {
+                demonId = 3;
+              } else if (r == 6 && c == 6) {
+                demonId = 4;
+              } else if (r == 8 && c == 4) {
+                demonId = 5;
+              } else if (r == 10 && c == 5) {
+                demonId = 6;
+              } else if (r == 12 && c == 3) {
+                demonId = 7;
+              }
+
+              _drawBackgroundDemon(canvas, demonId, c * cellW, r * cellH, cellW, cellH);
+            } else {
+              // Rak tua rusak berantakan dengan goresan cakar
+              final decayedBook = Paint()..color = const Color(0xFF4A1010);
+              canvas.drawRect(Rect.fromLTWH(c * cellW + 4, r * cellH + 3, cellW * 0.25, cellH * 0.35), decayedBook);
+              // Goresan cakar retak
+              canvas.drawLine(
+                Offset(c * cellW + 3, r * cellH + 2),
+                Offset(c * cellW + cellW * 0.8, r * cellH + cellH * 0.8),
+                Paint()..color = const Color(0xFF380808)..strokeWidth = 1.2,
+              );
+            }
+          }
         } else if (cell == '1') {
+          // --- LORONG JALAN PERPUSTAKAAN ---
           canvas.drawRect(rect, pathPaint);
+
+          if (level == 0) {
+            // Level 1: Tekstur ubin parket kayu berselang-seling terang
+            if ((r + c) % 2 == 0) {
+              canvas.drawRect(
+                Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+                Paint()..color = const Color(0xFFDFC6A0),
+              );
+            }
+            // Garis batas ubin parket yang jelas
+            canvas.drawRect(
+              rect,
+              Paint()
+                ..color = const Color(0xFFB59367)
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 0.8,
+            );
+          } else if (level == 1) {
+            // Level 2: Ubin batu slate terang & jelas
+            if ((r + c) % 2 == 0) {
+              canvas.drawRect(
+                Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+                Paint()..color = const Color(0xFF536277),
+              );
+            }
+            canvas.drawRect(
+              rect,
+              Paint()
+                ..color = const Color(0xFF475569)
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 0.8,
+            );
+          } else {
+            // Level 3: Arsip horor anxious berantakan! Jalur lantai bertekstur jelas terlihat
+            if ((r + c) % 2 == 0) {
+              canvas.drawRect(
+                Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+                Paint()..color = const Color(0xFF685161),
+              );
+            }
+            canvas.drawRect(
+              rect,
+              Paint()
+                ..color = const Color(0xFF836278)
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 0.8,
+            );
+          }
         } else if (cell == '2') {
-          canvas.drawRect(rect, startPaint);
+          // --- TITIK AWAL (START) ---
+          canvas.drawRect(rect, Paint()..color = const Color(0xFFB91C1C));
         } else if (cell == '3') {
-          canvas.drawRect(rect, goalPaint);
+          // --- TITIK AKHIR (END POINT) ---
+          if (level < 2) {
+            // Level 1 & Level 2: END POINT ADALAH PINTU KELUAR (DOOR)!
+            // Kusen Pintu
+            canvas.drawRect(rect, Paint()..color = const Color(0xFF1E293B));
+            // Daun Pintu Kayu
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + 2, r * cellH + 2, cellW - 4, cellH - 4),
+              Paint()..color = const Color(0xFF6B4226),
+            );
+            // Panel Pintu
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + 4, r * cellH + 4, (cellW - 8) * 0.45, (cellH - 8) * 0.4),
+              Paint()..color = const Color(0xFF4A2E1B),
+            );
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + cellW * 0.52, r * cellH + 4, (cellW - 8) * 0.45, (cellH - 8) * 0.4),
+              Paint()..color = const Color(0xFF4A2E1B),
+            );
+            // Gagang Pintu Kuningan
+            canvas.drawCircle(
+              Offset(c * cellW + cellW * 0.25, r * cellH + cellH * 0.55),
+              cellW * 0.08,
+              Paint()..color = const Color(0xFFFBBF24),
+            );
+            // Lampu EXIT Hijau di atas pintu
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + cellW * 0.2, r * cellH - 1, cellW * 0.6, 3),
+              Paint()..color = const Color(0xFF22C55E),
+            );
+          } else {
+            // Level 3: END POINT ADALAH RAK BUKU EMAS (SECRET GOLDEN BOOKSHELF)!
+            // Lemari Rak Emas Kuno
+            canvas.drawRect(rect, Paint()..color = const Color(0xFF78350F));
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + 2, r * cellH + 2, cellW - 4, cellH - 4),
+              Paint()..color = const Color(0xFFB45309),
+            );
+            // Buku Emas Menyala di Rak
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + 4, r * cellH + 4, cellW * 0.35, cellH * 0.6),
+              Paint()..color = const Color(0xFFFBBF24),
+            );
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + cellW * 0.5, r * cellH + 4, cellW * 0.35, cellH * 0.6),
+              Paint()..color = const Color(0xFFFEF08A),
+            );
+            // Ornamen Mahkota Rak Emas
+            canvas.drawRect(
+              Rect.fromLTWH(c * cellW + 2, r * cellH + 1, cellW - 4, 3),
+              Paint()..color = const Color(0xFFFDE047),
+            );
+          }
         }
       }
     }
@@ -1179,7 +2305,7 @@ class _MazePainter extends CustomPainter {
       text: 'START',
       style: TextStyle(
         color: Colors.white,
-        fontSize: 9,
+        fontSize: 8.5,
         fontWeight: FontWeight.bold,
         letterSpacing: 0.5,
       ),
@@ -1187,11 +2313,12 @@ class _MazePainter extends CustomPainter {
     textPainter.layout();
     textPainter.paint(canvas, Offset(cellW * 1.05, cellH * 1.25));
 
-    textPainter.text = const TextSpan(
-      text: 'GOLD',
+    // Label End Point: PINTU (Level 1 & 2) vs BUKU EMAS (Level 3)
+    textPainter.text = TextSpan(
+      text: level < 2 ? 'PINTU' : 'EMAS',
       style: TextStyle(
-        color: Colors.black,
-        fontSize: 9,
+        color: level < 2 ? Colors.white : Colors.black,
+        fontSize: 8.5,
         fontWeight: FontWeight.bold,
         letterSpacing: 0.5,
       ),
@@ -1200,10 +2327,298 @@ class _MazePainter extends CustomPainter {
     textPainter.paint(canvas, Offset(cellW * 8.9, cellH * 13.25));
   }
 
+  // Menggambar Iblis-iblis Pixel Latar Belakang di Level 3 (Hanya Mengintai di Rak, Tidak Mengejar!)
+  void _drawBackgroundDemon(Canvas canvas, int demonId, double cx, double cy, double cellW, double cellH) {
+    switch (demonId) {
+      case 1:
+        // Demon 1: Iblis Tanduk Merah (Red Horned Shadow Demon)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.15, cy + cellH * 0.22, cellW * 0.7, cellH * 0.68),
+          Paint()..color = const Color(0xFF140508),
+        );
+        // Tanduk Merah Kiri
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.14, cy + cellH * 0.08, cellW * 0.14, cellH * 0.18),
+          Paint()..color = const Color(0xFFDC2626),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.08, cy + cellH * 0.02, cellW * 0.1, cellH * 0.1),
+          Paint()..color = const Color(0xFFB91C1C),
+        );
+        // Tanduk Merah Kanan
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.72, cy + cellH * 0.08, cellW * 0.14, cellH * 0.18),
+          Paint()..color = const Color(0xFFDC2626),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.82, cy + cellH * 0.02, cellW * 0.1, cellH * 0.1),
+          Paint()..color = const Color(0xFFB91C1C),
+        );
+        // Mata Merah Menyala
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.26, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          Paint()..color = const Color(0xFFFF0033),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.58, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          Paint()..color = const Color(0xFFFF0033),
+        );
+        // Pupil Kuning Terang
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.31, cy + cellH * 0.39, cellW * 0.07, cellH * 0.08),
+          Paint()..color = const Color(0xFFFEF08A),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.63, cy + cellH * 0.39, cellW * 0.07, cellH * 0.08),
+          Paint()..color = const Color(0xFFFEF08A),
+        );
+        // Rahang & Taring Putih Runcing
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.32, cy + cellH * 0.62, cellW * 0.36, cellH * 0.18),
+          Paint()..color = const Color(0xFF000000),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          Paint()..color = Colors.white,
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.46, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          Paint()..color = Colors.white,
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.58, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          Paint()..color = Colors.white,
+        );
+        break;
+
+      case 2:
+        // Demon 2: Iblis Mata Ungu Bertanduk Gelap (Purple Void Fiend)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.22, cellW * 0.64, cellH * 0.68),
+          Paint()..color = const Color(0xFF240638),
+        );
+        // Mahkota Tanduk Ungu
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.22, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          Paint()..color = const Color(0xFFA855F7),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.64, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          Paint()..color = const Color(0xFFA855F7),
+        );
+        // Mata Magenta Neon
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.38, cellW * 0.16, cellH * 0.12),
+          Paint()..color = const Color(0xFFF43F5E),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.38, cellW * 0.16, cellH * 0.12),
+          Paint()..color = const Color(0xFFF43F5E),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.33, cy + cellH * 0.40, cellW * 0.06, cellH * 0.08),
+          Paint()..color = Colors.white,
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.61, cy + cellH * 0.40, cellW * 0.06, cellH * 0.08),
+          Paint()..color = Colors.white,
+        );
+        // Seringai Gigi Ungu
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.62, cellW * 0.32, cellH * 0.14),
+          Paint()..color = const Color(0xFF0F0218),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.38, cy + cellH * 0.62, cellW * 0.06, cellH * 0.07),
+          Paint()..color = const Color(0xFFE9D5FF),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.54, cy + cellH * 0.62, cellW * 0.06, cellH * 0.07),
+          Paint()..color = const Color(0xFFE9D5FF),
+        );
+        break;
+
+      case 3:
+        // Demon 3: Ghoul Bertaring Mencekam (Grinning Skull Ghoul)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.2, cy + cellH * 0.18, cellW * 0.6, cellH * 0.65),
+          Paint()..color = const Color(0xFF1E293B),
+        );
+        // Mata Kucing Kuning Tajam
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.32, cellW * 0.16, cellH * 0.14),
+          Paint()..color = const Color(0xFFFACC15),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.32, cellW * 0.16, cellH * 0.14),
+          Paint()..color = const Color(0xFFFACC15),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.32, cellW * 0.04, cellH * 0.14),
+          Paint()..color = Colors.black,
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.62, cy + cellH * 0.32, cellW * 0.04, cellH * 0.14),
+          Paint()..color = Colors.black,
+        );
+        // Seringai Lebar Mencekam
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.24, cy + cellH * 0.55, cellW * 0.52, cellH * 0.22),
+          Paint()..color = Colors.black,
+        );
+        for (int i = 0; i < 4; i++) {
+          canvas.drawRect(
+            Rect.fromLTWH(cx + cellW * (0.28 + i * 0.12), cy + cellH * 0.55, cellW * 0.07, cellH * 0.09),
+            Paint()..color = Colors.white,
+          );
+        }
+        break;
+
+      case 4:
+        // Demon 4: Iblis Pengintai 4 Mata di Rak (Four-Eyed Shelf Lurker)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.14, cy + cellH * 0.2, cellW * 0.72, cellH * 0.7),
+          Paint()..color = const Color(0xFF100714),
+        );
+        // Pasang Mata Merah Atas
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.25, cy + cellH * 0.28, cellW * 0.18, cellH * 0.12),
+          Paint()..color = const Color(0xFFEF4444),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.57, cy + cellH * 0.28, cellW * 0.18, cellH * 0.12),
+          Paint()..color = const Color(0xFFEF4444),
+        );
+        // Pasang Mata Emas Bawah
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.32, cy + cellH * 0.46, cellW * 0.14, cellH * 0.1),
+          Paint()..color = const Color(0xFFF59E0B),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.54, cy + cellH * 0.46, cellW * 0.14, cellH * 0.1),
+          Paint()..color = const Color(0xFFF59E0B),
+        );
+        // Cakar Memegang Papan Rak
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.2, cy + cellH * 0.75, cellW * 0.18, cellH * 0.12),
+          Paint()..color = const Color(0xFF581C87),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.62, cy + cellH * 0.75, cellW * 0.18, cellH * 0.12),
+          Paint()..color = const Color(0xFF581C87),
+        );
+        break;
+
+      case 5:
+        // Demon 5: Iblis Hijau Beracun Bertanduk (Toxic Green Horned Fiend)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.22, cellW * 0.64, cellH * 0.68),
+          Paint()..color = const Color(0xFF062817),
+        );
+        // Tanduk Hijau Tajam
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          Paint()..color = const Color(0xFF16A34A),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.68, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          Paint()..color = const Color(0xFF16A34A),
+        );
+        // Mata Hijau Radioaktif
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          Paint()..color = const Color(0xFF22C55E),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          Paint()..color = const Color(0xFF22C55E),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.33, cy + cellH * 0.39, cellW * 0.06, cellH * 0.08),
+          Paint()..color = const Color(0xFFFEF08A),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.61, cy + cellH * 0.39, cellW * 0.06, cellH * 0.08),
+          Paint()..color = const Color(0xFFFEF08A),
+        );
+        // Mulut & Taring Beracun
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.32, cy + cellH * 0.62, cellW * 0.36, cellH * 0.16),
+          Paint()..color = Colors.black,
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.36, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          Paint()..color = const Color(0xFF86EFAC),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          Paint()..color = const Color(0xFF86EFAC),
+        );
+        break;
+
+      case 6:
+        // Demon 6: Hantu Jubah Merah Berdiri di Rak (Grim Crimson Wraith)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.15, cy + cellH * 0.15, cellW * 0.7, cellH * 0.75),
+          Paint()..color = const Color(0xFF450A0A),
+        );
+        // Lubang Jubah Hitam Kelam
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.26, cellW * 0.44, cellH * 0.36),
+          Paint()..color = Colors.black,
+        );
+        // Mata Biru Es Hantu Menyala
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.36, cellW * 0.12, cellH * 0.12),
+          Paint()..color = const Color(0xFF38BDF8),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.54, cy + cellH * 0.36, cellW * 0.12, cellH * 0.12),
+          Paint()..color = const Color(0xFF38BDF8),
+        );
+        // Lilin Terkutuk Menyala di Sebelahnya
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.78, cy + cellH * 0.45, cellW * 0.14, cellH * 0.35),
+          Paint()..color = const Color(0xFFE2E8F0),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.81, cy + cellH * 0.32, cellW * 0.08, cellH * 0.12),
+          Paint()..color = const Color(0xFFEA580C),
+        );
+        break;
+
+      case 7:
+        // Demon 7: Wajah Iblis Berlumur Darah (Bleeding Demon Face)
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.2, cellW * 0.64, cellH * 0.7),
+          Paint()..color = const Color(0xFF1E0608),
+        );
+        // Mata Berdarah
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.34, cellW * 0.16, cellH * 0.12),
+          Paint()..color = const Color(0xFFB91C1C),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.34, cellW * 0.16, cellH * 0.12),
+          Paint()..color = const Color(0xFFB91C1C),
+        );
+        // Lelehan Darah Mengalir ke Bawah
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.33, cy + cellH * 0.46, cellW * 0.06, cellH * 0.45),
+          Paint()..color = const Color(0xFFDC2626),
+        );
+        canvas.drawRect(
+          Rect.fromLTWH(cx + cellW * 0.61, cy + cellH * 0.46, cellW * 0.06, cellH * 0.45),
+          Paint()..color = const Color(0xFFDC2626),
+        );
+        break;
+    }
+  }
+
   @override
-  bool shouldRepaint(covariant _MazePainter oldDelegate) {
+  bool shouldRepaint(covariant _PixelLibraryMazePainter oldDelegate) {
     return oldDelegate.gridStr != gridStr ||
         oldDelegate.isFlashing != isFlashing ||
-        oldDelegate.isLevel3 != isLevel3;
+        oldDelegate.level != level;
   }
 }

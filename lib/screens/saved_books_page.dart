@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import '../services/bookmark_service.dart';
 import '../widgets/rental_bottom_sheet.dart';
 import 'book_detail_page.dart';
@@ -37,12 +37,22 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
     await _loadBookmarks();
 
     if (!mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('"$title" dihapus dari daftar tersimpan.'),
+        duration: const Duration(milliseconds: 1800),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF302622),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        content: Text(
+          '"$title" dihapus dari daftar tersimpan.',
+          style: const TextStyle(color: Color(0xFFEDE2CF)),
+        ),
         action: SnackBarAction(
           label: 'Urungkan',
+          textColor: const Color(0xFFD4BE9D),
           onPressed: () async {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
             await BookmarkService.toggleBookmark(book);
             _loadBookmarks();
           },
@@ -75,10 +85,10 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: Colors.indigo.shade50,
+                            color: const Color(0xFFF7EDED),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.bookmark_border, size: 64, color: Colors.indigo.shade400),
+                          child: Icon(Icons.bookmark_border, size: 64, color: const Color(0xFF9A704F)),
                         ),
                         const SizedBox(height: 20),
                         const Text(
@@ -94,7 +104,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         const SizedBox(height: 24),
                         FilledButton.icon(
                           style: FilledButton.styleFrom(
-                            backgroundColor: Colors.indigo,
+                            backgroundColor: const Color(0xFF67343A),
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           ),
                           onPressed: () => Navigator.pop(context),
@@ -180,7 +190,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.indigo.shade50,
+                                            color: const Color(0xFFF7EDED),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(
@@ -188,7 +198,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.indigo.shade800,
+                                              color: const Color(0xFF5A2A38),
                                             ),
                                           ),
                                         ),
@@ -218,7 +228,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                   ),
                                   FilledButton(
                                     style: FilledButton.styleFrom(
-                                      backgroundColor: Colors.indigo,
+                                      backgroundColor: const Color(0xFF67343A),
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                       visualDensity: VisualDensity.compact,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

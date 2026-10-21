@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'constants/app_colors.dart';
 import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'screens/login_page.dart';
@@ -19,7 +21,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: 'RentBook',
-        theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.oxblood,
+            primary: AppColors.oxblood,
+            secondary: AppColors.tobacco,
+            surface: AppColors.surface,
+          ),
+          appBarTheme: AppBarTheme(
+            backgroundColor: AppColors.oxblood,
+            foregroundColor: AppColors.parchment,
+            elevation: 0,
+            titleTextStyle: GoogleFonts.poppins(
+              color: AppColors.parchment,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.3,
+            ),
+          ),
+          scaffoldBackgroundColor: AppColors.background,
+          textTheme: GoogleFonts.poppinsTextTheme(),
+          useMaterial3: true,
+        ),
         home: startLoggedIn ? const HomeShell() : const LoginPage(),
       );
 }

@@ -373,15 +373,15 @@ class _BooksPageState extends State<BooksPage> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.indigo.shade50,
+                                        color: const Color(0xFFF7EDED),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(
                                         'Rp ${_formatNumber(pricePerDay)}/hari',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.indigo.shade800,
+                                          color: Color(0xFF67343A),
                                         ),
                                       ),
                                     ),
@@ -404,7 +404,7 @@ class _BooksPageState extends State<BooksPage> {
                           const SizedBox(width: 8),
                           FilledButton(
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.indigo,
+                              backgroundColor: const Color(0xFF67343A),
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),

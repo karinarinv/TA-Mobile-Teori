@@ -179,10 +179,10 @@ class _AiPageState extends State<AiPage> {
                           Container(
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
-                              color: Colors.indigo.shade50,
+                              color: const Color(0xFFF7EDED),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.smart_toy, size: 54, color: Colors.indigo),
+                            child: const Icon(Icons.smart_toy, size: 54, color: Color(0xFF67343A)),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -203,8 +203,8 @@ class _AiPageState extends State<AiPage> {
                             children: _quickPrompts
                                 .map((p) => ActionChip(
                                       label: Text(p, style: const TextStyle(fontSize: 12)),
-                                      avatar: const Icon(Icons.auto_awesome, size: 14, color: Colors.indigo),
-                                      backgroundColor: Colors.indigo.shade50.withValues(alpha: 0.5),
+                                      avatar: const Icon(Icons.auto_awesome, size: 14, color: Color(0xFF67343A)),
+                                      backgroundColor: const Color(0xFFF7EDED).withValues(alpha: 0.5),
                                       onPressed: () => _send(p),
                                     ))
                                 .toList(),
@@ -230,8 +230,8 @@ class _AiPageState extends State<AiPage> {
                             if (!isUser) ...[
                               CircleAvatar(
                                 radius: 16,
-                                backgroundColor: Colors.indigo.shade100,
-                                child: const Icon(Icons.smart_toy, size: 18, color: Colors.indigo),
+                                backgroundColor: const Color(0xFFEADBCE),
+                                child: const Icon(Icons.smart_toy, size: 18, color: Color(0xFF67343A)),
                               ),
                               const SizedBox(width: 8),
                             ],
@@ -239,7 +239,7 @@ class _AiPageState extends State<AiPage> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                 decoration: BoxDecoration(
-                                  color: isUser ? Colors.indigo : Colors.white,
+                                  color: isUser ? const Color(0xFF67343A) : Colors.white,
                                   borderRadius: BorderRadius.only(
                                     topLeft: const Radius.circular(16),
                                     topRight: const Radius.circular(16),
@@ -269,7 +269,7 @@ class _AiPageState extends State<AiPage> {
                               const SizedBox(width: 8),
                               CircleAvatar(
                                 radius: 16,
-                                backgroundColor: Colors.indigo.shade700,
+                                backgroundColor: const Color(0xFF67343A),
                                 child: const Icon(Icons.person, size: 18, color: Colors.white),
                               ),
                             ],
@@ -290,12 +290,12 @@ class _AiPageState extends State<AiPage> {
                   const SizedBox(
                     width: 14,
                     height: 14,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.indigo),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF67343A)),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     'Asisten AI sedang menyusun rekomendasi...',
-                    style: TextStyle(fontSize: 12, color: Colors.indigo.shade700, fontStyle: FontStyle.italic),
+                    style: TextStyle(fontSize: 12, color: const Color(0xFF67343A), fontStyle: FontStyle.italic),
                   ),
                 ],
               ),
@@ -339,7 +339,7 @@ class _AiPageState extends State<AiPage> {
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
-                    style: IconButton.styleFrom(backgroundColor: Colors.indigo),
+                    style: IconButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
                     icon: const Icon(Icons.send, size: 20),
                     onPressed: _busy ? null : () => _send(),
                   ),

@@ -27,12 +27,67 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   String _paymentMethod = 'Saldo RentBook';
   bool _isProcessing = false;
 
+  final TextEditingController _voucherController = TextEditingController();
+  String? _appliedVoucher;
+  double _discountPercentage = 0.0;
+  String? _voucherMessage;
+  bool _isVoucherValid = false;
+
   final List<String> _paymentOptions = [
     'Saldo RentBook',
     'QRIS (GoPay/OVO/Dana)',
     'Transfer Virtual Account',
     'Bayar Tunai',
   ];
+
+  @override
+  void dispose() {
+    _voucherController.dispose();
+    super.dispose();
+  }
+
+  void _applyVoucher() {
+    final code = _voucherController.text.trim().toUpperCase();
+    if (code.isEmpty) return;
+
+    if (code == 'DISKON10') {
+      setState(() {
+        _appliedVoucher = code;
+        _discountPercentage = 0.10;
+        _isVoucherValid = true;
+        _voucherMessage = 'Voucher "DISKON10" aktif! Hemat 10%';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+              SizedBox(width: 8),
+              Expanded(child: Text('Voucher DISKON10 berhasil dipasang! Potongan 10%')),
+            ],
+          ),
+          backgroundColor: Colors.green.shade700,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+    } else {
+      setState(() {
+        _isVoucherValid = false;
+        _voucherMessage = 'Kode voucher "$code" tidak valid!';
+      });
+    }
+  }
+
+  void _removeVoucher() {
+    setState(() {
+      _appliedVoucher = null;
+      _discountPercentage = 0.0;
+      _isVoucherValid = false;
+      _voucherMessage = null;
+      _voucherController.clear();
+    });
+  }
 
   String _formatRupiah(int amount) {
     final formatter = NumberFormat('#,###', 'id_ID');
@@ -45,7 +100,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     final authors = widget.book['authors'] as String? ?? 'Penulis tidak diketahui';
     final img = widget.book['image'] as String?;
     final pricePerDay = (widget.book['pricePerDay'] as num?)?.toInt() ?? 5000;
-    final totalPrice = pricePerDay * _duration;
+    
+    final subtotal = pricePerDay * _duration;
+    final discountAmount = (_discountPercentage > 0) ? (subtotal * _discountPercentage).round() : 0;
+    final finalTotalPrice = subtotal - discountAmount;
 
     final now = DateTime.now();
     final returnDate = now.add(Duration(days: _duration));
@@ -117,7 +175,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.indigo.shade50,
+                          color: const Color(0xFFF7EDED),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -125,7 +183,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: Colors.indigo.shade800,
+                            color: const Color(0xFF5A2A38),
                           ),
                         ),
                       ),
@@ -154,10 +212,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.indigo : Colors.grey.shade100,
+                          color: isSelected ? const Color(0xFF67343A) : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: isSelected ? Colors.indigo : Colors.grey.shade300,
+                            color: isSelected ? const Color(0xFF67343A) : Colors.grey.shade300,
                           ),
                         ),
                         child: Center(
@@ -190,7 +248,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline),
-                      color: Colors.indigo,
+                      color: const Color(0xFF67343A),
                       onPressed: _duration > 1 ? () => setState(() => _duration--) : null,
                     ),
                     Text(
@@ -199,7 +257,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline),
-                      color: Colors.indigo,
+                      color: const Color(0xFF67343A),
                       onPressed: _duration < 60 ? () => setState(() => _duration++) : null,
                     ),
                   ],
@@ -273,7 +331,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       value: opt,
                       child: Row(
                         children: [
-                          Icon(icon, size: 20, color: Colors.indigo),
+                          Icon(icon, size: 20, color: const Color(0xFF67343A)),
                           const SizedBox(width: 10),
                           Text(opt, style: const TextStyle(fontSize: 13)),
                         ],
@@ -288,12 +346,99 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             ),
             const SizedBox(height: 16),
 
+            // Voucher Diskon (Hadiah Labirin Buku)
+            Row(
+              children: [
+                Icon(Icons.card_giftcard_rounded, size: 18, color: Colors.amber.shade800),
+                const SizedBox(width: 6),
+                const Text(
+                  'Punya Voucher Diskon?',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (_appliedVoucher != null)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.green.shade400),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Voucher $_appliedVoucher Terpasang',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green),
+                          ),
+                          Text(
+                            'Potongan 10% (-${_formatRupiah(discountAmount)})',
+                            style: TextStyle(fontSize: 12, color: Colors.green.shade800),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 20, color: Colors.grey),
+                      onPressed: _removeVoucher,
+                      tooltip: 'Hapus Voucher',
+                    ),
+                  ],
+                ),
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _voucherController,
+                      textCapitalization: TextCapitalization.characters,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1),
+                      decoration: InputDecoration(
+                        hintText: 'Contoh: DISKON10',
+                        hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400, letterSpacing: 0),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        isDense: true,
+                        prefixIcon: const Icon(Icons.confirmation_number_outlined, size: 18),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF67343A),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                    ),
+                    onPressed: _applyVoucher,
+                    child: const Text('Gunakan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  ),
+                ],
+              ),
+            if (_voucherMessage != null && !_isVoucherValid)
+              Padding(
+                padding: const EdgeInsets.only(top: 6, left: 4),
+                child: Text(
+                  _voucherMessage!,
+                  style: TextStyle(fontSize: 12, color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                ),
+              ),
+            const SizedBox(height: 16),
+
             // Rincian Biaya
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.indigo.shade100),
-                color: Colors.indigo.shade50.withValues(alpha: 0.4),
+                border: Border.all(color: const Color(0xFFEADBCE)),
+                color: const Color(0xFFF7EDED).withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
@@ -302,10 +447,20 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Tarif (${_formatRupiah(pricePerDay)} × $_duration hari)', style: const TextStyle(fontSize: 13)),
-                      Text(_formatRupiah(totalPrice), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                      Text(_formatRupiah(subtotal), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
                     ],
                   ),
                   const SizedBox(height: 6),
+                  if (discountAmount > 0) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Potongan Voucher ($_appliedVoucher)', style: TextStyle(fontSize: 13, color: Colors.green.shade800, fontWeight: FontWeight.bold)),
+                        Text('-${_formatRupiah(discountAmount)}', style: TextStyle(fontSize: 13, color: Colors.green.shade800, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                  ],
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -322,11 +477,11 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                         style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        _formatRupiah(totalPrice),
+                        _formatRupiah(finalTotalPrice),
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
-                          color: Colors.indigo.shade900,
+                          color: const Color(0xFF302622),
                         ),
                       ),
                     ],
@@ -342,10 +497,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
               height: 48,
               child: FilledButton(
                 style: FilledButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: const Color(0xFF67343A),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                onPressed: _isProcessing ? null : () => _confirmRent(title, authors, totalPrice, returnDate, dateFmt),
+                onPressed: _isProcessing ? null : () => _confirmRent(title, authors, finalTotalPrice, returnDate, dateFmt),
                 child: _isProcessing
                     ? const SizedBox(
                         width: 22,
@@ -353,7 +508,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                       )
                     : Text(
-                        'Konfirmasi & Bayar (${_formatRupiah(totalPrice)})',
+                        'Konfirmasi & Bayar (${_formatRupiah(finalTotalPrice)})',
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                       ),
               ),
@@ -377,8 +532,9 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
       final dueDateStr = dateFmt.format(returnDate);
       final totalFormatted = _formatRupiah(totalPrice);
       
-      // Catat ke Blockchain ledger
-      final ledgerData = 'SEWA: $title | Durasi: $_duration Hari | Biaya: $totalFormatted | Batas: $dueDateStr | Bayar: $_paymentMethod';
+      // Catat ke Blockchain ledger (termasuk keterangan voucher jika ada)
+      final voucherNote = _appliedVoucher != null ? ' | Voucher: $_appliedVoucher (-10%)' : '';
+      final ledgerData = 'SEWA: $title | Durasi: $_duration Hari | Biaya: $totalFormatted$voucherNote | Batas: $dueDateStr | Bayar: $_paymentMethod';
       await BlockchainService.addTransaction(ledgerData);
 
       // Jadwalkan notifikasi jatuh tempo
@@ -454,7 +610,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             const SizedBox(height: 12),
             Row(
               children: const [
-                Icon(Icons.shield_outlined, size: 16, color: Colors.indigo),
+                Icon(Icons.shield_outlined, size: 16, color: Color(0xFF67343A)),
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -472,7 +628,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             child: const Text('Tutup'),
           ),
           FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: Colors.indigo),
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
             onPressed: () {
               Navigator.pop(ctx);
               Navigator.push(context, MaterialPageRoute(builder: (_) => const BlockchainPage()));

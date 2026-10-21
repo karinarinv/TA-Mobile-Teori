@@ -83,10 +83,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: const Color(0xFFF7EDED),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.camera_alt, color: Colors.indigo),
+                  child: const Icon(Icons.camera_alt, color: Color(0xFF67343A)),
                 ),
                 title: const Text('Ambil dari Kamera'),
                 onTap: () {
@@ -98,10 +98,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: const Color(0xFFF7EDED),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.photo_library, color: Colors.indigo),
+                  child: const Icon(Icons.photo_library, color: Color(0xFF67343A)),
                 ),
                 title: const Text('Pilih dari Galeri'),
                 onTap: () {
@@ -148,12 +148,12 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
         title: const Text('Profil Pengguna', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: const Color(0xFF67343A),
+        foregroundColor: const Color(0xFFEDE2CF),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -173,7 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.indigo.shade100, width: 3),
+                                border: Border.all(color: const Color(0xFFEADBCE), width: 3),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withAlpha(20),
@@ -184,10 +184,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               child: CircleAvatar(
                                 radius: 55,
-                                backgroundColor: Colors.indigo.shade50,
+                                backgroundColor: const Color(0xFFF7EDED),
                                 backgroundImage: _photo != null ? FileImage(File(_photo!)) : null,
                                 child: _photo == null
-                                    ? const Icon(Icons.person, size: 55, color: Colors.indigo)
+                                    ? const Icon(Icons.person, size: 55, color: Color(0xFF67343A))
                                     : null,
                               ),
                             ),
@@ -198,7 +198,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: Container(
                                 padding: const EdgeInsets.all(7),
                                 decoration: BoxDecoration(
-                                  color: Colors.indigo,
+                                  color: const Color(0xFF67343A),
                                   shape: BoxShape.circle,
                                   border: Border.all(color: Colors.white, width: 2),
                                 ),
@@ -218,7 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: Colors.indigo.shade50,
+                        color: const Color(0xFFF7EDED),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -226,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Colors.indigo.shade800,
+                          color: const Color(0xFF5A2A38),
                         ),
                       ),
                     ),
@@ -261,7 +261,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.indigo,
+                                      color: Color(0xFF67343A),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -314,10 +314,10 @@ class _ProfilePageState extends State<ProfilePage> {
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.indigo.shade50,
+                                color: const Color(0xFFF7EDED),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Icon(Icons.collections_bookmark_rounded, color: Colors.indigo),
+                              child: const Icon(Icons.collections_bookmark_rounded, color: Color(0xFF67343A)),
                             ),
                             title: const Text('Buku Tersimpan', style: TextStyle(fontWeight: FontWeight.w600)),
                             subtitle: const Text('Koleksi buku favorit yang Anda simpan'),

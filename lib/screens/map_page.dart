@@ -385,10 +385,10 @@ class _MapPageState extends State<MapPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.indigo.shade50,
+                    color: const Color(0xFFF7EDED),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.local_library, color: Colors.indigo, size: 32),
+                  child: const Icon(Icons.local_library, color: Color(0xFF67343A), size: 32),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -465,7 +465,7 @@ class _MapPageState extends State<MapPage> {
                 Expanded(
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      backgroundColor: Colors.indigo,
+                      backgroundColor: const Color(0xFF67343A),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
@@ -491,7 +491,7 @@ class _MapPageState extends State<MapPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: isHighlight ? Colors.indigo : Colors.grey[600]),
+          Icon(icon, size: 18, color: isHighlight ? const Color(0xFF67343A) : Colors.grey[600]),
           const SizedBox(width: 10),
           SizedBox(
             width: 90,
@@ -503,7 +503,7 @@ class _MapPageState extends State<MapPage> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
-                color: isHighlight ? Colors.indigo.shade900 : Colors.black87,
+                color: isHighlight ? const Color(0xFF302622) : Colors.black87,
               ),
             ),
           ),
@@ -552,9 +552,9 @@ class _MapPageState extends State<MapPage> {
                     Polyline(
                       points: _routePoints,
                       strokeWidth: 5.5,
-                      color: Colors.indigoAccent,
+                      color: const Color(0xFF67343A),
                       borderStrokeWidth: 2.5,
-                      borderColor: Colors.indigo.shade900,
+                      borderColor: const Color(0xFF302622),
                     ),
                   ],
                 ),
@@ -572,7 +572,7 @@ class _MapPageState extends State<MapPage> {
                           Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                              color: Colors.blue.shade600,
+                              color: const Color(0xFF67343A),
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2.5),
                               boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6)],
@@ -602,7 +602,7 @@ class _MapPageState extends State<MapPage> {
                                     ? Colors.green.shade700
                                     : _selectedLib?.name == lib.name
                                         ? Colors.deepOrange
-                                        : Colors.indigo,
+                                        : const Color(0xFF67343A),
                                 shape: BoxShape.circle,
                                 border: Border.all(color: Colors.white, width: 2),
                                 boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 6)],
@@ -627,7 +627,7 @@ class _MapPageState extends State<MapPage> {
               child: Card(
                 elevation: 5,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                color: Colors.indigo.shade900,
+                color: const Color(0xFF302622),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: Row(
@@ -713,7 +713,7 @@ class _MapPageState extends State<MapPage> {
                 FloatingActionButton.small(
                   heroTag: 'my_loc',
                   backgroundColor: Colors.white,
-                  foregroundColor: Colors.indigo,
+                  foregroundColor: const Color(0xFF67343A),
                   tooltip: 'Pusatkan ke Lokasi Saya',
                   onPressed: () {
                     if (_me != null) {
@@ -783,7 +783,7 @@ class _MapPageState extends State<MapPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                         side: BorderSide(
-                          color: isNavigating ? Colors.green : isSelected ? Colors.indigo : Colors.transparent,
+                          color: isNavigating ? Colors.green : isSelected ? const Color(0xFF67343A) : Colors.transparent,
                           width: 2.0,
                         ),
                       ),
@@ -806,13 +806,13 @@ class _MapPageState extends State<MapPage> {
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
-                                      color: isNavigating ? Colors.green.shade50 : Colors.indigo.shade50,
+                                      color: isNavigating ? Colors.green.shade50 : const Color(0xFFF7EDED),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.local_library,
                                       size: 20,
-                                      color: isNavigating ? Colors.green : Colors.indigo,
+                                      color: isNavigating ? Colors.green : const Color(0xFF67343A),
                                     ),
                                   ),
                                   const SizedBox(width: 8),

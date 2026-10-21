@@ -174,9 +174,9 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
         foregroundColor: Colors.black87,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.indigo,
+          labelColor: const Color(0xFF67343A),
           unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.indigo,
+          indicatorColor: const Color(0xFF67343A),
           indicatorWeight: 3,
           tabs: const [
             Tab(icon: Icon(Icons.currency_exchange), text: 'Kurs Mata Uang'),
@@ -238,7 +238,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               child: ActionChip(
                                 label: Text(_formatRupiah(val)),
                                 labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                                backgroundColor: Colors.indigo.shade50,
+                                backgroundColor: const Color(0xFFF7EDED),
                                 onPressed: () {
                                   _amt.text = val.toString();
                                   setState(() {});
@@ -285,7 +285,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.indigo.shade50,
+                                color: const Color(0xFFF7EDED),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -317,7 +317,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
-                                color: Colors.indigo,
+                                color: Color(0xFF67343A),
                               ),
                             ),
                             Text(
@@ -341,18 +341,18 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: const Color(0xFFF7EDED),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.shade200),
+                  border: Border.all(color: const Color(0xFFD4BE9D)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.info_outline, color: Colors.blue.shade800, size: 20),
+                    Icon(Icons.info_outline, color: const Color(0xFF67343A), size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Jam operasional perpustakaan acuan: 08:00 - 16:00 waktu setempat.',
-                        style: TextStyle(fontSize: 12, color: Colors.blue.shade900),
+                        style: TextStyle(fontSize: 12, color: const Color(0xFF302622)),
                       ),
                     ),
                   ],
@@ -386,7 +386,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
-                                  color: isWib ? Colors.indigo : Colors.black87,
+                                  color: isWib ? const Color(0xFF67343A) : Colors.black87,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -452,7 +452,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'monospace',
-                                    color: Colors.indigo,
+                                    color: Color(0xFF67343A),
                                   ),
                                 ),
                               ],

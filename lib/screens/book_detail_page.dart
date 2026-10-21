@@ -38,16 +38,22 @@ class _BookDetailPageState extends State<BookDetailPage> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        duration: const Duration(milliseconds: 1800),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF67343A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Text(
           nowSaved
               ? '"$title" disimpan ke Buku Tersimpan.'
               : '"$title" dihapus dari Buku Tersimpan.',
+          style: const TextStyle(color: Color(0xFFEDE2CF), fontWeight: FontWeight.w600),
         ),
         action: nowSaved
             ? SnackBarAction(
                 label: 'Lihat',
-                textColor: Colors.amberAccent,
+                textColor: const Color(0xFFEDE2CF),
                 onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const SavedBooksPage()),
@@ -121,7 +127,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.indigo.shade50, Colors.white],
+                  colors: [const Color(0xFFF7EDED), Colors.white],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -166,11 +172,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.screen_rotation, size: 14, color: Colors.indigo.shade400),
+                      Icon(Icons.screen_rotation, size: 14, color: const Color(0xFF9A704F)),
                       const SizedBox(width: 4),
                       Text(
                         'Miringkan HP Anda untuk efek sensor 3D',
-                        style: TextStyle(fontSize: 12, color: Colors.indigo.shade600),
+                        style: TextStyle(fontSize: 12, color: const Color(0xFF67343A)),
                       ),
                     ],
                   ),
@@ -218,7 +224,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       children: [
                         _buildBadge(Icons.star, '${rating.toStringAsFixed(1)} / 5.0', Colors.amber.shade800, Colors.amber.shade50),
                         const SizedBox(width: 8),
-                        _buildBadge(Icons.category_outlined, category, Colors.indigo, Colors.indigo.shade50),
+                        _buildBadge(Icons.category_outlined, category, const Color(0xFF67343A), const Color(0xFFF7EDED)),
                         const SizedBox(width: 8),
                         _buildBadge(Icons.menu_book_outlined, '$pageCount Hal', Colors.teal, Colors.teal.shade50),
                         const SizedBox(width: 8),
@@ -232,9 +238,9 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.indigo.shade50,
+                      color: const Color(0xFFF7EDED),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.indigo.shade200),
+                      border: Border.all(color: const Color(0xFFD4BE9D)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -244,7 +250,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           children: [
                             const Text(
                               'Harga Tarif Sewa',
-                              style: TextStyle(fontSize: 12, color: Colors.indigo, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: 12, color: Color(0xFF67343A), fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -252,7 +258,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.indigo.shade900,
+                                color: const Color(0xFF302622),
                               ),
                             ),
                           ],
@@ -340,7 +346,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.indigo.shade900,
+                      color: const Color(0xFF302622),
                     ),
                   ),
                 ],
@@ -349,7 +355,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               Expanded(
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.indigo,
+                    backgroundColor: const Color(0xFF67343A),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
