@@ -5,7 +5,7 @@ import 'books_page.dart';
 import 'converter_page.dart';
 import 'map_page.dart';
 import 'ai_page.dart';
-import 'quiz_page.dart';
+import 'game_page.dart';
 import 'blockchain_page.dart';
 import 'saved_books_page.dart';
 
@@ -66,7 +66,7 @@ class _MenuPageState extends State<MenuPage> {
               SizedBox(height: 12),
               Text('🎁 Voucher Diskon:', style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 4),
-              Text('Jawab kuis di menu "Kuis Buku" dengan skor minimal 60% untuk mengklaim kode voucher potongan harga sewa!'),
+              Text('Taklukkan 3 level di menu "Labirin Perpustakaan" untuk menemukan Buku Emas dan mengklaim kode voucher potongan harga sewa!'),
             ],
           ),
         ),
@@ -133,12 +133,12 @@ class _MenuPageState extends State<MenuPage> {
         onTap: () => go(const MapPage()),
       ),
       _MenuItem(
-        title: 'Kuis Pengetahuan',
-        subtitle: 'Raih reward voucher sewa',
-        badge: 'Reward',
-        icon: Icons.quiz_rounded,
-        color: Colors.deepOrange.shade600,
-        onTap: () => go(const QuizPage()),
+        title: 'Labirin Perpustakaan',
+        subtitle: 'Temukan buku emas & voucher',
+        badge: 'Labirin',
+        icon: Icons.sports_esports_rounded,
+        color: Colors.cyan.shade700,
+        onTap: () => go(const GamePage()),
       ),
       _MenuItem(
         title: 'Riwayat Blockchain',
