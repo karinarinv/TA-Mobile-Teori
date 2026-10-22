@@ -276,14 +276,30 @@ class _BooksPageState extends State<BooksPage> {
             padding: const EdgeInsets.all(12),
             child: TextField(
               controller: _q,
+              style: const TextStyle(fontSize: 13),
               textInputAction: TextInputAction.search,
               onSubmitted: (_) => _search(),
               decoration: InputDecoration(
                 hintText: 'Cari judul, penulis, atau genre...',
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.menu_book),
+                hintStyle: TextStyle(fontSize: 12.5, color: Colors.grey.shade500),
+                filled: true,
+                fillColor: const Color(0xFFFAF7F2),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: const BorderSide(color: Color(0xFFEADBCE)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: const BorderSide(color: Color(0xFFEADBCE)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: const BorderSide(color: Color(0xFF67343A), width: 1.6),
+                ),
+                prefixIcon: const Icon(Icons.menu_book, color: Color(0xFF67343A)),
                 suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
+                  icon: const Icon(Icons.search, color: Color(0xFF67343A)),
                   onPressed: _search,
                 ),
               ),
@@ -311,9 +327,14 @@ class _BooksPageState extends State<BooksPage> {
                 final rating = item['rating']?.toString() ?? '4.5';
 
                 return Card(
+                  color: const Color(0xFFFAF7F2),
+                  surfaceTintColor: Colors.transparent,
                   margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   clipBehavior: Clip.antiAlias,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: const BorderSide(color: Color(0xFFEADBCE)),
+                  ),
                   elevation: 1.5,
                   child: InkWell(
                     onTap: () {
@@ -373,7 +394,7 @@ class _BooksPageState extends State<BooksPage> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFF7EDED),
+                                        color: const Color(0xFFEDE2CF),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text(

@@ -27,7 +27,16 @@ class MyApp extends StatelessWidget {
             seedColor: AppColors.oxblood,
             primary: AppColors.oxblood,
             secondary: AppColors.tobacco,
-            surface: AppColors.surface,
+            surface: const Color(0xFFFAF7F2),
+            surfaceContainer: const Color(0xFFFAF7F2),
+            surfaceContainerLow: const Color(0xFFFAF7F2),
+            surfaceContainerHigh: const Color(0xFFEDE2CF),
+            surfaceTint: Colors.transparent,
+          ),
+          cardTheme: const CardThemeData(
+            color: Color(0xFFFAF7F2),
+            surfaceTintColor: Colors.transparent,
+            elevation: 1.5,
           ),
           appBarTheme: AppBarTheme(
             backgroundColor: AppColors.oxblood,

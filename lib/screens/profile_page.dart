@@ -83,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF7EDED),
+                    color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.camera_alt, color: Color(0xFF67343A)),
@@ -98,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF7EDED),
+                    color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.photo_library, color: Color(0xFF67343A)),
@@ -183,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               child: CircleAvatar(
                                 radius: 55,
-                                backgroundColor: const Color(0xFFF7EDED),
+                                backgroundColor: const Color(0xFFEDE2CF),
                                 backgroundImage: _photo != null ? FileImage(File(_photo!)) : null,
                                 child: _photo == null
                                     ? const Icon(Icons.person, size: 55, color: Color(0xFF67343A))
@@ -217,7 +217,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF7EDED),
+                        color: const Color(0xFFEDE2CF),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
@@ -235,8 +235,9 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color(0xFFFAF7F2),
                         borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFEADBCE)),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withAlpha(10),
@@ -305,15 +306,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     // Quick Actions Card
                     Card(
+                      color: const Color(0xFFFAF7F2),
+                      surfaceTintColor: Colors.transparent,
                       elevation: 1,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Color(0xFFEADBCE)),
+                      ),
                       child: Column(
                         children: [
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF7EDED),
+                                color: const Color(0xFFEDE2CF),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(Icons.collections_bookmark_rounded, color: Color(0xFF67343A)),
@@ -352,16 +358,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     // Tombol Logout 
                     SizedBox(
                       width: double.infinity,
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red.shade700,
-                          side: BorderSide(color: Colors.red.shade300),
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF67343A),
+                          foregroundColor: const Color(0xFFEDE2CF),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 1,
                         ),
                         onPressed: _logout,
-                        icon: const Icon(Icons.logout, size: 18),
-                        label: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
+                        icon: const Icon(Icons.logout_rounded, size: 20),
+                        label: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5)),
                       ),
                     ),
                     const SizedBox(height: 18),

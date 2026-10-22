@@ -24,7 +24,7 @@ class RentalBottomSheet extends StatefulWidget {
 
 class _RentalBottomSheetState extends State<RentalBottomSheet> {
   int _duration = 7;
-  String _paymentMethod = 'Saldo RentBook';
+  String _paymentMethod = 'QRIS (GoPay/OVO/Dana)';
   bool _isProcessing = false;
 
   final TextEditingController _voucherController = TextEditingController();

@@ -170,13 +170,14 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
       appBar: AppBar(
         title: const Text('Konversi Kurs & Jam', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: const Color(0xFF67343A),
+        foregroundColor: const Color(0xFFEDE2CF),
+        iconTheme: const IconThemeData(color: Color(0xFFEDE2CF)),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF67343A),
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF67343A),
+          labelColor: const Color(0xFFEDE2CF),
+          unselectedLabelColor: const Color(0xFFD4BE9D),
+          indicatorColor: const Color(0xFFEDE2CF),
           indicatorWeight: 3,
           tabs: const [
             Tab(icon: Icon(Icons.currency_exchange), text: 'Kurs Mata Uang'),
@@ -192,8 +193,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
             padding: const EdgeInsets.all(16),
             children: [
               Card(
+                color: const Color(0xFFFAF7F2),
+                surfaceTintColor: Colors.transparent,
                 elevation: 1,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  side: const BorderSide(color: Color(0xFFEADBCE)),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -228,7 +234,6 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                       ),
                       const SizedBox(height: 12),
 
-                      // Quick nominal chips
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
@@ -238,7 +243,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               child: ActionChip(
                                 label: Text(_formatRupiah(val)),
                                 labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                                backgroundColor: const Color(0xFFF7EDED),
+                                backgroundColor: const Color(0xFFFAF7F2),
                                 onPressed: () {
                                   _amt.text = val.toString();
                                   setState(() {});
@@ -272,9 +277,14 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                 final info = _currencyInfo[code] ?? (code, '🌐 $code');
 
                 return Card(
+                  color: const Color(0xFFFAF7F2),
+                  surfaceTintColor: Colors.transparent,
                   margin: const EdgeInsets.only(bottom: 10),
                   elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Color(0xFFEADBCE)),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     child: Row(
@@ -285,7 +295,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF7EDED),
+                                color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -341,7 +351,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7EDED),
+                  color: const Color(0xFFFAF7F2),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: const Color(0xFFD4BE9D)),
                 ),
@@ -367,9 +377,14 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                 final isOpen = hour >= 8 && hour < 16;
 
                 return Card(
+                  color: const Color(0xFFFAF7F2),
+                  surfaceTintColor: Colors.transparent,
                   margin: const EdgeInsets.only(bottom: 12),
                   elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: const BorderSide(color: Color(0xFFEADBCE)),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(

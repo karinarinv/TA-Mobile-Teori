@@ -81,7 +81,6 @@ class _BlockchainPageState extends State<BlockchainPage> {
       for (final p in parts) {
         final trimmed = p.trim();
         if (trimmed.startsWith('Biaya:')) {
-          // Format contoh: Biaya: Rp 42.000
           final numStr = trimmed.replaceAll(RegExp(r'[^0-9]'), '');
           total += int.tryParse(numStr) ?? 0;
         }
@@ -153,7 +152,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF7EDED),
+                  color: const Color(0xFFEDE2CF),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
@@ -219,24 +218,24 @@ class _BlockchainPageState extends State<BlockchainPage> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Riwayat Transaksi (Blockchain)', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Riwayat Blockchain', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: const Color(0xFF67343A),
+        foregroundColor: const Color(0xFFEDE2CF),
+        iconTheme: const IconThemeData(color: Color(0xFFEDE2CF)),
         actions: [
           IconButton(
             tooltip: 'Segarkan',
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Color(0xFFEDE2CF)),
             onPressed: _load,
           ),
         ],
       ),
       body: Column(
         children: [
-          // Dashboard Ringkasan
           Container(
             padding: const EdgeInsets.all(16),
-            color: Colors.white,
+            color: const Color(0xFFFAF7F2),
             child: Column(
               children: [
                 Row(
@@ -245,7 +244,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF7EDED),
+                          color: const Color(0xFFEDE2CF),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -288,12 +287,13 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 ),
                 const SizedBox(height: 12),
 
-                // Search Bar
                 TextField(
                   controller: _searchCtrl,
+                  style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
                     hintText: 'Cari judul buku atau metode bayar...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
+                    hintStyle: TextStyle(fontSize: 12.5, color: Colors.grey.shade500),
+                    prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF67343A)),
                     suffixIcon: _filter.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear, size: 18),
@@ -304,16 +304,26 @@ class _BlockchainPageState extends State<BlockchainPage> {
                           )
                         : null,
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28),
+                      borderSide: const BorderSide(color: Color(0xFFEADBCE)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28),
+                      borderSide: const BorderSide(color: Color(0xFFEADBCE)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(28),
+                      borderSide: const BorderSide(color: Color(0xFF67343A), width: 1.6),
+                    ),
                     filled: true,
-                    fillColor: Colors.grey.shade50,
+                    fillColor: const Color(0xFFFAF7F2),
                   ),
                   onChanged: (v) => setState(() => _filter = v.trim()),
                 ),
                 const SizedBox(height: 12),
 
-                // Tombol Verifikasi & Simulasi
                 Row(
                   children: [
                     Expanded(
@@ -342,7 +352,6 @@ class _BlockchainPageState extends State<BlockchainPage> {
             ),
           ),
 
-          // Pesan Hasil Verifikasi
           if (_msg != null)
             Container(
               width: double.infinity,
@@ -373,7 +382,6 @@ class _BlockchainPageState extends State<BlockchainPage> {
               ),
             ),
 
-          // Daftar Blok
           Expanded(
             child: filtered.isEmpty
                 ? Center(
@@ -420,7 +428,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFF7EDED),
+                                      color: const Color(0xFFEDE2CF),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(

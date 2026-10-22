@@ -127,7 +127,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [const Color(0xFFF7EDED), Colors.white],
+                  colors: [const Color(0xFFFAF7F2), Colors.white],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -216,7 +216,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   ),
                   const SizedBox(height: 16),
 
-                  // PERBAIKAN OVERFLOW: Menggunakan SingleChildScrollView horizontal
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -224,7 +223,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       children: [
                         _buildBadge(Icons.star, '${rating.toStringAsFixed(1)} / 5.0', Colors.amber.shade800, Colors.amber.shade50),
                         const SizedBox(width: 8),
-                        _buildBadge(Icons.category_outlined, category, const Color(0xFF67343A), const Color(0xFFF7EDED)),
+                        _buildBadge(Icons.category_outlined, category, const Color(0xFF67343A), const Color(0xFFEDE2CF)),
                         const SizedBox(width: 8),
                         _buildBadge(Icons.menu_book_outlined, '$pageCount Hal', Colors.teal, Colors.teal.shade50),
                         const SizedBox(width: 8),
@@ -236,42 +235,50 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF7EDED),
+                      color: const Color(0xFFFAF7F2),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: const Color(0xFFD4BE9D)),
+                      border: Border.all(color: const Color(0xFFEADBCE)),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Harga Tarif Sewa',
-                              style: TextStyle(fontSize: 12, color: Color(0xFF67343A), fontWeight: FontWeight.w600),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${_formatRupiah(pricePerDay)} / hari',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF302622),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Harga Tarif Sewa',
+                                style: TextStyle(fontSize: 12, color: Color(0xFF67343A), fontWeight: FontWeight.w600),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              FittedBox(
+                                fit: BoxFit.scaleDown,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  '${_formatRupiah(pricePerDay)} / hari',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF302622),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade100,
+                            color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.green.shade200),
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.check_circle, size: 16, color: Colors.green),
+                              Icon(Icons.check_circle, size: 15, color: Colors.green),
                               SizedBox(width: 4),
                               Text(
                                 'Stok Siap Sewa',

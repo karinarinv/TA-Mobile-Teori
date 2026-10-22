@@ -85,7 +85,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF7EDED),
+                            color: const Color(0xFFEDE2CF),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(Icons.bookmark_border, size: 64, color: const Color(0xFF9A704F)),
@@ -190,7 +190,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFF7EDED),
+                                            color: const Color(0xFFEDE2CF),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(

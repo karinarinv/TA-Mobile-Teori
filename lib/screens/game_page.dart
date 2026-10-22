@@ -527,6 +527,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               ),
               onPressed: () {
                 Navigator.pop(ctx);
+                GameAudioService.playWin();
                 setState(() {
                   _currentLevel++;
                   _resetToLevelStart();
@@ -660,13 +661,6 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     final widgets = <Widget>[];
 
-    // Gradien warna sampul buku-buku yang dibawa
-    final bookGradients = [
-      const [Color(0xFFFBBF24), Color(0xFFD97706)], // Emas / Amber
-      const [Color(0xFF34D399), Color(0xFF059669)], // Zamrud / Emerald
-      const [Color(0xFFF87171), Color(0xFFDC2626)], // Merah Rubi
-    ];
-
     for (int i = 0; i < collected.length; i++) {
       // Posisi mengikuti jejak pemain (trailing train)
       final trailIdx = (i + 1) * 3;
@@ -678,8 +672,6 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       } else {
         pos = Offset(_playerCol, _playerRow);
       }
-
-      final colors = bookGradients[i % bookGradients.length];
 
       widgets.add(
         Positioned(
@@ -694,32 +686,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 child: child,
               );
             },
-            child: Container(
-              width: cellW * 0.56,
-              height: cellH * 0.56,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: colors,
+            child: Icon(
+              Icons.menu_book_rounded,
+              size: cellW * 0.62,
+              color: const Color(0xFFF59E0B),
+              shadows: const [
+                Shadow(
+                  color: Color(0xFFB45309),
+                  blurRadius: 6,
                 ),
-                border: Border.all(color: Colors.white, width: 1.4),
-                boxShadow: [
-                  BoxShadow(
-                    color: colors.first.withValues(alpha: 0.65),
-                    blurRadius: 6,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.menu_book_rounded,
-                  size: cellW * 0.34,
-                  color: Colors.white,
+                Shadow(
+                  color: Colors.black,
+                  blurRadius: 2,
+                  offset: Offset(0, 1),
                 ),
-              ),
+              ],
             ),
           ),
         ),
@@ -756,12 +737,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         _jumpscareProgressController,
       ]),
       builder: (context, child) {
-        final shakeX = (_shakeController.value - 0.5) * 16;
-        final shakeY = (Random().nextDouble() - 0.5) * 14;
-        final scale = 1.0 + (_jumpscareProgressController.value * 1.5);
+        // Efek getaran santai & stabil agar tulisan terbaca jelas tanpa membuat pusing
+        final shakeX = (_shakeController.value - 0.5) * 2.0;
+        final scale = 1.0 + (_jumpscareProgressController.value * 0.6);
 
         return Transform.translate(
-          offset: Offset(shakeX, shakeY),
+          offset: Offset(shakeX, 0),
           child: Container(
             color: const Color(0xFF090B04),
             width: double.infinity,
@@ -824,7 +805,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                               child: FittedBox(
                                 fit: BoxFit.scaleDown,
                                 child: Text(
-                                  'WIKWOK MENYERANG ($_jumpscareRemainingSeconds detik)',
+                                  'HANTU PENJAGA MENYERANG ($_jumpscareRemainingSeconds detik)',
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -1263,37 +1244,32 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     return Scaffold(
       backgroundColor: pageBgColor,
-      appBar: AppBar(
-        title: Text(
-          _currentLevel == 0
-              ? 'Perpustakaan Terang (Level 1)'
-              : _currentLevel == 1
-                  ? 'Perpustakaan Temaram (Level 2)'
-                  : 'Ruang Arsip Gelap (Level 3)',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        elevation: 0,
-        backgroundColor: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            tooltip: 'Ulang Level Ini',
-            icon: const Icon(Icons.restart_alt_rounded),
-            onPressed: _resetToLevelStart,
-          ),
-        ],
-      ),
       body: SafeArea(
         child: Column(
           children: [
-            // Status Bar & Level Header
+            // Header Minimalis Layar Penuh (Fokus Game Penuh, Bebas AppBar)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               color: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
               child: Row(
                 children: [
+                  // Tombol Keluar Minimalis
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: const Icon(Icons.close_rounded, size: 18, color: Colors.white70),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                     decoration: BoxDecoration(
                       color: _currentLevel == 2
                           ? const Color(0xFF384517).withValues(alpha: 0.6)
@@ -1305,7 +1281,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       ),
                     ),
                     child: Text(
-                      'Level ${_currentLevel + 1}/3',
+                      'Lvl ${_currentLevel + 1}/3',
                       style: TextStyle(
                         color: _currentLevel == 2 ? const Color(0xFFA3C742) : const Color(0xFFFBBF24),
                         fontWeight: FontWeight.bold,
@@ -1315,32 +1291,17 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _levelNames[_currentLevel],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        Text(
-                          _currentLevel == 2 && _countdown > 0 && _hasStartedMoving
-                              ? 'Wikwok bangun: $_countdown detik'
-                              : 'Tabrakan: $_wallHits | Koleksi: ${_allLevelBooks[_currentLevel].where((b) => b.isCollected).length}/${_allLevelBooks[_currentLevel].length}',
-                          style: TextStyle(
-                            color: _currentLevel == 2 && _hasStartedMoving ? const Color(0xFFFACC15) : Colors.grey.shade400,
-                            fontSize: 11,
-                            fontWeight: _currentLevel == 2 && _hasStartedMoving ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                    child: Text(
+                      _currentLevel == 2 && _countdown > 0 && _hasStartedMoving
+                          ? 'Hantu bangun: $_countdown dtk'
+                          : '${_levelNames[_currentLevel]} (${_allLevelBooks[_currentLevel].where((b) => b.isCollected).length}/${_allLevelBooks[_currentLevel].length})',
+                      style: TextStyle(
+                        color: _currentLevel == 2 && _hasStartedMoving ? const Color(0xFFFACC15) : Colors.white,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -1359,6 +1320,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       style: const TextStyle(fontSize: 10.5, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () => setState(() => _useDpad = !_useDpad),
+                  ),
+                  const SizedBox(width: 6),
+                  // Tombol Restart
+                  InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: _resetToLevelStart,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: const Icon(Icons.restart_alt_rounded, size: 18, color: Colors.white70),
+                    ),
                   ),
                 ],
               ),
@@ -1560,13 +1536,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                     ),
                                   ),
 
-                                  // Titik Koleksi Buku Pac-Man
+                                  // Titik Koleksi Buku Emas (Tanpa bulat, murni icon buku hangat bercahaya)
                                   ..._allLevelBooks[_currentLevel]
                                       .where((b) => !b.isCollected)
                                       .map((book) {
                                     return Positioned(
-                                      left: (book.col * cellW) + (cellW * 0.15),
-                                      top: (book.row * cellH) + (cellH * 0.15),
+                                      left: (book.col * cellW) + (cellW * 0.12),
+                                      top: (book.row * cellH) + (cellH * 0.12),
                                       child: AnimatedBuilder(
                                         animation: _itemFloatController,
                                         builder: (context, child) {
@@ -1576,27 +1552,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                             child: child,
                                           );
                                         },
-                                        child: Container(
-                                          width: cellW * 0.7,
-                                          height: cellH * 0.7,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.amber.shade400.withValues(alpha: 0.25),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.amber.withValues(alpha: 0.6),
-                                                blurRadius: 6,
-                                                spreadRadius: 1,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Center(
-                                            child: Icon(
-                                              Icons.menu_book_rounded,
-                                              size: cellW * 0.52,
-                                              color: const Color(0xFFFEF08A),
+                                        child: Icon(
+                                          Icons.menu_book_rounded,
+                                          size: cellW * 0.76,
+                                          color: const Color(0xFFFBBF24),
+                                          shadows: const [
+                                            Shadow(
+                                              color: Color(0xFFD97706),
+                                              blurRadius: 8,
                                             ),
-                                          ),
+                                            Shadow(
+                                              color: Colors.black45,
+                                              blurRadius: 2,
+                                              offset: Offset(0, 1),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     );
@@ -1649,10 +1619,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             ),
 
 
-            // Kontrol D-Pad / Panduan Bawah
+            // Kontrol D-Pad / Panduan Bawah (Nyaman untuk jempol, tidak terlalu ke bawah)
             if (_useDpad)
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                padding: const EdgeInsets.only(top: 8, bottom: 22, left: 16, right: 16),
                 color: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1815,7 +1785,7 @@ class _PersonPlayerIcon extends StatelessWidget {
   }
 }
 
-// Monster Wikwok di Labirin (Sprite Kelinci Animatronik Rusak Springtrap)
+// Monster Hantu Penjaga di Labirin Level 3 (Seram bercahaya merah)
 class _WikwokMazeIcon extends StatelessWidget {
   final double size;
 
@@ -1830,14 +1800,55 @@ class _WikwokMazeIcon extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF84A333).withValues(alpha: 0.9),
-            blurRadius: 12,
+            color: Colors.red.shade900.withValues(alpha: 0.85),
+            blurRadius: 14,
             spreadRadius: 3,
           ),
         ],
       ),
-      child: CustomPaint(
-        painter: _WikwokPixelPainter(),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Icon(
+            Icons.blur_on_rounded,
+            size: size * 1.15,
+            color: Colors.red.withValues(alpha: 0.6),
+          ),
+          Icon(
+            Icons.sentiment_very_dissatisfied_rounded,
+            size: size * 0.95,
+            color: const Color(0xFFFEE2E2),
+            shadows: const [
+              Shadow(color: Colors.red, blurRadius: 12),
+              Shadow(color: Colors.black, blurRadius: 4),
+            ],
+          ),
+          Positioned(
+            top: size * 0.32,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: size * 0.12,
+                  height: size * 0.12,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                SizedBox(width: size * 0.22),
+                Container(
+                  width: size * 0.12,
+                  height: size * 0.12,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2051,14 +2062,21 @@ class _HoldDpadButtonState extends State<_HoldDpadButton> {
       onTapUp: (_) => _stopHolding(),
       onTapCancel: () => _stopHolding(),
       child: Container(
-        width: 46,
-        height: 46,
+        width: 58,
+        height: 58,
         decoration: BoxDecoration(
           color: const Color(0xFF1E293B),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFF334155), width: 1.5),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFFBBF24).withValues(alpha: 0.4), width: 1.8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Icon(widget.icon, color: const Color(0xFFFBBF24), size: 26),
+        child: Icon(widget.icon, color: const Color(0xFFFBBF24), size: 32),
       ),
     );
   }
@@ -2109,7 +2127,7 @@ class _PixelLibraryMazePainter extends CustomPainter {
     final bookSpinePaints = [
       Paint()..color = const Color(0xFFDC2626), // Merah
       Paint()..color = const Color(0xFF16A34A), // Hijau
-      Paint()..color = const Color(0xFF2563EB), // Biru
+      Paint()..color = const Color(0xFFB45309), // Cokelat Amber
       Paint()..color = const Color(0xFFD97706), // Emas
       Paint()..color = const Color(0xFF9333EA), // Ungu
     ];

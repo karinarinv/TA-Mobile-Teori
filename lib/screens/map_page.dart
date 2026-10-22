@@ -46,8 +46,16 @@ class _MapPageState extends State<MapPage> {
   String _routeDistance = '';
   String _routeDuration = '';
 
-  // 11 Perpustakaan Nyata & Terpopuler di Daerah Istimewa Yogyakarta
   static const List<LibraryItem> _coreLibraries = [
+    LibraryItem(
+      name: 'Perpustakaan UPN "Veteran" Yogyakarta',
+      location: LatLng(-7.761895, 110.408712),
+      address: 'Gedung Perpustakaan UPN, Jl. SWK 104, Condongcatur, Kec. Depok, Kabupaten Sleman, D.I. Yogyakarta 55283',
+      hours: 'Senin - Jumat: 08.00 - 16.00 WIB (Sabtu - Minggu Tutup)',
+      phone: '(0274) 486733',
+      rating: 4.8,
+      facilities: ['Koleksi Skripsi & Buku', 'Ruang Baca Ber-AC', 'Free WiFi Kampus', 'Digital Library & E-Journal', 'Loker Mandiri'],
+    ),
     LibraryItem(
       name: 'Perpustakaan & Arsip UGM',
       location: LatLng(-7.769117, 110.378523),
@@ -385,7 +393,7 @@ class _MapPageState extends State<MapPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF7EDED),
+                    color: const Color(0xFFFAF7F2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(Icons.local_library, color: Color(0xFF67343A), size: 32),
@@ -618,7 +626,6 @@ class _MapPageState extends State<MapPage> {
             ],
           ),
 
-          // Banner Navigasi Aktif di Atas Peta
           if (_navigatingLib != null)
             Positioned(
               top: 12,
@@ -758,16 +765,16 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
 
-          // Slider card Perpustakaan 
+          // Slider card Perpustakaan Elegan & Nyaman
           Positioned(
             left: 0,
             right: 0,
             bottom: 16,
             child: SizedBox(
-              height: 135,
+              height: 146,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
                 itemCount: sortedLibs.length,
                 itemBuilder: (_, i) {
                   final lib = sortedLibs[i];
@@ -776,19 +783,32 @@ class _MapPageState extends State<MapPage> {
                   final dist = _getDistanceInKm(lib.location);
 
                   return Container(
-                    width: 275,
+                    width: 285,
                     margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    child: Card(
-                      elevation: isSelected ? 4 : 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        side: BorderSide(
-                          color: isNavigating ? Colors.green : isSelected ? const Color(0xFF67343A) : Colors.transparent,
-                          width: 2.0,
-                        ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isNavigating
+                            ? Colors.green.shade600
+                            : isSelected
+                                ? const Color(0xFF67343A)
+                                : const Color(0xFFEADBCE),
+                        width: isNavigating || isSelected ? 2.0 : 1.2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF302622).withValues(alpha: 0.08),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(18),
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(18),
                         onTap: () {
                           setState(() => _selectedLib = lib);
                           _mapController.move(lib.location, 15.5);
@@ -804,24 +824,49 @@ class _MapPageState extends State<MapPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(6),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: isNavigating ? Colors.green.shade50 : const Color(0xFFF7EDED),
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: isNavigating ? Colors.green.shade50 : const Color(0xFFEDE2CF),
+                                      borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Icon(
-                                      Icons.local_library,
+                                      Icons.local_library_rounded,
                                       size: 20,
-                                      color: isNavigating ? Colors.green : const Color(0xFF67343A),
+                                      color: isNavigating ? Colors.green.shade700 : const Color(0xFF67343A),
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 10),
                                   Expanded(
-                                    child: Text(
-                                      lib.name,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          lib.name,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                            color: Color(0xFF302622),
+                                            height: 1.2,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.star_rounded, size: 14, color: Colors.amber.shade700),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              '${lib.rating}',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey.shade700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -829,27 +874,43 @@ class _MapPageState extends State<MapPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.near_me, size: 14, color: Colors.deepOrange),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        _me != null ? '${dist.toStringAsFixed(1)} km' : 'Mencari GPS...',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.deepOrange,
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFAF7F2),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: const Color(0xFFEADBCE)),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.near_me_rounded, size: 13, color: Color(0xFF9A704F)),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          _me != null ? '${dist.toStringAsFixed(1)} km' : 'Mencari GPS...',
+                                          style: const TextStyle(
+                                            fontSize: 11.5,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF67343A),
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                  OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
+                                  FilledButton.icon(
+                                    style: FilledButton.styleFrom(
+                                      backgroundColor: isNavigating ? Colors.green.shade700 : const Color(0xFF67343A),
+                                      foregroundColor: Colors.white,
                                       visualDensity: VisualDensity.compact,
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    icon: const Icon(Icons.directions_rounded, size: 15),
+                                    label: Text(
+                                      isNavigating ? 'Aktif' : 'Rute',
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                                     ),
                                     onPressed: () => _fetchAndShowRoute(lib),
-                                    child: const Text('Rute', style: TextStyle(fontSize: 12)),
                                   ),
                                 ],
                               ),

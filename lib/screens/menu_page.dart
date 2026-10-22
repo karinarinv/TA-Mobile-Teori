@@ -226,30 +226,19 @@ class _MenuPageState extends State<MenuPage> {
         backgroundColor: _cOxblood,
         foregroundColor: _cParchment,
         titleSpacing: 16,
-        title: Row(
-          children: [
-            Image.asset(
-              'assets/images/rentbook_logo.png',
-              height: 30,
+        title: Align(
+          alignment: Alignment.centerLeft,
+          child: Image.asset(
+            'assets/images/rentbook_logo.png',
+            height: 42,
+            color: _cParchment,
+            colorBlendMode: BlendMode.srcIn,
+            errorBuilder: (_, __, ___) => const Icon(
+              Icons.menu_book_rounded,
               color: _cParchment,
-              colorBlendMode: BlendMode.srcIn,
-              errorBuilder: (_, __, ___) => const Icon(
-                Icons.menu_book_rounded,
-                color: _cParchment,
-                size: 26,
-              ),
+              size: 36,
             ),
-            const SizedBox(width: 10),
-            Text(
-              'RentBook',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: _cParchment,
-                letterSpacing: 0.4,
-              ),
-            ),
-          ],
+          ),
         ),
         actions: [
           IconButton(
@@ -257,7 +246,7 @@ class _MenuPageState extends State<MenuPage> {
             icon: const Icon(Icons.help_outline_rounded, color: _cParchment),
             onPressed: _showHelpDialog,
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 8),
         ],
       ),
       body: ListView(
@@ -340,19 +329,26 @@ class _MenuPageState extends State<MenuPage> {
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: _cAgedPaper.withValues(alpha: 0.16),
+                    color: _cAgedPaper.withValues(alpha: 0.22),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: _cAgedPaper.withValues(alpha: 0.35),
-                      width: 1.2,
+                      color: _cAgedPaper.withValues(alpha: 0.5),
+                      width: 1.6,
                     ),
                   ),
-                  child: const Icon(
-                    Icons.auto_stories_rounded,
+                  child: Image.asset(
+                    'assets/images/rentbook_logo.png',
+                    height: 58,
+                    width: 58,
                     color: _cParchment,
-                    size: 30,
+                    colorBlendMode: BlendMode.srcIn,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.auto_stories_rounded,
+                      color: _cParchment,
+                      size: 52,
+                    ),
                   ),
                 ),
               ],
