@@ -3,7 +3,6 @@ import 'package:crypto/crypto.dart';
 import 'db_helper.dart';
 import 'cloud_service.dart';
 
-/// Blockchain sederhana: tiap transaksi menyimpan hash blok sebelumnya.
 class BlockchainService {
   static String _calc(Object? data, Object? prev, Object? ts) =>
       sha256.convert(utf8.encode('$data|$prev|$ts')).toString();
@@ -18,11 +17,9 @@ class BlockchainService {
     await CloudService.insert('ledger', row); // sinkron ke online
   }
 
-  /// Semua blok, terbaru di atas.
   static Future<List<Map<String, Object?>>> all() async =>
       (await DbHelper.db).query('ledger', orderBy: 'id DESC');
 
-  /// Cek rantai (urutan lama ke baru).
   static bool verifyRows(List<Map<String, Object?>> rows) {
     var prev = '0';
     for (final r in rows) {

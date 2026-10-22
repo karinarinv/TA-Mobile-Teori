@@ -191,7 +191,7 @@ class _AiPageState extends State<AiPage> {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            'Bingung mau baca buku apa? Pilih saran cepat di bawah atau ketik langsung permintaan Anda:',
+                            'Bingung mau baca buku apa? Pilih saran cepat di bawah atau ketik langsung permintaan Anda',
                             style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                             textAlign: TextAlign.center,
                           ),

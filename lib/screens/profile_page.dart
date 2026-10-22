@@ -164,7 +164,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Column(
                   children: [
-                    // Avatar dengan Camera Badge
                     Center(
                       child: Stack(
                         children: [
@@ -350,7 +349,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Tombol Logout Khusus
+                    // Tombol Logout 
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
@@ -362,7 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         onPressed: _logout,
                         icon: const Icon(Icons.logout, size: 18),
-                        label: const Text('Keluar dari Akun', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
                     const SizedBox(height: 18),

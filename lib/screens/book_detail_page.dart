@@ -72,7 +72,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Penanganan null-safety yang sangat aman untuk semua nilai
+    // Penanganan null-safety 
     final book = widget.book;
     final title = book['title']?.toString() ?? 'Tanpa Judul';
     final authors = book['authors']?.toString() ?? 'Penulis tidak diketahui';

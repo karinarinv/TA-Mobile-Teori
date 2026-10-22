@@ -20,14 +20,14 @@ class MenuPage extends StatefulWidget {
 class _MenuPageState extends State<MenuPage> {
   String _user = 'Pembaca';
 
-  // Palet Warna Old Library
+  // Palet Warna 
   static const Color _cWalnut = Color(0xFF302622);
   static const Color _cOxblood = Color(0xFF67343A);
   static const Color _cTobacco = Color(0xFF9A704F);
   static const Color _cAgedPaper = Color(0xFFD4BE9D);
   static const Color _cParchment = Color(0xFFEDE2CF);
-  static const Color _cBgWarm = Color(0xFFFAF7F2); // Bersih, cerah, ramah di mata
-  static const Color _cCardBg = Colors.white; // Kartu putih bersih berkontras tajam
+  static const Color _cBgWarm = Color(0xFFFAF7F2); 
+  static const Color _cCardBg = Colors.white; 
 
   @override
   void initState() {
@@ -80,19 +80,19 @@ class _MenuPageState extends State<MenuPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                '📖 Cara Sewa Buku:',
+                'Cara Sewa Buku:',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: _cOxblood, fontSize: 13),
               ),
               const SizedBox(height: 4),
               Text(
-                '1. Buka menu "Cari & Sewa Buku" atau goyangkan HP untuk rekomendasi acak.\n'
+                '1. Buka menu "Cari & Sewa Buku" lalu ketik buku yang ingin dicari atau goyangkan HP untuk rekomendasi acak.\n'
                 '2. Pilih buku yang diinginkan lalu ketuk "Sewa Sekarang".\n'
                 '3. Tentukan durasi pinjam dan metode pembayaran.',
                 style: GoogleFonts.poppins(fontSize: 12, color: _cWalnut.withValues(alpha: 0.85), height: 1.4),
               ),
               const SizedBox(height: 12),
               Text(
-                '🔒 Transparansi Blockchain:',
+                'Transparansi Blockchain:',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: _cOxblood, fontSize: 13),
               ),
               const SizedBox(height: 4),
@@ -102,7 +102,7 @@ class _MenuPageState extends State<MenuPage> {
               ),
               const SizedBox(height: 12),
               Text(
-                '🎁 Voucher Diskon:',
+                'Voucher Diskon:',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: _cOxblood, fontSize: 13),
               ),
               const SizedBox(height: 4),
@@ -122,7 +122,7 @@ class _MenuPageState extends State<MenuPage> {
             ),
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Mengerti',
+              'Tutup',
               style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
             ),
           ),
@@ -151,14 +151,14 @@ class _MenuPageState extends State<MenuPage> {
 
     final todayStr = _formatToday();
 
-    // 8 Menu Terstruktur dengan Palet Warna Perpustakaan Klasik (Harmonis & Nyaman di Mata)
+    // 8 Menu 
     final items = [
       _MenuItem(
         title: 'Cari & Sewa Buku',
         subtitle: 'Katalog & sewa instan',
         badge: 'Katalog',
         icon: Icons.menu_book_rounded,
-        color: const Color(0xFF67343A), // Oxblood
+        color: const Color(0xFF67343A), 
         onTap: () => go(const BooksPage()),
       ),
       _MenuItem(
@@ -166,7 +166,7 @@ class _MenuPageState extends State<MenuPage> {
         subtitle: 'Daftar buku favorit',
         badge: 'Favorit',
         icon: Icons.bookmark_added_rounded,
-        color: const Color(0xFF9A704F), // Tobacco
+        color: const Color(0xFF9A704F),
         onTap: () => go(const SavedBooksPage()),
       ),
       _MenuItem(
@@ -174,23 +174,23 @@ class _MenuPageState extends State<MenuPage> {
         subtitle: 'Rekomendasi Gemini AI',
         badge: 'AI Smart',
         icon: Icons.auto_awesome_rounded,
-        color: const Color(0xFF5A2A38), // Deep Wine
+        color: const Color(0xFF5A2A38), 
         onTap: () => go(const AiPage()),
       ),
       _MenuItem(
         title: 'Perpustakaan Terdekat',
-        subtitle: '11 Titik Jogja & rute GPS',
+        subtitle: 'Titik Perpustakaan & rute GPS',
         badge: 'GPS Maps',
         icon: Icons.location_on_rounded,
-        color: const Color(0xFF43634B), // Vintage Forest / Banker's Lamp
+        color: const Color(0xFF43634B), 
         onTap: () => go(const MapPage()),
       ),
       _MenuItem(
         title: 'Labirin Perpustakaan',
-        subtitle: 'Temukan buku emas & voucher',
+        subtitle: 'Temukan buku emas',
         badge: 'Minigame',
         icon: Icons.sports_esports_rounded,
-        color: const Color(0xFFB45309), // Amber Emas Kuno
+        color: const Color(0xFFB45309), 
         onTap: () => go(const GamePage()),
       ),
       _MenuItem(
@@ -198,15 +198,15 @@ class _MenuPageState extends State<MenuPage> {
         subtitle: 'Ledger transaksi SHA-256',
         badge: 'SHA-256',
         icon: Icons.lock_clock_rounded,
-        color: const Color(0xFF7C3F2B), // Cedar / Terracotta
+        color: const Color(0xFF7C3F2B), 
         onTap: () => go(const BlockchainPage()),
       ),
       _MenuItem(
-        title: 'Konversi Valas & Jam',
-        subtitle: 'Multi-valas & jam dunia',
-        badge: 'Valas & Jam',
+        title: 'Konversi Kurs & Jam',
+        subtitle: 'Mata Uang & Jam Dunia',
+        badge: 'Kurs & Jam',
         icon: Icons.currency_exchange_rounded,
-        color: const Color(0xFF3B506B), // Deep Library Slate
+        color: const Color(0xFF3B506B), 
         onTap: () => go(const ConverterPage()),
       ),
       _MenuItem(
@@ -214,7 +214,7 @@ class _MenuPageState extends State<MenuPage> {
         subtitle: 'FAQ & info peminjaman',
         badge: 'Bantuan',
         icon: Icons.help_outline_rounded,
-        color: const Color(0xFF302622), // Walnut Wood
+        color: const Color(0xFF302622),
         onTap: _showHelpDialog,
       ),
     ];
@@ -263,7 +263,6 @@ class _MenuPageState extends State<MenuPage> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         children: [
-          // Banner Ucapan Hangat & Homey (Khas Perpustakaan Klasik)
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -361,7 +360,6 @@ class _MenuPageState extends State<MenuPage> {
           ),
           const SizedBox(height: 16),
 
-          // Banner Asisten AI Buku (Parchment Tone, Hangat & Tidak Menyilaukan)
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -434,7 +432,6 @@ class _MenuPageState extends State<MenuPage> {
           ),
           const SizedBox(height: 20),
 
-          // Judul Seksi Menu
           Padding(
             padding: const EdgeInsets.only(left: 4, bottom: 12),
             child: Row(
@@ -461,7 +458,6 @@ class _MenuPageState extends State<MenuPage> {
             ),
           ),
 
-          // 8-Card Grid Layout (Simetris 2 kolom, Homey & Nyaman di Mata)
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

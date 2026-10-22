@@ -523,7 +523,7 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perpustakaan Jogja (${sortedLibs.length})'),
+        title: Text('Perpustakaan Terdekat'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -758,7 +758,7 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
 
-          // Slider Kartu Perpustakaan di Bawah
+          // Slider card Perpustakaan 
           Positioned(
             left: 0,
             right: 0,

@@ -44,7 +44,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
-    // Live clock timer (berdetak setiap 1 detik)
+    // Live clock timer 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) {
         setState(() => _now = DateTime.now());
@@ -84,7 +84,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
         }
       }
     } catch (_) {
-      // Gunakan kurs default yang sudah siap
+      // Gunakan kurs default yang sudah ada
       if (mounted) {
         setState(() {
           _err = 'Mode offline: Menggunakan kurs referensi standar.';
@@ -129,21 +129,21 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
 
     final zones = <Map<String, dynamic>>[
       {
-        'name': 'WIB (Indonesia Barat)',
+        'name': 'WIB (Waktu Indonesia Barat)',
         'city': 'Jakarta, Yogyakarta, Bandung',
         'time': utc.add(const Duration(hours: 7)),
         'badge': 'UTC+7',
         'flag': '🇮🇩',
       },
       {
-        'name': 'WITA (Indonesia Tengah)',
+        'name': 'WITA (Waktu Indonesia Tengah)',
         'city': 'Denpasar Bali, Makassar, Balikpapan',
         'time': utc.add(const Duration(hours: 8)),
         'badge': 'UTC+8',
         'flag': '🇮🇩',
       },
       {
-        'name': 'WIT (Indonesia Timur)',
+        'name': 'WIT (Waktu Indonesia Timur)',
         'city': 'Jayapura, Ambon, Manokwari',
         'time': utc.add(const Duration(hours: 9)),
         'badge': 'UTC+9',
@@ -168,7 +168,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Konversi Kurs & Jam Buka', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Konversi Kurs & Jam', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
@@ -180,7 +180,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
           indicatorWeight: 3,
           tabs: const [
             Tab(icon: Icon(Icons.currency_exchange), text: 'Kurs Mata Uang'),
-            Tab(icon: Icon(Icons.access_time_filled), text: 'Jam Perpustakaan'),
+            Tab(icon: Icon(Icons.access_time_filled), text: 'Jam Dunia'),
           ],
         ),
       ),
@@ -259,7 +259,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               const SizedBox(height: 14),
 
               const Text(
-                'Nilai Konversi ke Valuta Asing (Buku Impor)',
+                'Nilai Konversi ke Mata Uang Asing (Buku Impor)',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
               ),
               const SizedBox(height: 10),

@@ -68,7 +68,7 @@ class _BooksPageState extends State<BooksPage> {
     return s.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.');
   }
 
-  // Membersihkan tag HTML bawaan Google Books (<p>, <b>, <i>, dll)
+  // Membersihkan tag HTML bawaan Google Books 
   String _cleanHtml(String htmlString) {
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
     return htmlString.replaceAll(exp, '').trim();
@@ -253,7 +253,7 @@ class _BooksPageState extends State<BooksPage> {
             Text('Katalog Buku RentBook', style: TextStyle(fontSize: 18)),
             Text(
               'Goyang HP untuk rekomendasi acak',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
             ),
           ],
         ),

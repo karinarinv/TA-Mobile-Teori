@@ -34,7 +34,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   bool _isVoucherValid = false;
 
   final List<String> _paymentOptions = [
-    'Saldo RentBook',
     'QRIS (GoPay/OVO/Dana)',
     'Transfer Virtual Account',
     'Bayar Tunai',
@@ -322,7 +321,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                   value: _paymentMethod,
                   items: _paymentOptions.map((opt) {
                     IconData icon = Icons.payment;
-                    if (opt.contains('Saldo')) icon = Icons.account_balance_wallet;
                     if (opt.contains('QRIS')) icon = Icons.qr_code_2;
                     if (opt.contains('Transfer')) icon = Icons.account_balance;
                     if (opt.contains('Tunai')) icon = Icons.storefront;
@@ -346,7 +344,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             ),
             const SizedBox(height: 16),
 
-            // Voucher Diskon (Hadiah Labirin Buku)
+            // Voucher Diskon 
             Row(
               children: [
                 Icon(Icons.card_giftcard_rounded, size: 18, color: Colors.amber.shade800),
@@ -402,7 +400,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       textCapitalization: TextCapitalization.characters,
                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1),
                       decoration: InputDecoration(
-                        hintText: 'Contoh: DISKON10',
+                        hintText: 'Kode Voucher',
                         hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400, letterSpacing: 0),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),

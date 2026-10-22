@@ -16,13 +16,13 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscure = true;
   bool _loading = false;
 
-  // Palet Warna Old Library
+  // Palet Warna 
   static const Color _cWalnut = Color(0xFF302622);
   static const Color _cOxblood = Color(0xFF67343A);
   static const Color _cTobacco = Color(0xFF9A704F);
   static const Color _cAgedPaper = Color(0xFFD4BE9D);
   static const Color _cParchment = Color(0xFFEDE2CF);
-  static const Color _cCardBg = Color(0xFFD8C7B0); // Warna kartu buku klasik
+  static const Color _cCardBg = Color(0xFFD8C7B0);
   static const Color _cTabInactive = Color(0xFFC7B197);
 
   @override
@@ -118,14 +118,12 @@ class _LoginPageState extends State<LoginPage> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // 1. Gambar Latar Belakang Perpustakaan Kayu Asli
           Image.asset(
             'assets/images/library_bg.jpg',
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Container(color: _cWalnut),
           ),
 
-          // 2. Lapisan Vignette Hangat & Gelap Alami (Vintage Library Atmosphere)
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -140,7 +138,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          // 3. Konten Utama: Logo RentBook, Tagline, dan Kartu Form Login
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -148,7 +145,6 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Logo RentBook Resmi (Ukuran Lebih Besar & Jelas)
                     Image.asset(
                       'assets/images/rentbook_logo.png',
                       height: 85,
@@ -173,27 +169,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Tagline Elegan dengan Font Poppins
-                    Text(
-                      'Sewa Buku Cerdas & Terdesentralisasi',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: _cParchment.withValues(alpha: 0.95),
-                        letterSpacing: 0.3,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.8),
-                            blurRadius: 6,
-                            offset: const Offset(0, 1.5),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Kartu Form Buku Kuno (Aged Parchment Card)
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
@@ -211,7 +186,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Tab Segmented Capsule (Masuk vs Daftar Baru)
                           Container(
                             height: 44,
                             padding: const EdgeInsets.all(3.5),
@@ -367,7 +341,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 18),
 
-                          // Tombol Aksi Utama (Oxblood Pill)
                           SizedBox(
                             width: double.infinity,
                             height: 48,
@@ -403,7 +376,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 18),
 
-                          // Divider Or
                           Row(
                             children: [
                               Expanded(
@@ -433,7 +405,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 16),
 
-                          // Tombol Masuk dengan Biometrik (Outlined Aged Style)
                           Material(
                             color: Colors.transparent,
                             child: InkWell(
