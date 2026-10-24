@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
 import '../constants/app_colors.dart';
 
 class FeedbackPage extends StatefulWidget {
@@ -34,11 +35,12 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Future<void> _loadFeedback() async {
+    final username = await AuthService.currentSession() ?? 'guest';
     final prefs = await SharedPreferences.getInstance();
-    final savedKesan = prefs.getString('feedback_kesan');
-    final savedSaran = prefs.getString('feedback_saran');
-    final savedRating = prefs.getInt('feedback_rating') ?? 5;
-    final savedDate = prefs.getString('feedback_date') ?? '';
+    final savedKesan = prefs.getString('feedback_kesan_$username');
+    final savedSaran = prefs.getString('feedback_saran_$username');
+    final savedRating = prefs.getInt('feedback_rating_$username') ?? 5;
+    final savedDate = prefs.getString('feedback_date_$username') ?? '';
 
     setState(() {
       _isLoading = false;
@@ -75,12 +77,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
       return;
     }
 
+    final username = await AuthService.currentSession() ?? 'guest';
     final dateStr = DateFormat('dd MMMM yyyy, HH:mm', 'id_ID').format(DateTime.now());
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('feedback_kesan', kesan);
-    await prefs.setString('feedback_saran', saran);
-    await prefs.setInt('feedback_rating', _rating);
-    await prefs.setString('feedback_date', dateStr);
+    await prefs.setString('feedback_kesan_$username', kesan);
+    await prefs.setString('feedback_saran_$username', saran);
+    await prefs.setInt('feedback_rating_$username', _rating);
+    await prefs.setString('feedback_date_$username', dateStr);
 
     setState(() {
       _hasSavedData = true;

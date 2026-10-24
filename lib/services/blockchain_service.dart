@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
 import '../config.dart';
+import 'auth_service.dart';
 import 'db_helper.dart';
 import 'cloud_service.dart';
 
@@ -43,9 +44,16 @@ class BlockchainService {
     }
   }
 
-  static Future<void> addTransaction(String data) async {
+  static Future<void> addTransaction(String data, [String? user]) async {
+    final currentUser = user ?? await AuthService.currentSession() ?? 'anonim';
     final db = await DbHelper.db;
-    final last = await db.query('ledger', orderBy: 'id DESC', limit: 1);
+    final last = await db.query(
+      'ledger',
+      where: 'username = ?',
+      whereArgs: [currentUser],
+      orderBy: 'id DESC',
+      limit: 1,
+    );
     final prev = last.isEmpty ? '0' : last.first['hash'] as String;
     final ts = DateTime.now().toIso8601String();
 
@@ -58,14 +66,28 @@ class BlockchainService {
       'hash': _calc(data, prev, ts),
       'ts': ts,
       'tx_hash': txHash,
+      'username': currentUser,
     };
 
     await db.insert('ledger', row);
-    await CloudService.insert('ledger', row); // sinkron ke online
+    try {
+      await CloudService.insert('ledger', row); // sinkron ke online
+    } catch (_) {}
   }
 
-  static Future<List<Map<String, Object?>>> all() async =>
-      (await DbHelper.db).query('ledger', orderBy: 'id DESC');
+  static Future<List<Map<String, Object?>>> all([String? user]) async {
+    final currentUser = user ?? await AuthService.currentSession();
+    final db = await DbHelper.db;
+    if (currentUser != null && currentUser.isNotEmpty) {
+      return db.query(
+        'ledger',
+        where: 'username = ?',
+        whereArgs: [currentUser],
+        orderBy: 'id DESC',
+      );
+    }
+    return db.query('ledger', orderBy: 'id DESC');
+  }
 
   static bool verifyRows(List<Map<String, Object?>> rows) {
     var prev = '0';
@@ -78,8 +100,20 @@ class BlockchainService {
     return true;
   }
 
-  static Future<bool> verify() async {
-    final rows = await (await DbHelper.db).query('ledger', orderBy: 'id ASC');
+  static Future<bool> verify([String? user]) async {
+    final currentUser = user ?? await AuthService.currentSession();
+    final db = await DbHelper.db;
+    List<Map<String, Object?>> rows;
+    if (currentUser != null && currentUser.isNotEmpty) {
+      rows = await db.query(
+        'ledger',
+        where: 'username = ?',
+        whereArgs: [currentUser],
+        orderBy: 'id ASC',
+      );
+    } else {
+      rows = await db.query('ledger', orderBy: 'id ASC');
+    }
     return verifyRows(rows);
   }
 }

@@ -7,6 +7,8 @@ import 'services/notification_service.dart';
 import 'screens/login_page.dart';
 import 'screens/home_shell.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID', null);
@@ -20,6 +22,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.startLoggedIn});
   @override
   Widget build(BuildContext context) => MaterialApp(
+        navigatorKey: rootNavigatorKey,
         title: 'RentBook',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

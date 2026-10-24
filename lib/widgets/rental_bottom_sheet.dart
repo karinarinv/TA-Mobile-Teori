@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../services/blockchain_service.dart';
 import '../services/notification_service.dart';
 import '../screens/blockchain_page.dart';
+import '../main.dart';
 
 class RentalBottomSheet extends StatefulWidget {
   final Map<String, dynamic> book;
@@ -549,7 +550,8 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
 
         if (!mounted) return;
         Navigator.pop(context);
-        _showSuccessDialog(context, title, authors, totalFormatted, dueDateStr);
+        final targetCtx = rootNavigatorKey.currentContext ?? context;
+        _showSuccessDialog(targetCtx, title, authors, totalFormatted, dueDateStr);
       } catch (e) {
         if (!mounted) return;
         setState(() => _isProcessing = false);
@@ -694,7 +696,9 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
             onPressed: () {
               Navigator.pop(ctx);
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const BlockchainPage()));
+              rootNavigatorKey.currentState?.push(
+                MaterialPageRoute(builder: (_) => const BlockchainPage()),
+              );
             },
             icon: const Icon(Icons.verified, size: 18),
             label: const Text('Cek Blockchain'),
@@ -735,7 +739,7 @@ class _QrisPaymentModal extends StatefulWidget {
 class _QrisPaymentModalState extends State<_QrisPaymentModal> {
   bool _isProcessing = false;
   Timer? _autoTimer;
-  int _secondsLeft = 5;
+  int _secondsLeft = 120;
 
   @override
   void initState() {
@@ -790,8 +794,9 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
 
       if (!mounted) return;
       Navigator.pop(context); // Tutup QR sheet
+      final targetCtx = rootNavigatorKey.currentContext ?? context;
       _RentalBottomSheetState._showSuccessDialog(
-        context,
+        targetCtx,
         widget.title,
         widget.authors,
         widget.totalFormatted,
@@ -808,16 +813,24 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
   Widget build(BuildContext context) {
     final qrPayload = '00020101021226580014ID.LINKAJA.WWW0118936009180000000000520458125303360540${widget.totalPrice}5802ID5912RENTBOOK%20ID6010YOGYAKARTA62070703A016304';
     final qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=$qrPayload';
+    final minutes = _secondsLeft ~/ 60;
+    final seconds = _secondsLeft % 60;
+    final timeStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           Container(
             width: 40,
             height: 4,
@@ -935,7 +948,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Deteksi pembayaran otomatis dalam $_secondsLeft detik...',
+                  'Deteksi pembayaran otomatis: $timeStr ($_secondsLeft dtk)...',
                   style: const TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
@@ -974,7 +987,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : const Text(
-                      'Konfirmasi Sekarang (Tanpa Menunggu)',
+                      'Saya Sudah Bayar (Konfirmasi Sekarang)',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
                     ),
               onPressed: _isProcessing ? null : _processPayment,
@@ -982,6 +995,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
           ),
           const SizedBox(height: 10),
         ],
+      ),
       ),
     );
   }
@@ -1059,7 +1073,7 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
       if (!mounted) return;
       Navigator.pop(context); // Tutup VA sheet
       _RentalBottomSheetState._showSuccessDialog(
-        context,
+        rootNavigatorKey.currentContext ?? context,
         widget.title,
         widget.authors,
         widget.totalFormatted,
@@ -1077,15 +1091,20 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
     final vaNumber = _vaNumbers[_selectedBank] ?? '8274 0812 3456 7890';
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Center(
             child: Container(
               width: 40,
@@ -1208,6 +1227,7 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
           ),
           const SizedBox(height: 10),
         ],
+      ),
       ),
     );
   }

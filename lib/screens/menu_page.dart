@@ -671,7 +671,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Kitab Panduan RentBook',
+                              'Panduan RentBook',
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -723,7 +723,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                               visualDensity: VisualDensity.compact,
                               padding: const EdgeInsets.symmetric(horizontal: 8),
                             ),
-                            onPressed: _currentPage > 0 ? _prevPage : null,
+                            onPressed: _currentPage > 0 ? _prevPage : () => Navigator.pop(context),
                             icon: const Icon(Icons.arrow_back_ios_rounded, size: 13),
                             label: Text(
                               'Kembali',

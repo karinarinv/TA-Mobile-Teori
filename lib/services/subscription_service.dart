@@ -85,7 +85,7 @@ class SubscriptionService {
       onAllowed();
     } else {
       if (!context.mounted) return;
-      showPaywallDialog(context, featureName: featureName, onSubscribed: onAllowed);
+      showPaywallDialog(context, featureName: featureName, onSubscribed: null);
     }
   }
 
@@ -154,14 +154,19 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
       decoration: const BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           // Handle bar
           Container(
             width: 42,
@@ -344,6 +349,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
           ),
         ],
       ),
+      ),
     );
   }
 
@@ -382,7 +388,7 @@ class _VipQrisPaymentModal extends StatefulWidget {
 
 class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
   Timer? _autoSuccessTimer;
-  int _secondsLeft = 5;
+  int _secondsLeft = 120;
   bool _isProcessing = false;
 
   @override
@@ -431,7 +437,6 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
 
       // Tampilkan dialog tanda terima pembayaran VIP resmi
       _showVipReceiptDialog(context, 'QRIS (GoPay/OVO/Dana)');
-      widget.onSuccess?.call();
     } catch (e) {
       if (!mounted) return;
       setState(() => _isProcessing = false);
@@ -445,16 +450,24 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
   Widget build(BuildContext context) {
     const qrPayload = '00020101021226580014ID.LINKAJA.WWW0118936009180000000000520458125303360540290005802ID5912RENTBOOK%20ID6010YOGYAKARTA62070703A016304';
     const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=$qrPayload';
+    final minutes = _secondsLeft ~/ 60;
+    final seconds = _secondsLeft % 60;
+    final timeStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
       decoration: const BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
           Container(
             width: 40,
             height: 4,
@@ -549,7 +562,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Deteksi pembayaran otomatis dalam $_secondsLeft detik...',
+                  'Deteksi pembayaran otomatis: $timeStr ($_secondsLeft dtk)...',
                   style: GoogleFonts.poppins(
                     fontSize: 11.5,
                     fontWeight: FontWeight.w600,
@@ -585,7 +598,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
           ),
           const SizedBox(height: 14),
 
-          // Tombol manual jika ingin langsung konfirmasi tanpa menunggu 5 detik
+          // Tombol konfirmasi langsung
           SizedBox(
             width: double.infinity,
             height: 46,
@@ -605,7 +618,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : Text(
-                      'Konfirmasi Sekarang',
+                      'Saya Sudah Bayar (Konfirmasi Sekarang)',
                       style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13),
                     ),
               onPressed: _isProcessing ? null : _completePayment,
@@ -613,6 +626,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
           ),
           const SizedBox(height: 8),
         ],
+      ),
       ),
     );
   }
@@ -673,7 +687,6 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
       Navigator.pop(context); // Tutup VA sheet
 
       _showVipReceiptDialog(context, 'Virtual Account $_selectedBank');
-      widget.onSuccess?.call();
     } catch (e) {
       if (!mounted) return;
       setState(() => _isProcessing = false);
@@ -688,15 +701,20 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
     final vaNumber = _vaNumbers[_selectedBank] ?? '8274 0812 9988 1122';
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.88,
+      ),
       decoration: const BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Center(
             child: Container(
               width: 40,
@@ -859,6 +877,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
           ),
           const SizedBox(height: 8),
         ],
+      ),
       ),
     );
   }
