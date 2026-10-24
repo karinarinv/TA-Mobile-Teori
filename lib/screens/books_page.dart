@@ -22,6 +22,18 @@ class _BooksPageState extends State<BooksPage> {
   String _status = '';
   StreamSubscription? _sub;
   DateTime _lastShake = DateTime.now();
+  String _selectedGenre = 'Semua';
+  final List<String> _genres = const [
+    'Semua',
+    'Bestseller',
+    'Fiksi',
+    'Sejarah',
+    'Sains',
+    'Bisnis',
+    'Seni',
+    'Filosofi',
+    'Teknologi',
+  ];
 
   @override
   void initState() {
@@ -273,7 +285,7 @@ class _BooksPageState extends State<BooksPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
             child: TextField(
               controller: _q,
               style: const TextStyle(fontSize: 13),
@@ -305,6 +317,50 @@ class _BooksPageState extends State<BooksPage> {
               ),
             ),
           ),
+
+          // Baris Filter Kategori Cepat (Elegan & Halus)
+          SizedBox(
+            height: 38,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              itemCount: _genres.length,
+              itemBuilder: (context, idx) {
+                final genre = _genres[idx];
+                final isSelected = _selectedGenre == genre;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(genre),
+                    selected: isSelected,
+                    showCheckmark: false,
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    labelStyle: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                      color: isSelected ? const Color(0xFFEDE2CF) : const Color(0xFF302622),
+                    ),
+                    backgroundColor: const Color(0xFFFAF7F2),
+                    selectedColor: const Color(0xFF67343A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSelected ? const Color(0xFF67343A) : const Color(0xFFEADBCE),
+                      ),
+                    ),
+                    onSelected: (_) {
+                      setState(() {
+                        _selectedGenre = genre;
+                        _q.text = genre == 'Semua' ? '' : genre;
+                      });
+                      _search();
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 6),
           if (_loading) const LinearProgressIndicator(),
           if (_status.isNotEmpty)
             Padding(
@@ -350,24 +406,59 @@ class _BooksPageState extends State<BooksPage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: SizedBox(
-                              width: 52,
-                              height: 76,
-                              child: img != null
-                                  ? Image.network(
-                                      img,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(
-                                        color: Colors.grey[200],
-                                        child: const Icon(Icons.book, color: Colors.grey),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.16),
+                                  blurRadius: 6,
+                                  offset: const Offset(1, 3),
+                                ),
+                              ],
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Stack(
+                                children: [
+                                  SizedBox(
+                                    width: 54,
+                                    height: 80,
+                                    child: img != null
+                                        ? Image.network(
+                                            img,
+                                            fit: BoxFit.cover,
+                                            errorBuilder: (_, __, ___) => Container(
+                                              color: Colors.grey[200],
+                                              child: const Icon(Icons.menu_book_rounded, color: Colors.grey),
+                                            ),
+                                          )
+                                        : Container(
+                                            color: Colors.grey[200],
+                                            child: const Icon(Icons.menu_book_rounded, color: Colors.grey),
+                                          ),
+                                  ),
+                                  // Efek realistis tulang punggung buku (spine shadow) di sisi kiri
+                                  Positioned(
+                                    left: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                    width: 6,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          colors: [
+                                            Colors.black.withValues(alpha: 0.35),
+                                            Colors.transparent,
+                                          ],
+                                        ),
                                       ),
-                                    )
-                                  : Container(
-                                      color: Colors.grey[200],
-                                      child: const Icon(Icons.book, color: Colors.grey),
                                     ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),

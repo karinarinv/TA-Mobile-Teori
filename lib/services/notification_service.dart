@@ -1,4 +1,4 @@
-﻿import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -17,6 +17,16 @@ class NotificationService {
   static const _d = NotificationDetails(
       android: AndroidNotificationDetails('rentbook', 'Pengingat Buku',
           importance: Importance.high, priority: Priority.high));
+
+  /// Notifikasi pembayaran lunas seketika
+  static Future<void> showPaymentSuccess(String title, String amount, String method) async {
+    await _n.show(
+      DateTime.now().millisecondsSinceEpoch ~/ 1000,
+      'Pembayaran Berhasil! ($method)',
+      'Sewa "$title" sebesar $amount telah terkonfirmasi lunas.',
+      _d,
+    );
+  }
 
   /// Notifikasi langsung + pengingat jatuh tempo (demo: 1 menit; durasi hari: days).
   static Future<void> scheduleReturn(String title, {int days = 3}) async {

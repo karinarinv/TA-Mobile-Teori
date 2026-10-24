@@ -1794,61 +1794,25 @@ class _WikwokMazeIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: size,
-      height: size,
+      width: size * 1.15,
+      height: size * 1.15,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.red.shade900.withValues(alpha: 0.85),
-            blurRadius: 14,
-            spreadRadius: 3,
+            color: const Color(0xFF5C6F2B).withValues(alpha: 0.65),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.8),
+            blurRadius: 6,
           ),
         ],
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(
-            Icons.blur_on_rounded,
-            size: size * 1.15,
-            color: Colors.red.withValues(alpha: 0.6),
-          ),
-          Icon(
-            Icons.sentiment_very_dissatisfied_rounded,
-            size: size * 0.95,
-            color: const Color(0xFFFEE2E2),
-            shadows: const [
-              Shadow(color: Colors.red, blurRadius: 12),
-              Shadow(color: Colors.black, blurRadius: 4),
-            ],
-          ),
-          Positioned(
-            top: size * 0.32,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: size * 0.12,
-                  height: size * 0.12,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                SizedBox(width: size * 0.22),
-                Container(
-                  width: size * 0.12,
-                  height: size * 0.12,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFEF4444),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+      child: CustomPaint(
+        size: Size(size * 1.15, size * 1.15),
+        painter: _WikwokPixelPainter(),
       ),
     );
   }

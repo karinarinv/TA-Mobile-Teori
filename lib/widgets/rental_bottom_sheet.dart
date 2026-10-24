@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:flutter/services.dart';
+import '../services/game_audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/blockchain_service.dart';
@@ -524,32 +527,94 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     DateTime returnDate,
     DateFormat dateFmt,
   ) async {
-    setState(() => _isProcessing = true);
+    final dueDateStr = dateFmt.format(returnDate);
+    final totalFormatted = _formatRupiah(totalPrice);
 
-    try {
-      final dueDateStr = dateFmt.format(returnDate);
-      final totalFormatted = _formatRupiah(totalPrice);
-      
-      // Catat ke Blockchain ledger (termasuk keterangan voucher jika ada)
-      final voucherNote = _appliedVoucher != null ? ' | Voucher: $_appliedVoucher (-10%)' : '';
-      final ledgerData = 'SEWA: $title | Durasi: $_duration Hari | Biaya: $totalFormatted$voucherNote | Batas: $dueDateStr | Bayar: $_paymentMethod';
-      await BlockchainService.addTransaction(ledgerData);
-
-      // Jadwalkan notifikasi jatuh tempo
-      await NotificationService.scheduleReturn(title, days: _duration);
-
-      if (!mounted) return;
+    if (_paymentMethod.contains('QRIS')) {
       Navigator.pop(context); // Tutup bottom sheet
+      _showQrisSheet(context, title, authors, totalPrice, totalFormatted, dueDateStr, _duration, _appliedVoucher);
+    } else if (_paymentMethod.contains('Virtual Account')) {
+      Navigator.pop(context); // Tutup bottom sheet
+      _showVaSheet(context, title, authors, totalPrice, totalFormatted, dueDateStr, _duration, _appliedVoucher);
+    } else {
+      // Bayar Tunai langsung proses
+      setState(() => _isProcessing = true);
+      try {
+        final voucherNote = _appliedVoucher != null ? ' | Voucher: $_appliedVoucher (-10%)' : '';
+        final ledgerData = 'SEWA: $title | Durasi: $_duration Hari | Biaya: $totalFormatted$voucherNote | Batas: $dueDateStr | Bayar: $_paymentMethod';
+        await BlockchainService.addTransaction(ledgerData);
+        await NotificationService.scheduleReturn(title, days: _duration);
+        await NotificationService.showPaymentSuccess(title, totalFormatted, 'Tunai di Kasir');
+        GameAudioService.playWin();
 
-      // Tampilkan Dialog Sukses
-      _showSuccessDialog(context, title, authors, totalFormatted, dueDateStr);
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isProcessing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memproses sewa: $e')),
-      );
+        if (!mounted) return;
+        Navigator.pop(context);
+        _showSuccessDialog(context, title, authors, totalFormatted, dueDateStr);
+      } catch (e) {
+        if (!mounted) return;
+        setState(() => _isProcessing = false);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal memproses sewa: $e')));
+      }
     }
+  }
+
+
+  // ============================================================
+  // SHEET PEMBAYARAN QRIS RESMI & INTERAKTIF (DAPAT DI-SCAN)
+  // ============================================================
+  static void _showQrisSheet(
+    BuildContext context,
+    String title,
+    String authors,
+    int totalPrice,
+    String totalFormatted,
+    String dueDateStr,
+    int duration,
+    String? appliedVoucher,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _QrisPaymentModal(
+        title: title,
+        authors: authors,
+        totalPrice: totalPrice,
+        totalFormatted: totalFormatted,
+        dueDateStr: dueDateStr,
+        duration: duration,
+        appliedVoucher: appliedVoucher,
+      ),
+    );
+  }
+
+  // ============================================================
+  // SHEET PEMBAYARAN VIRTUAL ACCOUNT RESMI DENGAN NOMOR VA
+  // ============================================================
+  static void _showVaSheet(
+    BuildContext context,
+    String title,
+    String authors,
+    int totalPrice,
+    String totalFormatted,
+    String dueDateStr,
+    int duration,
+    String? appliedVoucher,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => _VaPaymentModal(
+        title: title,
+        authors: authors,
+        totalPrice: totalPrice,
+        totalFormatted: totalFormatted,
+        dueDateStr: dueDateStr,
+        duration: duration,
+        appliedVoucher: appliedVoucher,
+      ),
+    );
   }
 
   static void _showSuccessDialog(
@@ -634,6 +699,514 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             icon: const Icon(Icons.verified, size: 18),
             label: const Text('Cek Blockchain'),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// ================================================================
+// WIDGET MODAL QRIS DENGAN KODE QR NYATA & NOTIFIKASI SUKSES
+// ================================================================
+class _QrisPaymentModal extends StatefulWidget {
+  final String title;
+  final String authors;
+  final int totalPrice;
+  final String totalFormatted;
+  final String dueDateStr;
+  final int duration;
+  final String? appliedVoucher;
+
+  const _QrisPaymentModal({
+    required this.title,
+    required this.authors,
+    required this.totalPrice,
+    required this.totalFormatted,
+    required this.dueDateStr,
+    required this.duration,
+    this.appliedVoucher,
+  });
+
+  @override
+  State<_QrisPaymentModal> createState() => _QrisPaymentModalState();
+}
+
+class _QrisPaymentModalState extends State<_QrisPaymentModal> {
+  bool _isProcessing = false;
+  Timer? _autoTimer;
+  int _secondsLeft = 5;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCountdown();
+  }
+
+  void _startCountdown() {
+    _autoTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_secondsLeft <= 1) {
+        timer.cancel();
+        _processPayment();
+      } else {
+        setState(() {
+          _secondsLeft--;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _processPayment() async {
+    if (_isProcessing) return;
+    _autoTimer?.cancel();
+    setState(() => _isProcessing = true);
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    try {
+      final voucherNote = widget.appliedVoucher != null ? ' | Voucher: ${widget.appliedVoucher} (-10%)' : '';
+      final ledgerData = 'SEWA: ${widget.title} | Durasi: ${widget.duration} Hari | Biaya: ${widget.totalFormatted}$voucherNote | Batas: ${widget.dueDateStr} | Bayar: QRIS (GoPay/OVO/Dana)';
+      
+      // Catat ke Blockchain
+      await BlockchainService.addTransaction(ledgerData);
+
+      // Notifikasi lunas seketika
+      await NotificationService.showPaymentSuccess(widget.title, widget.totalFormatted, 'QRIS');
+
+      // Jadwal jatuh tempo
+      await NotificationService.scheduleReturn(widget.title, days: widget.duration);
+
+      // Suara berhasil
+      GameAudioService.playWin();
+
+      if (!mounted) return;
+      Navigator.pop(context); // Tutup QR sheet
+      _RentalBottomSheetState._showSuccessDialog(
+        context,
+        widget.title,
+        widget.authors,
+        widget.totalFormatted,
+        widget.dueDateStr,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pembayaran QRIS gagal: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final qrPayload = '00020101021226580014ID.LINKAJA.WWW0118936009180000000000520458125303360540${widget.totalPrice}5802ID5912RENTBOOK%20ID6010YOGYAKARTA62070703A016304';
+    final qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=$qrPayload';
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+          ),
+          const SizedBox(height: 12),
+
+          // Header QRIS
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF67343A),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text('QRIS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text('Pembayaran Cepat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                ],
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+          const Divider(height: 16),
+
+          // Info Merchant
+          Text(
+            'RentBook Official Library',
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF302622)),
+          ),
+          Text(
+            'NMID: ID1020039281728 • A01',
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 12),
+
+          // Tampilan QR Code Nyata
+          Container(
+            width: 210,
+            height: 210,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFEADBCE), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Image.network(
+              qrUrl,
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.qr_code_2_rounded, size: 80, color: Color(0xFF67343A)),
+                    SizedBox(height: 6),
+                    Text('QRIS Siap Di-scan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+
+          // Total Bayar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF7F2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFEADBCE)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Total Tagihan QRIS:', style: TextStyle(fontSize: 13, color: Colors.black87)),
+                Text(
+                  widget.totalFormatted,
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Indikator auto verifikasi 5 detik
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF7F2),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: const Color(0xFFEADBCE)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF67343A)),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Deteksi pembayaran otomatis dalam $_secondsLeft detik...',
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF67343A),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          Text(
+            'Mendukung GoPay, OVO, Dana, ShopeePay, LinkAja, & m-Banking.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 16),
+
+          // Tombol Konfirmasi Langsung
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF67343A),
+                foregroundColor: const Color(0xFFEDE2CF),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              icon: _isProcessing
+                  ? const SizedBox.shrink()
+                  : const Icon(Icons.check_circle_outline_rounded, size: 20),
+              label: _isProcessing
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : const Text(
+                      'Konfirmasi Sekarang (Tanpa Menunggu)',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                    ),
+              onPressed: _isProcessing ? null : _processPayment,
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+}
+
+// ================================================================
+// WIDGET MODAL VIRTUAL ACCOUNT DENGAN PILIHAN BANK & SALIN NOMOR
+// ================================================================
+class _VaPaymentModal extends StatefulWidget {
+  final String title;
+  final String authors;
+  final int totalPrice;
+  final String totalFormatted;
+  final String dueDateStr;
+  final int duration;
+  final String? appliedVoucher;
+
+  const _VaPaymentModal({
+    required this.title,
+    required this.authors,
+    required this.totalPrice,
+    required this.totalFormatted,
+    required this.dueDateStr,
+    required this.duration,
+    this.appliedVoucher,
+  });
+
+  @override
+  State<_VaPaymentModal> createState() => _VaPaymentModalState();
+}
+
+class _VaPaymentModalState extends State<_VaPaymentModal> {
+  String _selectedBank = 'BCA';
+  bool _isProcessing = false;
+
+  final Map<String, String> _vaNumbers = {
+    'BCA': '8274 0812 3456 7890',
+    'Mandiri': '8871 0812 3456 7890',
+    'BNI': '8214 0812 3456 7890',
+    'BRI': '8088 0812 3456 7890',
+  };
+
+  void _copyVa(String number) {
+    Clipboard.setData(ClipboardData(text: number.replaceAll(' ', '')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: const [
+            Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+            SizedBox(width: 8),
+            Text('Nomor Virtual Account disalin ke clipboard!'),
+          ],
+        ),
+        backgroundColor: Colors.green.shade700,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  Future<void> _processPayment() async {
+    setState(() => _isProcessing = true);
+    await Future.delayed(const Duration(milliseconds: 900));
+
+    try {
+      final voucherNote = widget.appliedVoucher != null ? ' | Voucher: ${widget.appliedVoucher} (-10%)' : '';
+      final ledgerData = 'SEWA: ${widget.title} | Durasi: ${widget.duration} Hari | Biaya: ${widget.totalFormatted}$voucherNote | Batas: ${widget.dueDateStr} | Bayar: Virtual Account ($_selectedBank)';
+
+      await BlockchainService.addTransaction(ledgerData);
+      await NotificationService.showPaymentSuccess(widget.title, widget.totalFormatted, 'VA $_selectedBank');
+      await NotificationService.scheduleReturn(widget.title, days: widget.duration);
+
+      GameAudioService.playWin();
+
+      if (!mounted) return;
+      Navigator.pop(context); // Tutup VA sheet
+      _RentalBottomSheetState._showSuccessDialog(
+        context,
+        widget.title,
+        widget.authors,
+        widget.totalFormatted,
+        widget.dueDateStr,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isProcessing = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Pembayaran VA gagal: $e')));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vaNumber = _vaNumbers[_selectedBank] ?? '8274 0812 3456 7890';
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Transfer Virtual Account', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+            ],
+          ),
+          const Divider(height: 14),
+
+          const Text('Pilih Bank:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+          const SizedBox(height: 8),
+
+          // Pilihan Bank
+          Row(
+            children: ['BCA', 'Mandiri', 'BNI', 'BRI'].map((bank) {
+              final isSel = _selectedBank == bank;
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ChoiceChip(
+                  label: Text(bank),
+                  selected: isSel,
+                  selectedColor: const Color(0xFF67343A),
+                  backgroundColor: const Color(0xFFFAF7F2),
+                  labelStyle: TextStyle(
+                    color: isSel ? const Color(0xFFEDE2CF) : Colors.black87,
+                    fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 12,
+                  ),
+                  onSelected: (val) {
+                    if (val) setState(() => _selectedBank = bank);
+                  },
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 14),
+
+          // Kotak Nomor VA
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF7F2),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFEADBCE)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Nomor Virtual Account $_selectedBank', style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
+                    InkWell(
+                      onTap: () => _copyVa(vaNumber),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.copy_rounded, size: 14, color: Color(0xFF67343A)),
+                          SizedBox(width: 4),
+                          Text('Salin', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF67343A))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  vaNumber,
+                  style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Color(0xFF302622)),
+                ),
+                const SizedBox(height: 8),
+                Text('Atas Nama: RentBook Official', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Total Bayar
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Total Transfer:', style: TextStyle(fontSize: 13)),
+                Text(widget.totalFormatted, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF67343A))),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Tombol Selesaikan Pembayaran VA
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF67343A),
+                foregroundColor: const Color(0xFFEDE2CF),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              icon: _isProcessing ? const SizedBox.shrink() : const Icon(Icons.verified_rounded, size: 20),
+              label: _isProcessing
+                  ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Text('Konfirmasi Pembayaran VA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
+              onPressed: _isProcessing ? null : _processPayment,
+            ),
+          ),
+          const SizedBox(height: 10),
         ],
       ),
     );

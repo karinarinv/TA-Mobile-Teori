@@ -313,14 +313,33 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   const SizedBox(height: 24),
 
                   const Text(
-                    'Informasi Tambahan',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'Spesifikasi & Informasi Buku',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 12),
-                  _buildDetailRow('Penerbit', publisher),
-                  _buildDetailRow('Tanggal Rilis', publishedDate),
-                  _buildDetailRow('Bahasa', 'Indonesia / Terjemahan Resmi'),
-                  _buildDetailRow('Keamanan Transaksi', 'Dicatat di Blockchain Ledger (SHA-256)'),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSpecBox(Icons.business_rounded, 'Penerbit', publisher),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildSpecBox(Icons.calendar_month_rounded, 'Tanggal Rilis', publishedDate),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSpecBox(Icons.translate_rounded, 'Bahasa', 'Indonesia / Resmi'),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildSpecBox(Icons.verified_user_rounded, 'Keamanan', 'Ledger SHA-256'),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 40),
                 ],
               ),
@@ -402,24 +421,37 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+  Widget _buildSpecBox(IconData icon, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAF7F2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFEADBCE)),
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 140,
-            child: Text(
-              label,
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-            ),
+          Row(
+            children: [
+              Icon(icon, size: 16, color: const Color(0xFF67343A)),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-            ),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF302622)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

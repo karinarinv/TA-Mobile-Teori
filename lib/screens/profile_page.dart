@@ -1,3 +1,4 @@
+import '../services/subscription_service.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,6 +21,8 @@ class _ProfilePageState extends State<ProfilePage> {
   int _savedCount = 0;
   int _rentalCount = 0;
   bool _loading = true;
+  bool _isVip = false;
+  String _vipExpiry = '';
 
   @override
   void initState() {
@@ -38,9 +41,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final rentals = await BlockchainService.all();
 
     if (mounted) {
+      final isVip = await SubscriptionService.isVip();
+      final expiry = await SubscriptionService.getExpiryDate();
       setState(() {
         _savedCount = bookmarks.length;
         _rentalCount = rentals.length;
+        _isVip = isVip;
+        _vipExpiry = expiry;
         _loading = false;
       });
     }
@@ -215,21 +222,115 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEDE2CF),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'Member Aktif RentBook',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF5A2A38),
+                        color: _isVip ? const Color(0xFF67343A).withValues(alpha: 0.12) : const Color(0xFFEDE2CF),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: _isVip ? const Color(0xFF67343A) : Colors.transparent,
+                          width: 1.2,
                         ),
                       ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _isVip ? Icons.workspace_premium_rounded : Icons.person_outline_rounded,
+                            size: 14,
+                            color: const Color(0xFF67343A),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _isVip ? 'Member VIP' : 'Member Reguler',
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF67343A),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
+
+                    // Kartu Status Berlangganan VIP
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFAF7F2),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _isVip ? const Color(0xFF67343A) : const Color(0xFFEADBCE),
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEDE2CF),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _isVip ? Icons.workspace_premium_rounded : Icons.card_membership_rounded,
+                              color: const Color(0xFF67343A),
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _isVip ? 'Keanggotaan VIP Aktif' : 'Tingkatkan ke VIP Club',
+                                  style: const TextStyle(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF302622),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  _isVip
+                                      ? 'Berlaku hingga $_vipExpiry. Akun otomatis menjadi Reguler saat masa aktif berakhir.'
+                                      : 'Akses Labirin Perpustakaan, Konversi Kurs & AI Vision Scanner.',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.grey.shade700,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF67343A),
+                              foregroundColor: const Color(0xFFEDE2CF),
+                              visualDensity: VisualDensity.compact,
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onPressed: () {
+                              SubscriptionService.showPaywallDialog(
+                                context,
+                                featureName: _isVip ? 'Perpanjang VIP' : 'Membership VIP',
+                                onSubscribed: _load,
+                              );
+                            },
+                            child: Text(
+                              _isVip ? 'Perpanjang' : 'Upgrade',
+                              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
 
                     // Stats Bar (Tersimpan & Disewa)
                     Container(
