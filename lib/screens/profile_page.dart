@@ -306,27 +306,29 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF67343A),
-                              foregroundColor: const Color(0xFFEDE2CF),
-                              visualDensity: VisualDensity.compact,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          if (!_isVip) ...[
+                            const SizedBox(width: 8),
+                            FilledButton(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF67343A),
+                                foregroundColor: const Color(0xFFEDE2CF),
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              onPressed: () {
+                                SubscriptionService.showPaywallDialog(
+                                  context,
+                                  featureName: 'Membership VIP',
+                                  onSubscribed: _load,
+                                );
+                              },
+                              child: const Text(
+                                'Upgrade',
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                              ),
                             ),
-                            onPressed: () {
-                              SubscriptionService.showPaywallDialog(
-                                context,
-                                featureName: _isVip ? 'Perpanjang VIP' : 'Membership VIP',
-                                onSubscribed: _load,
-                              );
-                            },
-                            child: Text(
-                              _isVip ? 'Perpanjang' : 'Upgrade',
-                              style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
-                            ),
-                          ),
+                          ],
                         ],
                       ),
                     ),

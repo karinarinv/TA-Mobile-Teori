@@ -30,13 +30,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
   };
 
   final Map<String, (String, String)> _currencyInfo = {
-    'USD': ('Dolar Amerika Serikat', '🇺🇸 \$'),
-    'EUR': ('Euro Eropa', '🇪🇺 €'),
-    'SGD': ('Dolar Singapura', '🇸🇬 S\$'),
-    'JPY': ('Yen Jepang', '🇯🇵 ¥'),
-    'GBP': ('Poundsterling Inggris', '🇬🇧 £'),
-    'AUD': ('Dolar Australia', '🇦🇺 A\$'),
-    'MYR': ('Ringgit Malaysia', '🇲🇾 RM'),
+    'USD': ('Dolar Amerika Serikat', '\$'),
+    'EUR': ('Euro Eropa', '€'),
+    'SGD': ('Dolar Singapura', 'S\$'),
+    'JPY': ('Yen Jepang', '¥'),
+    'GBP': ('Poundsterling Inggris', '£'),
+    'AUD': ('Dolar Australia', 'A\$'),
+    'MYR': ('Ringgit Malaysia', 'RM'),
   };
 
   @override
@@ -133,35 +133,35 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
         'city': 'Jakarta, Yogyakarta, Bandung',
         'time': utc.add(const Duration(hours: 7)),
         'badge': 'UTC+7',
-        'flag': '🇮🇩',
+        'flag': 'ID',
       },
       {
         'name': 'WITA (Waktu Indonesia Tengah)',
         'city': 'Denpasar Bali, Makassar, Balikpapan',
         'time': utc.add(const Duration(hours: 8)),
         'badge': 'UTC+8',
-        'flag': '🇮🇩',
+        'flag': 'ID',
       },
       {
         'name': 'WIT (Waktu Indonesia Timur)',
         'city': 'Jayapura, Ambon, Manokwari',
         'time': utc.add(const Duration(hours: 9)),
         'badge': 'UTC+9',
-        'flag': '🇮🇩',
+        'flag': 'ID',
       },
       {
         'name': 'Tokyo (JST)',
         'city': 'Tokyo, Osaka, Kyoto',
         'time': utc.add(const Duration(hours: 9)),
         'badge': 'UTC+9',
-        'flag': '🇯🇵',
+        'flag': 'JP',
       },
       {
         'name': 'London (GMT / BST)',
         'city': 'London, Oxford, Manchester',
         'time': utc.add(Duration(hours: _bst(utc) ? 1 : 0)),
         'badge': _bst(utc) ? 'BST (UTC+1)' : 'GMT (UTC+0)',
-        'flag': '🇬🇧',
+        'flag': 'GB',
       },
     ];
 
@@ -274,7 +274,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                 final code = e.key;
                 final rate = e.value;
                 final converted = amount * rate;
-                final info = _currencyInfo[code] ?? (code, '🌐 $code');
+                final info = _currencyInfo[code] ?? (code, code);
 
                 return Card(
                   color: const Color(0xFFFAF7F2),

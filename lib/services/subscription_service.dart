@@ -387,43 +387,10 @@ class _VipQrisPaymentModal extends StatefulWidget {
 }
 
 class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
-  Timer? _autoSuccessTimer;
-  int _secondsLeft = 120;
   bool _isProcessing = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _startAutoVerificationTimer();
-  }
-
-  void _startAutoVerificationTimer() {
-    _autoSuccessTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      if (_secondsLeft <= 1) {
-        timer.cancel();
-        _completePayment();
-      } else {
-        setState(() {
-          _secondsLeft--;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _autoSuccessTimer?.cancel();
-    super.dispose();
-  }
 
   Future<void> _completePayment() async {
     if (_isProcessing) return;
-    _autoSuccessTimer?.cancel();
-
     setState(() => _isProcessing = true);
 
     try {
@@ -450,13 +417,10 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
   Widget build(BuildContext context) {
     const qrPayload = '00020101021226580014ID.LINKAJA.WWW0118936009180000000000520458125303360540290005802ID5912RENTBOOK%20ID6010YOGYAKARTA62070703A016304';
     const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=$qrPayload';
-    final minutes = _secondsLeft ~/ 60;
-    final seconds = _secondsLeft % 60;
-    final timeStr = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.88,
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       decoration: const BoxDecoration(
         color: AppColors.background,
@@ -468,165 +432,142 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(2)),
-          ),
-          const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(color: AppColors.border, borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 12),
 
-          // Header
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.oxblood,
-                      borderRadius: BorderRadius.circular(6),
+            // Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.oxblood,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'QRIS',
+                        style: GoogleFonts.poppins(color: AppColors.parchment, fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
                     ),
-                    child: Text(
-                      'QRIS',
-                      style: GoogleFonts.poppins(color: AppColors.parchment, fontWeight: FontWeight.bold, fontSize: 12),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Langganan VIP 30 Hari',
+                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.walnut),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Langganan VIP 30 Hari',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.walnut),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: AppColors.walnut),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const Divider(height: 14, color: AppColors.border),
+
+            Text(
+              'RentBook Official VIP Membership',
+              style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.walnut),
+            ),
+            Text(
+              'NMID: ID1020039281728 • A01',
+              style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+
+            // Tampilan QR Code Nyata
+            Container(
+              width: 170,
+              height: 170,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
-              IconButton(
-                icon: const Icon(Icons.close, color: AppColors.walnut),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-          const Divider(height: 16, color: AppColors.border),
-
-          Text(
-            'RentBook Official VIP Membership',
-            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.walnut),
-          ),
-          Text(
-            'NMID: ID1020039281728 • A01',
-            style: GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 12),
-
-          // Tampilan QR Code Nyata
-          Container(
-            width: 200,
-            height: 200,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
+              child: Image.network(
+                qrUrl,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const Center(
+                  child: Icon(Icons.qr_code_2_rounded, size: 70, color: AppColors.oxblood),
                 ),
-              ],
-            ),
-            child: Image.network(
-              qrUrl,
-              fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => const Center(
-                child: Icon(Icons.qr_code_2_rounded, size: 70, color: AppColors.oxblood),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // Indikator Auto Verifikasi 5 Detik
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.agedPaper.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.oxblood),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Deteksi pembayaran otomatis: $timeStr ($_secondsLeft dtk)...',
-                  style: GoogleFonts.poppins(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.oxblood,
+            // Total Tagihan
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total Tagihan:',
+                    style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.walnut),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Total Tagihan
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total Tagihan:',
-                  style: GoogleFonts.poppins(fontSize: 12.5, color: AppColors.walnut),
-                ),
-                Text(
-                  'Rp 29.000',
-                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.oxblood),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Tombol konfirmasi langsung
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.oxblood,
-                foregroundColor: AppColors.parchment,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  Text(
+                    'Rp 29.000',
+                    style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.oxblood),
+                  ),
+                ],
               ),
-              icon: _isProcessing
-                  ? const SizedBox.shrink()
-                  : const Icon(Icons.check_circle_outline_rounded, size: 18),
-              label: _isProcessing
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                    )
-                  : Text(
-                      'Saya Sudah Bayar (Konfirmasi Sekarang)',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13),
-                    ),
-              onPressed: _isProcessing ? null : _completePayment,
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
-      ),
+            const SizedBox(height: 10),
+
+            Text(
+              'Mendukung GoPay, OVO, Dana, ShopeePay, LinkAja, dan Mobile Banking.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(fontSize: 11.5, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+
+            // Tombol Konfirmasi Pembayaran
+            SizedBox(
+              width: double.infinity,
+              height: 46,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.oxblood,
+                  foregroundColor: AppColors.parchment,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: _isProcessing
+                    ? const SizedBox.shrink()
+                    : const Icon(Icons.check_circle_outline_rounded, size: 18),
+                label: _isProcessing
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                    : Text(
+                        'Konfirmasi Pembayaran VIP',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                onPressed: _isProcessing ? null : _completePayment,
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
@@ -949,12 +890,14 @@ void _showVipReceiptDialog(BuildContext context, String paymentMethod) {
           ),
         ],
       ),
+      actionsAlignment: MainAxisAlignment.center,
       actions: [
         FilledButton(
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.oxblood,
             foregroundColor: AppColors.parchment,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           ),
           onPressed: () => Navigator.pop(ctx),
           child: Text(

@@ -187,6 +187,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     _startLevelAudio();
     _resetToLevelStart();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _showPixelGameGuideDialog();
+      }
+    });
   }
 
   @override
@@ -857,7 +863,201 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     );
   }
 
-  // Halaman Kalah (Bebas Emojis, Desain Rapi & Bersih)
+  // Dialog Panduan Game Pixel Art Lucu
+  void _showPixelGameGuideDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFFFAF7F2),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: Color(0xFF67343A), width: 2),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Header Pixel Art
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CustomPaint(painter: _CutePixelGoldenBookPainter()),
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'PANDUAN LABIRIN',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                    color: Color(0xFF67343A),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 28,
+                  height: 28,
+                  child: CustomPaint(painter: _CutePixelGoldenBookPainter()),
+                ),
+              ],
+            ),
+            const Divider(color: Color(0xFFEADBCE), height: 20),
+
+            // Item 1: Karakter Penjelajah
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEDE2CF),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF67343A), width: 1.2),
+                  ),
+                  child: CustomPaint(painter: _CutePixelAdventurerPainter()),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Petualang Pustaka',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF302622)),
+                      ),
+                      Text(
+                        'Kamu mencari Buku Emas legendaris di arsip tua.',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            // Item 2: Buku di Lorong
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEDE2CF),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF67343A), width: 1.2),
+                  ),
+                  child: CustomPaint(painter: _CutePixelBookPainter()),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Koleksi Buku & Rak Emas',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF302622)),
+                      ),
+                      Text(
+                        'Sentuh rak buku emas di tiap lantai untuk naik level!',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            // Item 3: Monster Wikwok Lantai 3
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEDE2CF),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFF67343A), width: 1.2),
+                  ),
+                  child: CustomPaint(painter: _CutePixelWikwokPainter()),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Awas Wikwok di Lantai 3!',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF67343A)),
+                      ),
+                      Text(
+                        'Setelah 5 detik, Wikwok bangun mengejar. Lari secepatnya!',
+                        style: TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Navigasi D-Pad
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEDE2CF).withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFEADBCE)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.gamepad_rounded, size: 18, color: Color(0xFF67343A)),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Kontrol: Gunakan tombol D-Pad virtual di bawah layar untuk melangkah.',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF302622)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          FilledButton.icon(
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF67343A),
+              foregroundColor: const Color(0xFFEDE2CF),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(ctx),
+            icon: const Icon(Icons.play_arrow_rounded, size: 20),
+            label: const Text(
+              'Mulai Petualangan',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Halaman Kalah (Sesuai Color Palette Aplikasi & Retro Game)
   Widget _buildDefeatView() {
     return Center(
       child: SingleChildScrollView(
@@ -866,18 +1066,18 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 96,
-              height: 96,
+              width: 88,
+              height: 88,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF1B220B),
-                border: Border.all(color: const Color(0xFF6E882B), width: 2),
+                color: const Color(0xFFEDE2CF),
+                border: Border.all(color: const Color(0xFF67343A), width: 2.5),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4C5E1E).withValues(alpha: 0.4),
-                    blurRadius: 24,
-                    spreadRadius: 4,
+                    color: const Color(0xFF67343A).withValues(alpha: 0.2),
+                    blurRadius: 18,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -885,25 +1085,25 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 painter: _WikwokPixelPainter(),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             const Text(
               'KAMU TERTANGKAP',
               style: TextStyle(
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-                color: Color(0xFFE2E8F0),
+                letterSpacing: 1.2,
+                color: Color(0xFF67343A),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             const Text(
               'Wikwok Menemukanmu di Ruang Arsip',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF94A3B8),
+                color: Color(0xFF302622),
               ),
               textAlign: TextAlign.center,
             ),
@@ -912,21 +1112,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF1E293B),
+                color: const Color(0xFFEDE2CF).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFF334155)),
+                border: Border.all(color: const Color(0xFFEADBCE)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  const Row(
                     children: [
-                      Icon(Icons.lightbulb_outline_rounded, color: Colors.amber.shade400, size: 20),
-                      const SizedBox(width: 8),
+                      Icon(Icons.lightbulb_outline_rounded, color: Color(0xFF67343A), size: 20),
+                      SizedBox(width: 8),
                       Text(
                         'Strategi Menghadapi Wikwok',
                         style: TextStyle(
-                          color: Colors.amber.shade300,
+                          color: Color(0xFF67343A),
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -934,23 +1134,23 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    '1. Anda memiliki waktu 5 detik sebelum Wikwok bangun mengejar.\n'
-                    '2. Setelah Wikwok bangun, larilah secepat mungkin menuju Rak Buku Emas di pojok kanan bawah!\n'
-                    '3. Gunakan mode D-Pad jika kontrol sentuh terasa sulit di lorong sempit.',
+                  const Text(
+                    '1. Kamu memiliki waktu 5 detik sebelum Wikwok bangun mengejar.\n'
+                    '2. Setelah Wikwok bangun, larilah secepat mungkin menuju Rak Buku Emas di sudut labirin!\n'
+                    '3. Jangan berhenti atau berbalik arah menuju jalur buntu.',
                     style: TextStyle(
-                      fontSize: 12.5,
-                      color: Colors.grey.shade300,
+                      fontSize: 12,
+                      color: Color(0xFF302622),
                       height: 1.45,
                     ),
                   ),
-                  const Divider(color: Color(0xFF334155), height: 20),
+                  const Divider(color: Color(0xFFEADBCE), height: 18),
                   Row(
                     children: [
                       Expanded(
                         child: Text(
                           'Lorong: ${_levelNames[2]}',
-                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                          style: const TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -958,7 +1158,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       const SizedBox(width: 8),
                       Text(
                         'Tabrakan: $_wallHits kali',
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        style: const TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                         maxLines: 1,
                       ),
                     ],
@@ -966,22 +1166,22 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             SizedBox(
               width: double.infinity,
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF4C5E1E),
-                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xFF67343A),
+                  foregroundColor: const Color(0xFFEDE2CF),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: _resetToLevelStart,
                 icon: const Icon(Icons.replay_rounded, size: 20),
                 label: const Text(
-                  'COBA KABUR LAGI DARI WIKWOK',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                  'Coba Lagi Dari Lantai Ini',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -992,8 +1192,8 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               height: 44,
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white70,
-                  side: const BorderSide(color: Color(0xFF475569)),
+                  foregroundColor: const Color(0xFF67343A),
+                  side: const BorderSide(color: Color(0xFF67343A)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () {
@@ -1005,13 +1205,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   });
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Ulangi Dari Level 1'),
+                label: const Text('Ulangi Dari Lantai 1', style: TextStyle(fontWeight: FontWeight.w600)),
               ),
             ),
             const SizedBox(height: 8),
 
             TextButton.icon(
-              style: TextButton.styleFrom(foregroundColor: Colors.grey.shade400),
+              style: TextButton.styleFrom(foregroundColor: const Color(0xFF67343A)),
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
@@ -1027,6 +1227,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     );
   }
 
+  // Halaman Menang (Sesuai Color Palette Aplikasi)
   Widget _buildVictoryView() {
     return Center(
       child: SingleChildScrollView(
@@ -1035,73 +1236,78 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              width: 90,
+              height: 90,
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.amber.shade50,
+                color: const Color(0xFFEDE2CF),
+                border: Border.all(color: const Color(0xFF67343A), width: 2.5),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.amber.withValues(alpha: 0.3),
-                    blurRadius: 30,
-                    spreadRadius: 8,
+                    color: const Color(0xFF67343A).withValues(alpha: 0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: Icon(
-                Icons.auto_stories_rounded,
-                size: 80,
-                color: Colors.amber.shade800,
+              child: CustomPaint(
+                painter: _CutePixelGoldenBookPainter(),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             const Text(
-              'SELAMAT',
+              'SELAMAT, MISI SELESAI!',
               style: TextStyle(
-                fontSize: 26,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
-                color: Colors.black87,
+                color: Color(0xFF67343A),
               ),
             ),
             const SizedBox(height: 6),
             const Text(
               'Anda Berhasil Menemukan Rak Buku Emas',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFFD97706),
+                color: Color(0xFF302622),
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'Lolos dari kejaran Wikwok dan menuntaskan 3 lorong labirin perpustakaan RentBook.',
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              elevation: 1.5,
+              color: const Color(0xFFFAF7F2),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Color(0xFFEADBCE)),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(18),
                 child: Column(
                   children: [
-                    Row(
+                    const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.card_giftcard_rounded, color: Colors.amber.shade800, size: 22),
-                        const SizedBox(width: 8),
+                        Icon(Icons.card_giftcard_rounded, color: Color(0xFF67343A), size: 22),
+                        SizedBox(width: 8),
                         Text(
                           'Hadiah Voucher Sewa Buku',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
-                            color: Colors.amber.shade900,
+                            color: Color(0xFF67343A),
                           ),
                         ),
                       ],
@@ -1110,10 +1316,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: const Color(0xFFEDE2CF),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                          color: Colors.grey.shade300,
+                          color: const Color(0xFF67343A).withValues(alpha: 0.3),
                           style: BorderStyle.solid,
                         ),
                       ),
@@ -1126,7 +1332,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 3,
-                              color: Color(0xFFB45309),
+                              color: Color(0xFF67343A),
                               fontFamily: 'monospace',
                             ),
                           ),
@@ -1136,34 +1342,36 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     const SizedBox(height: 10),
                     Text(
                       'Potongan 10% untuk sewa buku apa pun di katalog RentBook.',
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                      style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 14),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        side: const BorderSide(color: Color(0xFFD97706)),
+                        side: const BorderSide(color: Color(0xFF67343A)),
+                        foregroundColor: const Color(0xFF67343A),
                       ),
                       onPressed: _copyVoucher,
-                      icon: const Icon(Icons.copy_rounded, size: 16, color: Color(0xFFD97706)),
+                      icon: const Icon(Icons.copy_rounded, size: 16, color: Color(0xFF67343A)),
                       label: const Text(
                         'Salin Kode Voucher',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFD97706)),
+                        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             SizedBox(
               width: double.infinity,
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFFD97706),
+                  backgroundColor: const Color(0xFF67343A),
+                  foregroundColor: const Color(0xFFEDE2CF),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: () {
@@ -1178,6 +1386,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 10),
             TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: const Color(0xFF67343A)),
               onPressed: () {
                 setState(() {
                   _currentLevel = 0;
@@ -1209,12 +1418,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     if (_isDefeatActive) {
       return Scaffold(
-        backgroundColor: const Color(0xFF0F172A),
+        backgroundColor: const Color(0xFFFAF7F2),
         appBar: AppBar(
           title: const Text('Misi Gagal', style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
-          backgroundColor: const Color(0xFF0F172A),
-          foregroundColor: Colors.white,
+          backgroundColor: const Color(0xFF67343A),
+          foregroundColor: const Color(0xFFEDE2CF),
           automaticallyImplyLeading: false,
         ),
         body: SafeArea(
@@ -1225,12 +1434,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     if (_isGameOver) {
       return Scaffold(
-        backgroundColor: Colors.grey.shade50,
+        backgroundColor: const Color(0xFFFAF7F2),
         appBar: AppBar(
           title: const Text('Kemenangan Labirin Buku', style: TextStyle(fontWeight: FontWeight.bold)),
           elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
+          backgroundColor: const Color(0xFF67343A),
+          foregroundColor: const Color(0xFFEDE2CF),
         ),
         body: _buildVictoryView(),
       );
@@ -2603,4 +2812,179 @@ class _PixelLibraryMazePainter extends CustomPainter {
         oldDelegate.isFlashing != isFlashing ||
         oldDelegate.level != level;
   }
+}
+
+// =========================================================================
+// PAINTERS PIXEL ART LUCU UNTUK PANDUAN GAME RETRO ARCADE
+// =========================================================================
+
+class _CutePixelAdventurerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 9;
+    const int rows = 9;
+    final pw = size.width / cols;
+    final ph = size.height / rows;
+
+    const List<List<int>> m = [
+      [0, 1, 1, 1, 1, 1, 0, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [0, 2, 2, 2, 2, 2, 0, 0, 0],
+      [0, 3, 2, 2, 3, 2, 0, 0, 0],
+      [0, 2, 2, 4, 2, 2, 0, 0, 0],
+      [0, 5, 5, 5, 5, 5, 0, 0, 0],
+      [0, 5, 6, 6, 6, 5, 0, 0, 0],
+      [0, 7, 7, 0, 7, 7, 0, 0, 0],
+      [0, 8, 8, 0, 8, 8, 0, 0, 0],
+    ];
+
+    final Map<int, Paint> p = {
+      1: Paint()..color = const Color(0xFF67343A), // Oxblood hat
+      2: Paint()..color = const Color(0xFFFFD1A9), // Skin
+      3: Paint()..color = const Color(0xFF302622), // Eyes
+      4: Paint()..color = const Color(0xFFE57373), // Smile
+      5: Paint()..color = const Color(0xFF9A704F), // Shirt
+      6: Paint()..color = const Color(0xFFD4AF37), // Book bag
+      7: Paint()..color = const Color(0xFF4C272C), // Pants
+      8: Paint()..color = const Color(0xFF302622), // Shoes
+    };
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final val = m[r][c];
+        if (val != 0 && p.containsKey(val)) {
+          canvas.drawRect(Rect.fromLTWH(c * pw, r * ph, pw + 0.3, ph + 0.3), p[val]!);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CutePixelBookPainter extends CustomPainter {
+  _CutePixelBookPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 9;
+    const int rows = 9;
+    final pw = size.width / cols;
+    final ph = size.height / rows;
+
+    const List<List<int>> m = [
+      [1, 1, 1, 0, 1, 1, 1, 0, 0],
+      [1, 2, 2, 1, 2, 2, 1, 0, 0],
+      [1, 2, 3, 1, 3, 2, 1, 0, 0],
+      [1, 2, 2, 1, 2, 2, 1, 0, 0],
+      [1, 2, 3, 1, 3, 2, 1, 0, 0],
+      [1, 2, 2, 1, 2, 2, 1, 0, 0],
+      [1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ];
+
+    final Map<int, Paint> p = {
+      1: Paint()..color = const Color(0xFF67343A),
+      2: Paint()..color = const Color(0xFFEDE2CF), // Kertas
+      3: Paint()..color = const Color(0xFF8A7663), // Tulisan
+    };
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final val = m[r][c];
+        if (val != 0 && p.containsKey(val)) {
+          canvas.drawRect(Rect.fromLTWH(c * pw, r * ph, pw + 0.3, ph + 0.3), p[val]!);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CutePixelGoldenBookPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 9;
+    const int rows = 9;
+    final pw = size.width / cols;
+    final ph = size.height / rows;
+
+    const List<List<int>> m = [
+      [0, 0, 4, 0, 0, 0, 0, 0, 0],
+      [0, 1, 1, 1, 0, 1, 1, 1, 0],
+      [1, 2, 2, 1, 2, 2, 1, 0, 0],
+      [1, 2, 3, 1, 3, 2, 1, 0, 0],
+      [1, 2, 2, 1, 2, 2, 1, 0, 0],
+      [1, 2, 3, 1, 3, 2, 1, 4, 0],
+      [1, 1, 1, 1, 1, 1, 1, 0, 0],
+      [0, 1, 1, 1, 1, 1, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ];
+
+    final Map<int, Paint> p = {
+      1: Paint()..color = const Color(0xFFB45309), // Gold border
+      2: Paint()..color = const Color(0xFFFEF08A), // Bright gold
+      3: Paint()..color = const Color(0xFFD97706), // Gold lines
+      4: Paint()..color = const Color(0xFFFFFFFF), // Sparkle
+    };
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final val = m[r][c];
+        if (val != 0 && p.containsKey(val)) {
+          canvas.drawRect(Rect.fromLTWH(c * pw, r * ph, pw + 0.3, ph + 0.3), p[val]!);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CutePixelWikwokPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 9;
+    const int rows = 9;
+    final pw = size.width / cols;
+    final ph = size.height / rows;
+
+    const List<List<int>> m = [
+      [0, 1, 0, 0, 0, 0, 0, 2, 0],
+      [0, 1, 0, 0, 0, 0, 1, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 3, 3, 1, 1, 1, 3, 3, 1],
+      [1, 4, 3, 1, 1, 1, 4, 3, 1],
+      [1, 1, 1, 5, 5, 1, 1, 1, 1],
+      [0, 1, 6, 1, 6, 1, 6, 1, 0],
+      [0, 1, 1, 1, 1, 1, 1, 1, 0],
+      [0, 0, 1, 1, 1, 1, 1, 0, 0],
+    ];
+
+    final Map<int, Paint> p = {
+      1: Paint()..color = const Color(0xFF5C6F2B), // Moss green
+      2: Paint()..color = const Color(0xFF94A3B8), // Wire
+      3: Paint()..color = const Color(0xFF0F120A), // Eyes socket
+      4: Paint()..color = const Color(0xFFFEF08A), // Glow eye
+      5: Paint()..color = const Color(0xFF0D1007), // Mouth cavity
+      6: Paint()..color = const Color(0xFFFEF08A), // Teeth
+    };
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final val = m[r][c];
+        if (val != 0 && p.containsKey(val)) {
+          canvas.drawRect(Rect.fromLTWH(c * pw, r * ph, pw + 0.3, ph + 0.3), p[val]!);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

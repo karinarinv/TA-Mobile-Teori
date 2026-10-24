@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../services/bookmark_service.dart';
 import '../widgets/rental_bottom_sheet.dart';
 import 'book_detail_page.dart';
+import 'books_page.dart';
 
 class SavedBooksPage extends StatefulWidget {
   const SavedBooksPage({super.key});
@@ -105,11 +106,18 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         FilledButton.icon(
                           style: FilledButton.styleFrom(
                             backgroundColor: const Color(0xFF67343A),
+                            foregroundColor: const Color(0xFFEDE2CF),
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const BooksPage()),
+                            );
+                          },
                           icon: const Icon(Icons.search),
-                          label: const Text('Jelajahi Katalog Buku'),
+                          label: const Text('Jelajahi Katalog Buku', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
