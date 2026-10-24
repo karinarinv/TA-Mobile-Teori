@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../config.dart';
 import '../services/blockchain_service.dart';
 
 class BlockchainPage extends StatefulWidget {
@@ -15,6 +17,22 @@ class _BlockchainPageState extends State<BlockchainPage> {
   bool _ok = true;
   String _filter = '';
   final TextEditingController _searchCtrl = TextEditingController();
+
+  Future<void> _openEtherscan([String? txHash]) async {
+    final String url = (txHash != null && txHash.isNotEmpty)
+        ? 'https://sepolia.etherscan.io/tx/$txHash'
+        : 'https://sepolia.etherscan.io/address/$sepoliaWalletAddress';
+    final uri = Uri.parse(url);
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Tidak dapat membuka link: $url')),
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -382,6 +400,56 @@ class _BlockchainPageState extends State<BlockchainPage> {
               ),
             ),
 
+          // Banner Info Etherscan Sepolia
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFAF7F2),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFEADBCE)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF67343A).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.language_rounded, color: Color(0xFF67343A), size: 20),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Ethereum Sepolia Explorer',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF302622)),
+                      ),
+                      Text(
+                        'Akun: ${_s(sepoliaWalletAddress)}',
+                        style: const TextStyle(fontSize: 11, color: Color(0xFF6B564A)),
+                      ),
+                    ],
+                  ),
+                ),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    foregroundColor: const Color(0xFF67343A),
+                    side: const BorderSide(color: Color(0xFF67343A)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () => _openEtherscan(),
+                  icon: const Icon(Icons.open_in_new, size: 14),
+                  label: const Text('Etherscan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+
           Expanded(
             child: filtered.isEmpty
                 ? Center(
@@ -512,6 +580,33 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                     ),
                                   ],
                                 ),
+                              ),
+                              const SizedBox(height: 10),
+                              // Tombol Cek Transaksi di Etherscan
+                              Builder(
+                                builder: (context) {
+                                  final txHash = r['tx_hash'] as String?;
+                                  final hasTx = txHash != null && txHash.isNotEmpty;
+                                  return SizedBox(
+                                    width: double.infinity,
+                                    child: FilledButton.icon(
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: hasTx ? const Color(0xFF67343A) : const Color(0xFF9A704F),
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                      icon: const Icon(Icons.open_in_new, size: 14),
+                                      label: Text(
+                                        hasTx
+                                            ? 'Cek Transaksi di Etherscan ↗'
+                                            : 'Cek Akun di Etherscan ↗',
+                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () => _openEtherscan(txHash),
+                                    ),
+                                  );
+                                },
                               ),
                             ],
                           ),
