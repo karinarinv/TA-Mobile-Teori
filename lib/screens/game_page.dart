@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
 import '../services/game_audio_service.dart';
 import 'books_page.dart';
 
@@ -49,11 +51,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   double _chaserRow = 1.5;
   bool _isChaserActive = false;
 
-  // Jumpscare Wikwok (2 Detik Saja) & Defeat State
+  // Jumpscare Wikwok & Defeat State
   bool _isJumpscareActive = false;
   bool _isDefeatActive = false;
-  int _jumpscareRemainingSeconds = 2;
+  final int _jumpscareRemainingSeconds = 2;
   Timer? _jumpscareTimer;
+  bool _isVoucherUsed = false;
+
+  Future<void> _checkVoucherStatus() async {
+    try {
+      final user = await AuthService.currentSession() ?? 'guest';
+      final prefs = await SharedPreferences.getInstance();
+      final used = prefs.getBool('voucher_diskon10_used_$user') ?? false;
+      if (mounted) setState(() => _isVoucherUsed = used);
+    } catch (_) {}
+  }
 
   // Titik Koleksi Buku Pac-Man
   late List<List<_MazeBookItem>> _allLevelBooks;
@@ -187,6 +199,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     _startLevelAudio();
     _resetToLevelStart();
+    _checkVoucherStatus();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -311,7 +324,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     final dist = sqrt(pow(_chaserCol - _playerCol, 2) + pow(_chaserRow - _playerRow, 2));
     if (dist < 0.65) {
-      _triggerWikwokJumpscare();
+      _triggerWikwokCaught();
     }
   }
 
@@ -343,37 +356,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     return (chaserC + 0.5, chaserR + 0.5);
   }
 
-  // Jumpscare Wikwok 2 Detik
-  void _triggerWikwokJumpscare() {
+  // Tertangkap Wikwok: Langsung Kalah Tanpa Jumpscare Asing
+  void _triggerWikwokCaught() {
     _stopLevelTimers();
-    GameAudioService.stopChase();
-    GameAudioService.playJumpscare();
-
-    _shakeController.repeat(reverse: true);
-    _jawController.repeat(reverse: true);
-    _jumpscareProgressController.forward(from: 0.0);
+    GameAudioService.stopAll();
+    GameAudioService.playLose();
 
     setState(() {
-      _isJumpscareActive = true;
-      _isDefeatActive = false;
+      _isJumpscareActive = false;
+      _isDefeatActive = true;
       _isChaserActive = false;
-      _jumpscareRemainingSeconds = 2;
-    });
-
-    _jumpscareTimer?.cancel();
-    _jumpscareTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      if (_jumpscareRemainingSeconds > 1) {
-        setState(() {
-          _jumpscareRemainingSeconds--;
-        });
-      } else {
-        timer.cancel();
-        _onJumpscareFinished();
-      }
     });
   }
 
@@ -383,13 +375,15 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     _jawController.stop();
     _jumpscareProgressController.stop();
 
-    GameAudioService.stopJumpscare();
+    GameAudioService.stopAll();
     GameAudioService.playLose();
 
-    setState(() {
-      _isJumpscareActive = false;
-      _isDefeatActive = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isJumpscareActive = false;
+        _isDefeatActive = true;
+      });
+    }
   }
 
   int _getCell(int r, int c) {
@@ -547,6 +541,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       );
     } else {
       GameAudioService.stopBgm();
+      _checkVoucherStatus();
       setState(() {
         _isGameOver = true;
       });
@@ -618,7 +613,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     if (_isChaserActive) {
       final dist = sqrt(pow(_chaserCol - _playerCol, 2) + pow(_chaserRow - _playerRow, 2));
       if (dist < 0.65) {
-        _triggerWikwokJumpscare();
+        _triggerWikwokCaught();
         return;
       }
     }
@@ -1286,83 +1281,139 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 20),
 
-            Card(
-              elevation: 1.5,
-              color: const Color(0xFFFAF7F2),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: const BorderSide(color: Color(0xFFEADBCE)),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Column(
-                  children: [
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.card_giftcard_rounded, color: Color(0xFF67343A), size: 22),
-                        SizedBox(width: 8),
-                        Text(
-                          'Hadiah Voucher Sewa Buku',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Color(0xFF67343A),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEDE2CF),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: const Color(0xFF67343A).withValues(alpha: 0.3),
-                          style: BorderStyle.solid,
-                        ),
-                      ),
-                      child: const Row(
+            if (_isVoucherUsed)
+              Card(
+                elevation: 1.5,
+                color: const Color(0xFFFAF7F2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: const BorderSide(color: Color(0xFFEADBCE)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    children: [
+                      const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          Icon(Icons.workspace_premium_rounded, color: Color(0xFFB45309), size: 24),
+                          SizedBox(width: 8),
                           Text(
-                            'DISKON10',
+                            'Penakluk Labirin Emas',
                             style: TextStyle(
-                              fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              letterSpacing: 3,
+                              fontSize: 14,
                               color: Color(0xFF67343A),
-                              fontFamily: 'monospace',
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Potongan 10% untuk sewa buku apa pun di katalog RentBook.',
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 14),
-                    OutlinedButton.icon(
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        side: const BorderSide(color: Color(0xFF67343A)),
-                        foregroundColor: const Color(0xFF67343A),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Selamat! Anda telah berhasil menuntaskan seluruh tantangan labirin buku.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
                       ),
-                      onPressed: _copyVoucher,
-                      icon: const Icon(Icons.copy_rounded, size: 16, color: Color(0xFF67343A)),
-                      label: const Text(
-                        'Salin Kode Voucher',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEDE2CF),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFEADBCE)),
+                        ),
+                        child: const Text(
+                          'Voucher DISKON10 sudah pernah Anda pakai sebelumnya.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF67343A),
+                          ),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+              )
+            else
+              Card(
+                elevation: 1.5,
+                color: const Color(0xFFFAF7F2),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: const BorderSide(color: Color(0xFFEADBCE)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.card_giftcard_rounded, color: Color(0xFF67343A), size: 22),
+                          SizedBox(width: 8),
+                          Text(
+                            'Hadiah Voucher Sewa Buku',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Color(0xFF67343A),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEDE2CF),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFF67343A).withValues(alpha: 0.3),
+                            style: BorderStyle.solid,
+                          ),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'DISKON10',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 3,
+                                color: Color(0xFF67343A),
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Potongan 10% untuk sewa buku apa pun di katalog RentBook.',
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 14),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          side: const BorderSide(color: Color(0xFF67343A)),
+                          foregroundColor: const Color(0xFF67343A),
+                        ),
+                        onPressed: _copyVoucher,
+                        icon: const Icon(Icons.copy_rounded, size: 16, color: Color(0xFF67343A)),
+                        label: const Text(
+                          'Salin Kode Voucher',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 20),
 
             SizedBox(
@@ -1896,7 +1947,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 }
 
-// Icon Player: Karakter Orang yang Mengumpulkan dan Membawa Buku-buku Labirin
+// Icon Player: Karakter Petualang Pixel Art (Sama dengan Panduan Game)
 class _PersonPlayerIcon extends StatelessWidget {
   final double size;
   final int carriedBooksCount;
@@ -1912,43 +1963,27 @@ class _PersonPlayerIcon extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          // Badan Karakter Orang
+          // Karakter Pixel Art Petualang Buku (Sama dengan Panduan Game)
           Container(
             width: size,
             height: size,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: const RadialGradient(
-                colors: [
-                  Color(0xFFFEF08A),
-                  Color(0xFFF59E0B),
-                  Color(0xFFB45309),
-                ],
-              ),
-              border: Border.all(color: Colors.white, width: 1.6),
+              borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFF59E0B).withValues(alpha: 0.85),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                ),
-                const BoxShadow(
-                  color: Colors.white,
-                  blurRadius: 3,
-                  spreadRadius: 0.5,
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
+                  blurRadius: 8,
+                  spreadRadius: 1.5,
                 ),
               ],
             ),
-            child: Center(
-              child: Icon(
-                Icons.person_rounded,
-                size: size * 0.72,
-                color: const Color(0xFF302622),
-              ),
+            child: CustomPaint(
+              size: Size(size, size),
+              painter: _CutePixelAdventurerPainter(),
             ),
           ),
 
-          // Indikator Buku-buku yang Sedang Dibawa oleh Karakter Orang
+          // Indikator Buku-buku yang Sedang Dibawa oleh Karakter
           if (carriedBooksCount > 0)
             Positioned(
               right: -3,

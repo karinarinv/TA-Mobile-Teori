@@ -203,7 +203,8 @@ class _NotificationPageState extends State<NotificationPage> {
                       Switch(
                         value: _promoEnabled,
                         onChanged: _togglePromo,
-                        activeColor: AppColors.oxblood,
+                        activeThumbColor: AppColors.oxblood,
+                        activeTrackColor: AppColors.oxblood.withValues(alpha: 0.3),
                       ),
                     ],
                   ),

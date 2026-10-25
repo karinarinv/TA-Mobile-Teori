@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../services/auth_service.dart';
 import '../services/game_audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -49,11 +51,32 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     super.dispose();
   }
 
-  void _applyVoucher() {
+  Future<void> _applyVoucher() async {
     final code = _voucherController.text.trim().toUpperCase();
     if (code.isEmpty) return;
 
     if (code == 'DISKON10') {
+      final username = await AuthService.currentSession() ?? 'guest';
+      final prefs = await SharedPreferences.getInstance();
+      final isUsed = prefs.getBool('voucher_diskon10_used_$username') ?? false;
+
+      if (!mounted) return;
+
+      if (isUsed) {
+        setState(() {
+          _isVoucherValid = false;
+          _voucherMessage = 'Voucher DISKON10 sudah pernah digunakan.';
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Voucher DISKON10 sudah pernah Anda gunakan sebelumnya.'),
+            backgroundColor: Colors.red.shade700,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+
       setState(() {
         _appliedVoucher = code;
         _discountPercentage = 0.10;
@@ -534,10 +557,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
 
     if (_paymentMethod.contains('QRIS')) {
       Navigator.pop(context); // Tutup bottom sheet
-      _showQrisSheet(context, title, authors, totalPrice, totalFormatted, dueDateStr, _duration, _appliedVoucher);
+      _showQrisSheet(context, title, authors, totalPrice, totalFormatted, dueDateStr, _duration, _appliedVoucher, widget.book['category']?.toString());
     } else if (_paymentMethod.contains('Virtual Account')) {
       Navigator.pop(context); // Tutup bottom sheet
-      _showVaSheet(context, title, authors, totalPrice, totalFormatted, dueDateStr, _duration, _appliedVoucher);
+      _showVaSheet(context, title, authors, totalPrice, totalFormatted, dueDateStr, _duration, _appliedVoucher, widget.book['category']?.toString());
     } else {
       // Bayar Tunai langsung proses
       setState(() => _isProcessing = true);
@@ -548,6 +571,16 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         await NotificationService.scheduleReturn(title, days: _duration);
         await NotificationService.showPaymentSuccess(title, totalFormatted, 'Tunai di Kasir');
         GameAudioService.playWin();
+
+        final username = await AuthService.currentSession() ?? 'guest';
+        final prefs = await SharedPreferences.getInstance();
+        if (_appliedVoucher == 'DISKON10') {
+          await prefs.setBool('voucher_diskon10_used_$username', true);
+        }
+        final cat = widget.book['category']?.toString();
+        if (cat != null && cat.isNotEmpty) {
+          await prefs.setString('last_rented_genre_$username', cat);
+        }
 
         if (!mounted) return;
         navigator.pop();
@@ -575,6 +608,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     String dueDateStr,
     int duration,
     String? appliedVoucher,
+    String? category,
   ) {
     showModalBottomSheet(
       context: context,
@@ -588,6 +622,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         dueDateStr: dueDateStr,
         duration: duration,
         appliedVoucher: appliedVoucher,
+        category: category,
       ),
     );
   }
@@ -604,6 +639,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     String dueDateStr,
     int duration,
     String? appliedVoucher,
+    String? category,
   ) {
     showModalBottomSheet(
       context: context,
@@ -617,6 +653,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         dueDateStr: dueDateStr,
         duration: duration,
         appliedVoucher: appliedVoucher,
+        category: category,
       ),
     );
   }
@@ -736,6 +773,7 @@ class _QrisPaymentModal extends StatefulWidget {
   final String dueDateStr;
   final int duration;
   final String? appliedVoucher;
+  final String? category;
 
   const _QrisPaymentModal({
     required this.title,
@@ -745,6 +783,7 @@ class _QrisPaymentModal extends StatefulWidget {
     required this.dueDateStr,
     required this.duration,
     this.appliedVoucher,
+    this.category,
   });
 
   @override
@@ -775,6 +814,15 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
 
       // Suara berhasil
       GameAudioService.playWin();
+
+      final username = await AuthService.currentSession() ?? 'guest';
+      final prefs = await SharedPreferences.getInstance();
+      if (widget.appliedVoucher == 'DISKON10') {
+        await prefs.setBool('voucher_diskon10_used_$username', true);
+      }
+      if (widget.category != null && widget.category!.isNotEmpty) {
+        await prefs.setString('last_rented_genre_$username', widget.category!);
+      }
 
       if (!mounted) return;
       navigator.pop(); // Tutup QR sheet
@@ -964,6 +1012,7 @@ class _VaPaymentModal extends StatefulWidget {
   final String dueDateStr;
   final int duration;
   final String? appliedVoucher;
+  final String? category;
 
   const _VaPaymentModal({
     required this.title,
@@ -973,6 +1022,7 @@ class _VaPaymentModal extends StatefulWidget {
     required this.dueDateStr,
     required this.duration,
     this.appliedVoucher,
+    this.category,
   });
 
   @override
@@ -1021,6 +1071,15 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
       await NotificationService.scheduleReturn(widget.title, days: widget.duration);
 
       GameAudioService.playWin();
+
+      final username = await AuthService.currentSession() ?? 'guest';
+      final prefs = await SharedPreferences.getInstance();
+      if (widget.appliedVoucher == 'DISKON10') {
+        await prefs.setBool('voucher_diskon10_used_$username', true);
+      }
+      if (widget.category != null && widget.category!.isNotEmpty) {
+        await prefs.setString('last_rented_genre_$username', widget.category!);
+      }
 
       if (!mounted) return;
       Navigator.pop(context); // Tutup VA sheet
