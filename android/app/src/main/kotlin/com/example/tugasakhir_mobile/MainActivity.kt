@@ -267,6 +267,63 @@ class MainActivity : FlutterFragmentActivity() {
         } catch (_: Exception) {}
     }
 
+    // Suara "Ting" singkat (notifikasi / item diambil)
+    private fun playTing() {
+        thread {
+            try {
+                val sampleRate = 22050
+                val minBufferSize = AudioTrack.getMinBufferSize(
+                    sampleRate,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT
+                )
+                val audioTrack = AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_GAME)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                            .setSampleRate(sampleRate)
+                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(minBufferSize)
+                    .setTransferMode(AudioTrack.MODE_STREAM)
+                    .build()
+
+                audioTrack.play()
+
+                val notes = doubleArrayOf(1046.50, 1567.98)
+                val durations = intArrayOf(70, 160)
+
+                for (idx in notes.indices) {
+                    val freq = notes[idx]
+                    val durationMs = durations[idx]
+                    val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
+                    val buffer = ShortArray(numSamples)
+
+                    for (i in 0 until numSamples) {
+                        val t = i.toDouble() / sampleRate
+                        val envelope = if (i < 100) i / 100.0 else Math.exp(-3.0 * (i.toDouble() / numSamples))
+                        val wave = sin(2.0 * Math.PI * freq * t)
+                        val sample = wave * 9000.0 * envelope
+                        buffer[i] = sample.toInt().coerceIn(-32767, 32767).toShort()
+                    }
+                    audioTrack.write(buffer, 0, numSamples)
+                }
+
+                audioTrack.stop()
+                audioTrack.release()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     // Suara Menang Berhasil Next Level (Chiptune Victory Fanfare)
     private fun playWin() {
         stopBgm()
