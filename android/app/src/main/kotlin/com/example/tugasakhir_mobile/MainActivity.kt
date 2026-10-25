@@ -31,6 +31,10 @@ class MainActivity : FlutterFragmentActivity() {
     @Volatile
     private var jumpscareVoicePlayer: MediaPlayer? = null
 
+    @Volatile
+    private var isWinPlaying = false
+    private var winTrack: AudioTrack? = null
+
     private var vibrator: Vibrator? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -243,11 +247,78 @@ class MainActivity : FlutterFragmentActivity() {
         chaseTrack = null
     }
 
-    // Suara Jumpscare Asing Dihapus Bersih Sesuai Permintaan
+    // Suara Jumpscare Retro Synthesizer Arcade + Getaran Layar
     private fun playJumpscare() {
         stopAll()
-        // Suara alert singkat tanpa suara asing jumpscare
-        playLose()
+        isJumpscarePlaying = true
+        thread {
+            try {
+                val sampleRate = 22050
+                val minBufferSize = AudioTrack.getMinBufferSize(
+                    sampleRate,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT
+                )
+                val audioTrack = AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_GAME)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                            .setSampleRate(sampleRate)
+                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(minBufferSize)
+                    .setTransferMode(AudioTrack.MODE_STREAM)
+                    .build()
+
+                jumpscareTrack = audioTrack
+                audioTrack.play()
+
+                val durationMs = 850
+                val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
+                val buffer = ShortArray(numSamples)
+
+                for (i in 0 until numSamples) {
+                    if (!isJumpscarePlaying) break
+                    val t = i.toDouble() / sampleRate
+                    val freq1 = 1400.0 - (t * 900.0)
+                    val freq2 = 1450.0 - (t * 850.0)
+                    val noise = (Math.random() * 2.0 - 1.0) * 12000.0
+                    val wave = (sin(2.0 * Math.PI * freq1 * t) + sin(2.0 * Math.PI * freq2 * t)) * 14000.0
+                    buffer[i] = ((wave + noise) * 0.7).toInt().coerceIn(-32767, 32767).toShort()
+                }
+
+                if (isJumpscarePlaying) {
+                    audioTrack.write(buffer, 0, numSamples)
+                }
+                try { audioTrack.stop() } catch (_: Exception) {}
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                try { jumpscareTrack?.release() } catch (_: Exception) {}
+                jumpscareTrack = null
+                isJumpscarePlaying = false
+            }
+        }
+
+        try {
+            if (vibrator != null && vibrator?.hasVibrator() == true) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator?.vibrate(VibrationEffect.createOneShot(800, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator?.vibrate(800)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun stopJumpscare() {
@@ -258,77 +329,23 @@ class MainActivity : FlutterFragmentActivity() {
         } catch (_: Exception) {}
         jumpscareTrack = null
         try {
-            jumpscareVoicePlayer?.stop()
-            jumpscareVoicePlayer?.release()
-        } catch (_: Exception) {}
-        jumpscareVoicePlayer = null
-        try {
             vibrator?.cancel()
         } catch (_: Exception) {}
     }
 
-    // Suara "Ting" singkat (notifikasi / item diambil)
-    private fun playTing() {
-        thread {
-            try {
-                val sampleRate = 22050
-                val minBufferSize = AudioTrack.getMinBufferSize(
-                    sampleRate,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT
-                )
-                val audioTrack = AudioTrack.Builder()
-                    .setAudioAttributes(
-                        AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_GAME)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build()
-                    )
-                    .setAudioFormat(
-                        AudioFormat.Builder()
-                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                            .setSampleRate(sampleRate)
-                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                            .build()
-                    )
-                    .setBufferSizeInBytes(minBufferSize)
-                    .setTransferMode(AudioTrack.MODE_STREAM)
-                    .build()
-
-                audioTrack.play()
-
-                val notes = doubleArrayOf(1046.50, 1567.98)
-                val durations = intArrayOf(70, 160)
-
-                for (idx in notes.indices) {
-                    val freq = notes[idx]
-                    val durationMs = durations[idx]
-                    val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
-                    val buffer = ShortArray(numSamples)
-
-                    for (i in 0 until numSamples) {
-                        val t = i.toDouble() / sampleRate
-                        val envelope = if (i < 100) i / 100.0 else Math.exp(-3.0 * (i.toDouble() / numSamples))
-                        val wave = sin(2.0 * Math.PI * freq * t)
-                        val sample = wave * 9000.0 * envelope
-                        buffer[i] = sample.toInt().coerceIn(-32767, 32767).toShort()
-                    }
-                    audioTrack.write(buffer, 0, numSamples)
-                }
-
-                audioTrack.stop()
-                audioTrack.release()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    private fun stopWin() {
+        isWinPlaying = false
+        try {
+            winTrack?.stop()
+            winTrack?.release()
+        } catch (_: Exception) {}
+        winTrack = null
     }
 
     // Suara Menang Berhasil Next Level (Chiptune Victory Fanfare)
     private fun playWin() {
-        stopBgm()
-        stopChase()
-        stopJumpscare()
+        stopAll()
+        isWinPlaying = true
 
         thread {
             try {
@@ -356,12 +373,14 @@ class MainActivity : FlutterFragmentActivity() {
                     .setTransferMode(AudioTrack.MODE_STREAM)
                     .build()
 
+                winTrack = audioTrack
                 audioTrack.play()
 
                 val notes = doubleArrayOf(523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98)
                 val durations = intArrayOf(120, 120, 120, 260, 150, 480)
 
                 for (idx in notes.indices) {
+                    if (!isWinPlaying) break
                     val freq = notes[idx]
                     val durationMs = durations[idx]
                     val numSamples = (sampleRate * (durationMs / 1000.0)).toInt()
@@ -377,13 +396,18 @@ class MainActivity : FlutterFragmentActivity() {
                         val sample = (square * 0.75 + raw2 * 2500.0) * envelope
                         buffer[i] = sample.toInt().coerceIn(-32767, 32767).toShort()
                     }
-                    audioTrack.write(buffer, 0, numSamples)
+                    if (isWinPlaying) {
+                        audioTrack.write(buffer, 0, numSamples)
+                    }
                 }
 
-                audioTrack.stop()
-                audioTrack.release()
+                try { audioTrack.stop() } catch (_: Exception) {}
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                try { winTrack?.release() } catch (_: Exception) {}
+                winTrack = null
+                isWinPlaying = false
             }
         }
     }
@@ -460,6 +484,7 @@ class MainActivity : FlutterFragmentActivity() {
         stopBgm()
         stopChase()
         stopJumpscare()
+        stopWin()
     }
 
     override fun onDestroy() {

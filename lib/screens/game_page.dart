@@ -54,7 +54,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   // Jumpscare Wikwok & Defeat State
   bool _isJumpscareActive = false;
   bool _isDefeatActive = false;
-  final int _jumpscareRemainingSeconds = 2;
+  int _jumpscareRemainingSeconds = 2;
   Timer? _jumpscareTimer;
   bool _isVoucherUsed = false;
 
@@ -148,7 +148,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     _allLevelBooks = [
       // Level 1: 3 buku koleksi
       [
-        _MazeBookItem(id: 1, col: 5, row: 1, title: 'Islam Ala Prabowo'),
+        _MazeBookItem(id: 1, col: 5, row: 1, title: 'a little life'),
         _MazeBookItem(id: 2, col: 5, row: 7, title: 'Filosofi Teras'),
         _MazeBookItem(id: 3, col: 4, row: 13, title: 'Atomic Habits'),
       ],
@@ -324,7 +324,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     final dist = sqrt(pow(_chaserCol - _playerCol, 2) + pow(_chaserRow - _playerRow, 2));
     if (dist < 0.65) {
-      _triggerWikwokCaught();
+      _triggerWikwokJumpscare();
     }
   }
 
@@ -356,16 +356,37 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     return (chaserC + 0.5, chaserR + 0.5);
   }
 
-  // Tertangkap Wikwok: Langsung Kalah Tanpa Jumpscare Asing
-  void _triggerWikwokCaught() {
+  // Jumpscare Wikwok 2 Detik Sesuai Codingan Asli
+  void _triggerWikwokJumpscare() {
     _stopLevelTimers();
-    GameAudioService.stopAll();
-    GameAudioService.playLose();
+    GameAudioService.stopChase();
+    GameAudioService.stopBgm();
+    GameAudioService.playJumpscare();
+
+    _shakeController.repeat(reverse: true);
+    _jawController.repeat(reverse: true);
+    _jumpscareProgressController.forward(from: 0.0);
 
     setState(() {
-      _isJumpscareActive = false;
-      _isDefeatActive = true;
+      _isJumpscareActive = true;
       _isChaserActive = false;
+      _jumpscareRemainingSeconds = 2;
+    });
+
+    _jumpscareTimer?.cancel();
+    _jumpscareTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_jumpscareRemainingSeconds > 1) {
+        setState(() {
+          _jumpscareRemainingSeconds--;
+        });
+      } else {
+        timer.cancel();
+        _onJumpscareFinished();
+      }
     });
   }
 
@@ -375,7 +396,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     _jawController.stop();
     _jumpscareProgressController.stop();
 
-    GameAudioService.stopAll();
+    GameAudioService.stopJumpscare();
     GameAudioService.playLose();
 
     if (mounted) {
@@ -527,7 +548,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               ),
               onPressed: () {
                 Navigator.pop(ctx);
-                GameAudioService.playWin();
+                GameAudioService.stopAll();
                 setState(() {
                   _currentLevel++;
                   _resetToLevelStart();
@@ -613,7 +634,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     if (_isChaserActive) {
       final dist = sqrt(pow(_chaserCol - _playerCol, 2) + pow(_chaserRow - _playerRow, 2));
       if (dist < 0.65) {
-        _triggerWikwokCaught();
+        _triggerWikwokJumpscare();
         return;
       }
     }
@@ -1231,23 +1252,32 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 90,
-              height: 90,
-              padding: const EdgeInsets.all(16),
+              width: 104,
+              height: 104,
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: const Color(0xFFEDE2CF),
                 border: Border.all(color: const Color(0xFF67343A), width: 2.5),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF67343A).withValues(alpha: 0.2),
+                    color: const Color(0xFF67343A).withValues(alpha: 0.25),
                     blurRadius: 20,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: CustomPaint(
-                painter: _CutePixelGoldenBookPainter(),
+              child: AnimatedBuilder(
+                animation: _pulseController,
+                builder: (context, _) {
+                  final bob = sin(_pulseController.value * 2 * pi) * 3.5;
+                  return Transform.translate(
+                    offset: Offset(0, bob),
+                    child: CustomPaint(
+                      painter: _CutePixelHappyAdventurerPainter(),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 18),
@@ -1289,11 +1319,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(16),
                   side: const BorderSide(color: Color(0xFFEADBCE)),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                   child: Column(
                     children: [
-                      const Row(
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.workspace_premium_rounded, color: Color(0xFFB45309), size: 24),
@@ -1302,35 +1332,17 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                             'Penakluk Labirin Emas',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 15,
                               color: Color(0xFF67343A),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 12),
                       Text(
-                        'Selamat! Anda telah berhasil menuntaskan seluruh tantangan labirin buku.',
+                        'Selamat! Anda telah berhasil menuntaskan seluruh tantangan labirin buku dan menyelamatkan seluruh arsip kuno perpustakaan RentBook.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEDE2CF),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFEADBCE)),
-                        ),
-                        child: const Text(
-                          'Voucher DISKON10 sudah pernah Anda pakai sebelumnya.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF67343A),
-                          ),
-                        ),
+                        style: TextStyle(fontSize: 13, color: Color(0xFF302622), height: 1.45),
                       ),
                     ],
                   ),
@@ -2852,6 +2864,58 @@ class _PixelLibraryMazePainter extends CustomPainter {
 // =========================================================================
 // PAINTERS PIXEL ART LUCU UNTUK PANDUAN GAME RETRO ARCADE
 // =========================================================================
+
+// Karakter Penjelajah Bahagia Memegang Buku & Piala (Tampilan Menang)
+class _CutePixelHappyAdventurerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    const int cols = 13;
+    const int rows = 11;
+    final pw = size.width / cols;
+    final ph = size.height / rows;
+
+    const List<List<int>> m = [
+      [0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 11, 0],
+      [0, 8, 8, 0, 1, 1, 1, 1, 1, 0, 10, 11, 10],
+      [8, 9, 8, 0, 0, 2, 2, 2, 0, 10, 10, 10, 10],
+      [8, 9, 8, 2, 0, 3, 2, 3, 0, 2, 0, 10, 0],
+      [0, 2, 0, 0, 12, 2, 4, 2, 12, 0, 0, 10, 0],
+      [0, 0, 0, 0, 0, 5, 5, 5, 0, 0, 10, 10, 10],
+      [0, 0, 0, 0, 0, 5, 5, 5, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 6, 6, 6, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 6, 0, 6, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 7, 0, 7, 0, 0, 0, 0, 0],
+    ];
+
+    final Map<int, Paint> p = {
+      1: Paint()..color = const Color(0xFF67343A), // Oxblood hat
+      2: Paint()..color = const Color(0xFFFFD1A9), // Skin
+      3: Paint()..color = const Color(0xFF302622), // Joyful eyes
+      4: Paint()..color = const Color(0xFFB91C1C), // Joyful smile
+      5: Paint()..color = const Color(0xFF9A704F), // Shirt
+      6: Paint()..color = const Color(0xFF4C272C), // Pants
+      7: Paint()..color = const Color(0xFF302622), // Shoes
+      8: Paint()..color = const Color(0xFF1D4ED8), // Blue book
+      9: Paint()..color = const Color(0xFFFEF08A), // Book pages
+      10: Paint()..color = const Color(0xFFF59E0B), // Golden trophy
+      11: Paint()..color = const Color(0xFFFDE047), // Trophy shine
+      12: Paint()..color = const Color(0xFFF87171), // Cheerful blush
+    };
+
+    for (int r = 0; r < rows; r++) {
+      for (int c = 0; c < cols; c++) {
+        final val = m[r][c];
+        if (val != 0 && p.containsKey(val)) {
+          canvas.drawRect(Rect.fromLTWH(c * pw, r * ph, pw + 0.3, ph + 0.3), p[val]!);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
 
 class _CutePixelAdventurerPainter extends CustomPainter {
   @override

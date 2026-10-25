@@ -1,8 +1,10 @@
+import 'dart:io';
+import 'package:intl/intl.dart';
+import '../services/db_helper.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../constants/app_colors.dart';
 import '../services/auth_service.dart';
 import '../services/notification_service.dart';
@@ -17,7 +19,8 @@ import 'game_page.dart';
 import 'map_page.dart';
 import 'notification_page.dart';
 import 'profile_page.dart';
-import 'saved_books_page.dart';
+
+
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -28,6 +31,8 @@ class MenuPage extends StatefulWidget {
 
 class _MenuPageState extends State<MenuPage> {
   String _user = 'rahma';
+  String? _userPhoto;
+  bool _isVip = false;
   int _unreadNotifications = 0;
   String? _lastRentedGenre;
 
@@ -47,8 +52,7 @@ class _MenuPageState extends State<MenuPage> {
     'publishedDate': '2021',
     'publisher': 'Ballantine Books',
     'pageCount': 496,
-    'description':
-        'Ryland Grace adalah satu-satunya penyintas dalam misi keputusasaan terakhir untuk menyelamatkan bumi dari kepunahan. Jauh dari rumah, sendirian di antara bintang-bintang. Bahkan di tempat paling asing sekalipun, kita masih bisa menemukan teman.',
+    'description': 'Ryland Grace adalah satu-satunya penyintas dalam misi keputusasaan terakhir untuk menyelamatkan bumi dari kepunahan. Jauh dari rumah, sendirian di antara bintang-bintang. Bahkan di tempat paling asing sekalipun, kita masih bisa menemukan teman.',
   };
 
   // Koleksi Buku Terkurasi
@@ -63,8 +67,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '1937',
       'publisher': 'The Ralston Society',
       'pageCount': 238,
-      'description':
-          'Sebuah adikarya literatur pengembangan diri dan kesuksesan finansial terpopuler sepanjang masa. Merangkum 13 prinsip sukses yang digali selama lebih dari 20 tahun dari ratusan tokoh sukses dunia.',
+      'description': 'Sebuah adikarya literatur pengembangan diri dan kesuksesan finansial terpopuler sepanjang masa. Merangkum 13 prinsip sukses yang digali selama lebih dari 20 tahun dari ratusan tokoh sukses dunia.',
     },
     {
       'title': 'The Stranger in the Lifeboat',
@@ -76,8 +79,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '2021',
       'publisher': 'Harper',
       'pageCount': 288,
-      'description':
-          'Kisah naratif yang menggetarkan tentang sekelompok penyintas di atas sekoci penyelamat setelah kapal pesiar mewah tenggelam, hingga mereka menyelamatkan seorang pria asing misterius.',
+      'description': 'Kisah naratif yang menggetarkan tentang sekelompok penyintas di atas sekoci penyelamat setelah kapal pesiar mewah tenggelam, hingga mereka menyelamatkan seorang pria asing misterius.',
     },
     {
       'title': 'Bumi Manusia',
@@ -89,8 +91,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '1980',
       'publisher': 'Hasta Mitra',
       'pageCount': 535,
-      'description':
-          'Mahakarya sastra Indonesia tentang perlawanan Minke, pemuda pribumi terpelajar yang menolak tunduk di hadapan arogansi kolonialisme akhir abad ke-19.',
+      'description': 'Mahakarya sastra Indonesia tentang perlawanan Minke, pemuda pribumi terpelajar yang menolak tunduk di hadapan arogansi kolonialisme akhir abad ke-19.',
     },
     {
       'title': 'Filosofi Teras',
@@ -102,8 +103,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '2019',
       'publisher': 'Kompas',
       'pageCount': 346,
-      'description':
-          'Panduan praktis stoisisme Yunani-Romawi kuno yang diracik khusus untuk membantu manusia modern menavigasi kecemasan mental dan emosi negatif secara rasional.',
+      'description': 'Panduan praktis stoisisme Yunani-Romawi kuno yang diracik khusus untuk membantu manusia modern menavigasi kecemasan mental dan emosi negatif secara rasional.',
     },
     {
       'title': 'A Little Life',
@@ -115,8 +115,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '2015',
       'publisher': 'Doubleday',
       'pageCount': 720,
-      'description':
-          'Novel mendalam tentang persahabatan empat pemuda di New York yang menelusuri batas kesetiaan, trauma masa lalu, dan daya tahan cinta manusia melewati dekade kehidupan.',
+      'description': 'Novel mendalam tentang persahabatan empat pemuda di New York yang menelusuri batas kesetiaan, trauma masa lalu, dan daya tahan cinta manusia melewati dekade kehidupan.',
     },
     {
       'title': 'Losing Hope',
@@ -128,8 +127,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '2013',
       'publisher': 'Atria Books',
       'pageCount': 336,
-      'description':
-          'Kisah emosional tentang penebusan, luka masa kecil yang disembunyikan, dan kekuatan kejujuran dalam memulihkan cinta yang sempat hilang.',
+      'description': 'Kisah emosional tentang penebusan, luka masa kecil yang disembunyikan, dan kekuatan kejujuran dalam memulihkan cinta yang sempat hilang.',
     },
     {
       'title': 'Sapiens: Riwayat Singkat Umat Manusia',
@@ -141,8 +139,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '2014',
       'publisher': 'Harper',
       'pageCount': 443,
-      'description':
-          'Eksplorasi memukau tentang bagaimana spesies kera tak berarti berevolusi menjadi penguasa bumi melalui revolusi kognitif, agrikultur, dan saintifik.',
+      'description': 'Eksplorasi memukau tentang bagaimana spesies kera tak berarti berevolusi menjadi penguasa bumi melalui revolusi kognitif, agrikultur, dan saintifik.',
     },
     {
       'title': 'The Psychology of Money',
@@ -154,8 +151,7 @@ class _MenuPageState extends State<MenuPage> {
       'publishedDate': '2020',
       'publisher': 'Harriman House',
       'pageCount': 252,
-      'description':
-          '19 cerita pendek yang mengeksplorasi relasi ganjil antara perilaku manusia, ego, dan uang, serta bagaimana ketenangan emosi mengalahkan kecerdasan teknis.',
+      'description': '19 cerita pendek yang mengeksplorasi relasi ganjil antara perilaku manusia, ego, dan uang, serta bagaimana ketenangan emosi mengalahkan kecerdasan teknis.',
     },
   ];
 
@@ -192,8 +188,26 @@ class _MenuPageState extends State<MenuPage> {
 
   Future<void> _loadUser() async {
     final u = await AuthService.currentSession();
-    if (u != null && u.isNotEmpty && mounted) {
-      setState(() => _user = u);
+    String? photo;
+    if (u != null && u.isNotEmpty) {
+      try {
+        final rows = await (await DbHelper.db).query(
+          'users',
+          where: 'username=?',
+          whereArgs: [u],
+        );
+        if (rows.isNotEmpty) {
+          photo = rows.first['photo'] as String?;
+        }
+      } catch (_) {}
+    }
+    final isVip = await SubscriptionService.isVip();
+    if (mounted) {
+      setState(() {
+        if (u != null && u.isNotEmpty) _user = u;
+        _userPhoto = photo;
+        _isVip = isVip;
+      });
     }
   }
 
@@ -228,7 +242,11 @@ class _MenuPageState extends State<MenuPage> {
         return !cat.contains(_lastRentedGenre!.toLowerCase());
       }).toList();
 
-      _recommendedBooks = [...matching, _projectHailMaryBook, ...others].take(5).toList();
+      _recommendedBooks = [
+        ...matching,
+        _projectHailMaryBook,
+        ...others,
+      ].take(5).toList();
     } else {
       _recommendedBooks = [
         _projectHailMaryBook,
@@ -256,7 +274,8 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    void go(Widget w) => Navigator.push(context, MaterialPageRoute(builder: (_) => w));
+    void go(Widget w) =>
+        Navigator.push(context, MaterialPageRoute(builder: (_) => w));
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF7F2),
@@ -270,296 +289,364 @@ class _MenuPageState extends State<MenuPage> {
             await _loadLastRentedGenre();
           },
           child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ============================================================
-                // 1. TOP HEADER (SESUAI WIREFRAME: AVATAR + USERNAME + ? + BELL)
-                // ============================================================
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                   decoration: const BoxDecoration(
-                    color: Color(0xFF67343A), // Oxblood solid sesuai wireframe
+                    color: Color(
+                      0xFF67343A,
+                    ), // Oxblood solid membungkus sampai ke banner
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
+                        blurRadius: 6,
+                        offset: Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: Row(
-                    children: [
-                      // Avatar bulat (diklik mengarah ke ProfilePage)
-                      GestureDetector(
-                        onTap: () async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ProfilePage()),
-                          );
-                          _loadUser();
-                        },
-                        child: Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: const Color(0xFFEDE2CF),
-                            border: Border.all(color: const Color(0xFFD4BE9D), width: 1.5),
-                          ),
-                          child: Center(
-                            child: Text(
-                              _user.isNotEmpty ? _user[0].toUpperCase() : 'R',
-                              style: GoogleFonts.playfairDisplay(
-                                color: const Color(0xFF67343A),
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Nama Pengguna (diklik mengarah ke ProfilePage)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ProfilePage()),
-                            );
-                            _loadUser();
-                          },
-                          child: Text(
-                            _user,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFFEDE2CF),
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Ikon Panduan '?'
-                      IconButton(
-                        tooltip: 'Panduan RentBook',
-                        visualDensity: VisualDensity.compact,
-                        icon: const Icon(
-                          Icons.help_outline_rounded,
-                          color: Color(0xFFEDE2CF),
-                          size: 24,
-                        ),
-                        onPressed: _showHelpDialog,
-                      ),
-
-                      // Ikon Lonceng Notifikasi (Bell) dengan Badge
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          IconButton(
-                            tooltip: 'Pemberitahuan & Promo',
-                            visualDensity: VisualDensity.compact,
-                            icon: const Icon(
-                              Icons.notifications_none_rounded,
-                              color: Color(0xFFEDE2CF),
-                              size: 24,
-                            ),
-                            onPressed: () async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (_) => const NotificationPage()),
-                              );
-                              _loadNotificationsCount();
-                            },
-                          ),
-                          if (_unreadNotifications > 0)
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: Container(
-                                padding: const EdgeInsets.all(3),
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFC0392B),
-                                  shape: BoxShape.circle,
-                                ),
-                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                                child: Text(
-                                  '$_unreadNotifications',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // ============================================================
-                // 2. BANNER CAROUSEL (LANGSUNG SETELAH HEADER, SESUAI WIREFRAME)
-                // ============================================================
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: SizedBox(
-                          height: 168,
-                          child: PageView(
-                            controller: _bannerController,
-                            onPageChanged: (i) => setState(() => _currentBannerIndex = i),
-                            children: [
-                              // Banner 1: Selamat Datang (Arahkan ke Katalog Buku)
-                              _buildImageBanner(
-                                imagePath: 'assets/images/banner_welcome.png',
-                                onTap: () => go(const BooksPage()),
+                      // Baris Profil Pengguna, Ikon Panduan & Notifikasi
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 18,
+                          vertical: 12,
+                        ),
+                        child: Row(
+                          children: [
+                            // Avatar bulat mengikuti ProfilePage (diklik mengarah ke ProfilePage)
+                            GestureDetector(
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ProfilePage(),
+                                  ),
+                                );
+                                _loadUser();
+                              },
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFEDE2CF),
+                                  border: Border.all(
+                                    color: const Color(0xFFD4BE9D),
+                                    width: 1.8,
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black12,
+                                      blurRadius: 4,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipOval(
+                                  child:
+                                      (_userPhoto != null &&
+                                          File(_userPhoto!).existsSync())
+                                      ? Image.file(
+                                          File(_userPhoto!),
+                                          fit: BoxFit.cover,
+                                          width: 44,
+                                          height: 44,
+                                          errorBuilder: (_, __, ___) => Center(
+                                            child: Text(
+                                              _user.isNotEmpty
+                                                  ? _user[0].toUpperCase()
+                                                  : 'R',
+                                              style:
+                                                  GoogleFonts.playfairDisplay(
+                                                    color: const Color(
+                                                      0xFF67343A,
+                                                    ),
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          ),
+                                        )
+                                      : Center(
+                                          child: Text(
+                                            _user.isNotEmpty
+                                                ? _user[0].toUpperCase()
+                                                : 'R',
+                                            style: GoogleFonts.playfairDisplay(
+                                              color: const Color(0xFF67343A),
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                ),
                               ),
+                            ),
+                            const SizedBox(width: 12),
 
-                              // Banner 2: Game Labirin (Arahkan ke Menu Game / Cek VIP)
-                              _buildImageBanner(
-                                imagePath: 'assets/images/banner_game.png',
-                                onTap: () {
-                                  SubscriptionService.checkAccess(
-                                    context,
-                                    featureName: 'Labirin Perpustakaan',
-                                    onAllowed: () => go(const GamePage()),
-                                  );
-                                },
-                              ),
-
-                              // Banner 3: Buku Project Hail Mary (Arahkan ke Detail Hail Mary)
-                              _buildImageBanner(
-                                imagePath: 'assets/images/banner_hail_mary.png',
-                                onTap: () {
-                                  Navigator.push(
+                            // Tanggal / Status Keanggotaan
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => BookDetailPage(book: _projectHailMaryBook),
+                                      builder: (_) => const ProfilePage(),
                                     ),
                                   );
+                                  _loadUser();
                                 },
+                                child: Text(
+                                  '${DateFormat('EEEE, d MMM yyyy', 'id_ID').format(DateTime.now())} • ${_isVip ? "VIP Member" : "Anggota"}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFFD4BE9D),
+                                  ),
+                                ),
                               ),
+                            ),
 
-                              // Banner 4: VIP Membership (Langsung Pop up Upgrade VIP)
-                              _buildImageBanner(
-                                imagePath: 'assets/images/banner_vip.png',
-                                onTap: () {
-                                  SubscriptionService.showPaywallDialog(
-                                    context,
-                                    featureName: 'Membership VIP',
-                                  );
-                                },
+                            // Ikon Panduan '?'
+                            IconButton(
+                              tooltip: 'Panduan RentBook',
+                              visualDensity: VisualDensity.compact,
+                              icon: const Icon(
+                                Icons.help_outline_rounded,
+                                color: Color(0xFFEDE2CF),
+                                size: 24,
                               ),
-                            ],
-                          ),
+                              onPressed: _showHelpDialog,
+                            ),
+
+                            // Ikon Lonceng Notifikasi (Bell) dengan Badge
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IconButton(
+                                  tooltip: 'Pemberitahuan & Promo',
+                                  visualDensity: VisualDensity.compact,
+                                  icon: const Icon(
+                                    Icons.notifications_none_rounded,
+                                    color: Color(0xFFEDE2CF),
+                                    size: 24,
+                                  ),
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const NotificationPage(),
+                                      ),
+                                    );
+                                    _loadNotificationsCount();
+                                  },
+                                ),
+                                if (_unreadNotifications > 0)
+                                  Positioned(
+                                    top: 6,
+                                    right: 6,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFC0392B),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      constraints: const BoxConstraints(
+                                        minWidth: 16,
+                                        minHeight: 16,
+                                      ),
+                                      child: Text(
+                                        '$_unreadNotifications',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                          height: 1,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 10),
 
-                      // Indikator Titik-Titik (...) Sesuai Wireframe
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(4, (index) {
-                          final isCur = _currentBannerIndex == index;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.symmetric(horizontal: 3),
-                            width: isCur ? 20 : 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: isCur ? const Color(0xFF67343A) : const Color(0xFFD4BE9D),
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          );
-                        }),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // ============================================================
-                // 3. REKOMENDASI HARI INI (DINAMIS SESUAI GENRE SEBELUMNYA)
-                // ============================================================
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'rekomendasi hari ini',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF302622),
-                            ),
-                          ),
-                          if (_lastRentedGenre != null && _lastRentedGenre!.isNotEmpty)
+                      // Teks: Selamat Datang [user]! dan subteks Temukan bacaan yang mungkin kamu sukai
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(18, 4, 18, 14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              'Berdasarkan bacaan terakhirmu: $_lastRentedGenre',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                color: const Color(0xFF9A704F),
-                                fontWeight: FontWeight.w600,
+                              'Selamat datang $_user!',
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFFEDE2CF),
+                                letterSpacing: 0.2,
                               ),
                             ),
-                        ],
+                            const SizedBox(height: 3),
+                            Text(
+                              'Temukan bacaan yang mungkin kamu sukai.',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12.5,
+                                color: const Color(0xFFD4BE9D),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      GestureDetector(
-                        onTap: () => go(const BooksPage()),
-                        child: Text(
-                          'Lihat Semua',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF67343A),
-                          ),
+
+                      // 2. BANNER CAROUSEL (DENGAN SHADOW AGAR TIDAK MENYATU DENGAN HEADERBAR)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: SizedBox(
+                                  height: 168,
+                                  child: PageView(
+                                    controller: _bannerController,
+                                    onPageChanged: (i) =>
+                                        setState(() => _currentBannerIndex = i),
+                                    children: [
+                                      // Banner 1: Selamat Datang (Arahkan ke Katalog Buku)
+                                      _buildImageBanner(
+                                        imagePath:
+                                            'assets/images/banner_welcome.png',
+                                        onTap: () => go(const BooksPage()),
+                                      ),
+
+                                      // Banner 2: Game Labirin (Arahkan ke Menu Game / Cek VIP)
+                                      _buildImageBanner(
+                                        imagePath:
+                                            'assets/images/banner_game.png',
+                                        onTap: () {
+                                          SubscriptionService.checkAccess(
+                                            context,
+                                            featureName: 'Labirin Perpustakaan',
+                                            onAllowed: () =>
+                                                go(const GamePage()),
+                                          );
+                                        },
+                                      ),
+
+                                      // Banner 3: Buku Project Hail Mary (Arahkan ke Detail Hail Mary)
+                                      _buildImageBanner(
+                                        imagePath: 'assets/images/banner_hail_mary.png',
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => BookDetailPage(
+                                                book: _projectHailMaryBook,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+
+                                      // Banner 4: VIP Membership (Langsung Pop up Upgrade VIP)
+                                      _buildImageBanner(
+                                        imagePath:
+                                            'assets/images/banner_vip.png',
+                                        onTap: () {
+                                          SubscriptionService.showPaywallDialog(
+                                            context,
+                                            featureName: 'Membership VIP',
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Indikator Titik-Titik (...)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: List.generate(4, (index) {
+                                final isCur = _currentBannerIndex == index;
+                                return AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 3,
+                                  ),
+                                  width: isCur ? 20 : 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: isCur
+                                        ? const Color(0xFFEDE2CF)
+                                        : const Color(0xFFD4BE9D)
+                                              .withValues(alpha: 0.45),
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                );
+                              }),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
                         ),
                       ),
                     ],
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Daftar Kartu Buku Rekomendasi Horizontal
-                SizedBox(
-                  height: 215,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    itemCount: _recommendedBooks.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 14),
-                    itemBuilder: (context, i) {
-                      final b = _recommendedBooks[i];
-                      return _buildRecommendedBookCard(b);
-                    },
                   ),
                 ),
 
                 const SizedBox(height: 22),
 
                 // ============================================================
-                // 4. CHATBOT (ASISTEN AI KURATOR BUKU SESUAI WIREFRAME)
+                // 3. EKSPLOR FITUR RENTBOOK (MENU GOJEK STYLE: 3 ATAS, 3 BAWAH)
+                // ============================================================
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: Text(
+                    'Eksplor fitur Rentbook',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF302622),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                  child: _buildServicesGrid(go),
+                ),
+
+                const SizedBox(height: 24),
+
+                // ============================================================
+                // 4. CHATBOT KURATOR BUKU AI (LANGSUNG SETELAH EKSPLOR FITUR)
                 // ============================================================
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -569,7 +656,10 @@ class _MenuPageState extends State<MenuPage> {
                       borderRadius: BorderRadius.circular(16),
                       onTap: () => go(const AiPage()),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [Color(0xFF67343A), Color(0xFF4C272C)],
@@ -577,10 +667,14 @@ class _MenuPageState extends State<MenuPage> {
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFD4AF37), width: 1.2),
+                          border: Border.all(
+                            color: const Color(0xFFD4AF37),
+                            width: 1.2,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF67343A).withValues(alpha: 0.25),
+                              color: const Color(0xFF67343A)
+                                  .withValues(alpha: 0.25),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -618,7 +712,8 @@ class _MenuPageState extends State<MenuPage> {
                                     'Tanya rekomendasi bacaan & sinopsis cerdas kapan saja',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11,
-                                      color: const Color(0xFFEDE2CF).withValues(alpha: 0.9),
+                                      color: const Color(0xFFEDE2CF)
+                                          .withValues(alpha: 0.9),
                                     ),
                                   ),
                                 ],
@@ -626,7 +721,10 @@ class _MenuPageState extends State<MenuPage> {
                             ),
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFEDE2CF),
                                 borderRadius: BorderRadius.circular(10),
@@ -647,31 +745,73 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 26),
 
                 // ============================================================
-                // 5. LAYANAN / MENU PERPUSTAKAAN (GRID SESUAI WIREFRAME)
+                // 5. PILIHAN UNTUKMU (BUKU-BUKU REKOMENDASI SETELAH CHATBOT)
                 // ============================================================
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: Text(
-                    'layanan/menu',
-                    style: GoogleFonts.playfairDisplay(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF302622),
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Pilihan untukmu',
+                            style: GoogleFonts.playfairDisplay(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF302622),
+                            ),
+                          ),
+                          if (_lastRentedGenre != null &&
+                              _lastRentedGenre!.isNotEmpty)
+                            Text(
+                              'Berdasarkan bacaan terakhir: $_lastRentedGenre',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                color: const Color(0xFF9A704F),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () => go(const BooksPage()),
+                        child: Text(
+                          'Lihat Semua',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF67343A),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
                 const SizedBox(height: 12),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18),
-                  child: _buildServicesGrid(go),
+                // Daftar Kartu Buku Rekomendasi Horizontal
+                SizedBox(
+                  height: 228,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    itemCount: _recommendedBooks.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (context, i) {
+                      final b = _recommendedBooks[i];
+                      return _buildRecommendedBookCard(b);
+                    },
+                  ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -709,7 +849,11 @@ class _MenuPageState extends State<MenuPage> {
             errorBuilder: (_, __, ___) => Container(
               color: const Color(0xFF67343A),
               child: const Center(
-                child: Icon(Icons.menu_book_rounded, color: Color(0xFFEDE2CF), size: 36),
+                child: Icon(
+                  Icons.menu_book_rounded,
+                  color: Color(0xFFEDE2CF),
+                  size: 36,
+                ),
               ),
             ),
           ),
@@ -779,7 +923,8 @@ class _MenuPageState extends State<MenuPage> {
                               ? Image.network(
                                   img,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => _buildFallbackMiniCover(title),
+                                  errorBuilder: (_, __, ___) =>
+                                      _buildFallbackMiniCover(title),
                                 )
                               : _buildFallbackMiniCover(title),
                         ),
@@ -827,7 +972,11 @@ class _MenuPageState extends State<MenuPage> {
                     ),
                     Row(
                       children: [
-                        const Icon(Icons.star_rounded, size: 12, color: Color(0xFFD4AF37)),
+                        const Icon(
+                          Icons.star_rounded,
+                          size: 12,
+                          color: Color(0xFFD4AF37),
+                        ),
                         Text(
                           rating.toStringAsFixed(1),
                           style: GoogleFonts.plusJakartaSans(
@@ -868,37 +1017,52 @@ class _MenuPageState extends State<MenuPage> {
     );
   }
 
+  // 1. Gambar untuk Fitur Cari & Sewa Buku:
+  static const String pathGambarCariBuku = 'assets/images/cari dan sewa.png';
+
+  // 2. Gambar untuk Fitur Kenali Buku (Pindai Cover):
+  static const String pathGambarKenaliBuku ='assets/images/kenali buku.png'; 
+
+  // 3. Gambar untuk Fitur Labirin Game:
+  static const String? pathGambarLabirinGame = 'assets/images/labirin.png';
+
+  // 4. Gambar untuk Fitur Perpustakaan GPS:
+  static const String? pathGambarPerpustakaanGps = 'assets/images/gps.png';
+
+  // 5. Gambar untuk Fitur Riwayat Blockchain:
+  static const String? pathGambarRiwayatBlockchain = 'assets/images/blockchain.png';
+
+  // 6. Gambar untuk Fitur Konversi Kurs:
+  static const String? pathGambarKonversiKurs ='assets/images/konversi.png';
+
   // =========================================================================
-  // WIDGET: LAYANAN / MENU (2x2 GRID SESUAI WIREFRAME)
+  // WIDGET: EKSPLOR FITUR RENTBOOK
   // =========================================================================
   Widget _buildServicesGrid(void Function(Widget) go) {
     final services = [
       _ServiceItem(
-        title: 'Cari & Sewa Buku',
-        desc: 'Katalog buku & sensor goyang',
-        badge: 'Katalog',
-        icon: Icons.menu_book_rounded,
-        color: const Color(0xFF67343A),
+        title: 'Cari Buku',
+        imageAsset: pathGambarCariBuku,
+        fallbackIcon: Icons.menu_book_rounded,
+        fallbackColor: const Color(0xFF67343A),
         onTap: () => go(const BooksPage()),
       ),
       _ServiceItem(
-        title: 'Scan Cover AI',
-        desc: 'Deteksi kamera & galeri foto',
-        badge: 'VIP',
-        icon: Icons.camera_enhance_rounded,
-        color: const Color(0xFF4C3B71),
+        title: 'Kenali Buku',
+        imageAsset: pathGambarKenaliBuku,
+        fallbackIcon: Icons.camera_enhance_rounded,
+        fallbackColor: const Color(0xFF4C3B71),
         onTap: () => SubscriptionService.checkAccess(
           context,
-          featureName: 'Scan Cover Buku',
+          featureName: 'Kenali Buku',
           onAllowed: () => go(const AiVisionPage()),
         ),
       ),
       _ServiceItem(
         title: 'Labirin Game',
-        desc: 'Game arcade buku & voucher',
-        badge: 'VIP',
-        icon: Icons.sports_esports_rounded,
-        color: const Color(0xFFB45309),
+        imageAsset: pathGambarLabirinGame,
+        fallbackIcon: Icons.sports_esports_rounded,
+        fallbackColor: const Color(0xFFB45309),
         onTap: () => SubscriptionService.checkAccess(
           context,
           featureName: 'Labirin Perpustakaan',
@@ -907,39 +1071,28 @@ class _MenuPageState extends State<MenuPage> {
       ),
       _ServiceItem(
         title: 'Perpustakaan GPS',
-        desc: 'Peta rute cabang terdekat',
-        badge: 'GPS Map',
-        icon: Icons.location_on_rounded,
-        color: const Color(0xFF43634B),
+        imageAsset: pathGambarPerpustakaanGps,
+        fallbackIcon: Icons.location_on_rounded,
+        fallbackColor: const Color(0xFF43634B),
         onTap: () => go(const MapPage()),
       ),
       _ServiceItem(
         title: 'Riwayat Blockchain',
-        desc: 'Buku besar transaksi SHA-256',
-        badge: 'SHA-256',
-        icon: Icons.lock_clock_rounded,
-        color: const Color(0xFF7C3F2B),
+        imageAsset: pathGambarRiwayatBlockchain,
+        fallbackIcon: Icons.lock_clock_rounded,
+        fallbackColor: const Color(0xFF7C3F2B),
         onTap: () => go(const BlockchainPage()),
       ),
       _ServiceItem(
-        title: 'Konversi Kurs & Jam',
-        desc: 'Kurs mata uang & jam dunia',
-        badge: 'VIP',
-        icon: Icons.currency_exchange_rounded,
-        color: const Color(0xFF3B506B),
+        title: 'Konversi Kurs',
+        imageAsset: pathGambarKonversiKurs,
+        fallbackIcon: Icons.currency_exchange_rounded,
+        fallbackColor: const Color(0xFF3B506B),
         onTap: () => SubscriptionService.checkAccess(
           context,
           featureName: 'Konversi Kurs & Jam',
           onAllowed: () => go(const ConverterPage()),
         ),
-      ),
-      _ServiceItem(
-        title: 'Buku Tersimpan',
-        desc: 'Koleksi bacaan favorit Anda',
-        badge: 'Favorit',
-        icon: Icons.bookmark_added_rounded,
-        color: const Color(0xFF9A704F),
-        onTap: () => go(const SavedBooksPage()),
       ),
     ];
 
@@ -948,92 +1101,54 @@ class _MenuPageState extends State<MenuPage> {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: services.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
         mainAxisSpacing: 12,
-        childAspectRatio: 1.3,
+        mainAxisExtent: 104,
       ),
       itemBuilder: (context, i) {
         final s = services[i];
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFEADBCE), width: 1.1),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF302622).withValues(alpha: 0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(16),
-              onTap: s.onTap,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: s.color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(s.icon, size: 20, color: s.color),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: s.color.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            s.badge,
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 9.5,
-                              fontWeight: FontWeight.bold,
-                              color: s.color,
-                            ),
-                          ),
-                        ),
-                      ],
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: s.onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1EAE1),
+                      borderRadius: BorderRadius.circular(15),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          s.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.playfairDisplay(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF302622),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          s.desc,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 10,
-                            color: const Color(0xFF7A685A),
-                          ),
-                        ),
-                      ],
+                    clipBehavior: Clip.antiAlias,
+                    child: s.imageAsset != null
+                        ? Image.asset(
+                            s.imageAsset!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                _buildFallbackServiceIllustration(s),
+                          )
+                        : _buildFallbackServiceIllustration(s),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    s.title,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.15,
+                      color: const Color(0xFF302622),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -1041,22 +1156,47 @@ class _MenuPageState extends State<MenuPage> {
       },
     );
   }
+
+  Widget _buildFallbackServiceIllustration(_ServiceItem s) {
+    return Container(
+      decoration: BoxDecoration(
+        color: s.fallbackColor.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Center(
+        child: Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: s.fallbackColor.withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Icon(s.fallbackIcon, size: 26, color: s.fallbackColor),
+        ),
+      ),
+    );
+  }
 }
 
 class _ServiceItem {
   final String title;
-  final String desc;
-  final String badge;
-  final IconData icon;
-  final Color color;
+  final String? imageAsset;
+  final IconData fallbackIcon;
+  final Color fallbackColor;
   final VoidCallback onTap;
 
   _ServiceItem({
     required this.title,
-    required this.desc,
-    required this.badge,
-    required this.icon,
-    required this.color,
+    this.imageAsset,
+    required this.fallbackIcon,
+    required this.fallbackColor,
     required this.onTap,
   });
 }
@@ -1068,7 +1208,8 @@ class _LibraryBookGuideDialog extends StatefulWidget {
   const _LibraryBookGuideDialog();
 
   @override
-  State<_LibraryBookGuideDialog> createState() => _LibraryBookGuideDialogState();
+  State<_LibraryBookGuideDialog> createState() =>
+      _LibraryBookGuideDialogState();
 }
 
 class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
@@ -1135,7 +1276,9 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                   height: 34,
                   decoration: BoxDecoration(
                     color: const Color(0xFF8B2635),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(6)),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(6),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.3),
@@ -1145,7 +1288,11 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                     ],
                   ),
                   child: const Center(
-                    child: Icon(Icons.bookmark_rounded, color: Color(0xFFF1E6D4), size: 14),
+                    child: Icon(
+                      Icons.bookmark_rounded,
+                      color: Color(0xFFF1E6D4),
+                      size: 14,
+                    ),
                   ),
                 ),
               ),
@@ -1155,21 +1302,35 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                 decoration: BoxDecoration(
                   color: const Color(0xFFFAF7F2),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFEADBCE), width: 1.5),
+                  border: Border.all(
+                    color: const Color(0xFFEADBCE),
+                    width: 1.5,
+                  ),
                 ),
                 child: Column(
                   children: [
                     // Header Buku
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEDE2CF).withValues(alpha: 0.6),
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                        border: const Border(bottom: BorderSide(color: Color(0xFFEADBCE))),
+                        borderRadius: const BorderRadius.vertical(
+                          top: Radius.circular(16),
+                        ),
+                        border: const Border(
+                          bottom: BorderSide(color: Color(0xFFEADBCE)),
+                        ),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.auto_stories_rounded, color: Color(0xFF67343A), size: 20),
+                          const Icon(
+                            Icons.auto_stories_rounded,
+                            color: Color(0xFF67343A),
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -1186,7 +1347,11 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                             borderRadius: BorderRadius.circular(12),
                             child: const Padding(
                               padding: EdgeInsets.all(4),
-                              child: Icon(Icons.close_rounded, size: 20, color: Color(0xFF67343A)),
+                              child: Icon(
+                                Icons.close_rounded,
+                                size: 20,
+                                color: Color(0xFF67343A),
+                              ),
                             ),
                           ),
                         ],
@@ -1210,11 +1375,18 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
 
                     // Bilah Navigasi Halaman Buku
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: const Color(0xFFEDE2CF).withValues(alpha: 0.6),
-                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-                        border: const Border(top: BorderSide(color: Color(0xFFEADBCE))),
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(16),
+                        ),
+                        border: const Border(
+                          top: BorderSide(color: Color(0xFFEADBCE)),
+                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1223,23 +1395,38 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                             style: TextButton.styleFrom(
                               foregroundColor: const Color(0xFF67343A),
                               visualDensity: VisualDensity.compact,
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                              ),
                             ),
-                            onPressed: _currentPage > 0 ? _prevPage : () => Navigator.pop(context),
-                            icon: const Icon(Icons.arrow_back_ios_rounded, size: 13),
+                            onPressed: _currentPage > 0
+                                ? _prevPage
+                                : () => Navigator.pop(context),
+                            icon: const Icon(
+                              Icons.arrow_back_ios_rounded,
+                              size: 13,
+                            ),
                             label: Text(
                               'Kembali',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
 
                           // Indikator Halaman
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFAF7F2),
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFEADBCE)),
+                              border: Border.all(
+                                color: const Color(0xFFEADBCE),
+                              ),
                             ),
                             child: Text(
                               'Hal ${_currentPage + 1} dari $_totalPages',
@@ -1256,16 +1443,28 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                               backgroundColor: const Color(0xFF67343A),
                               foregroundColor: const Color(0xFFEDE2CF),
                               visualDensity: VisualDensity.compact,
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                             onPressed: _nextPage,
                             label: Text(
-                              _currentPage == _totalPages - 1 ? 'Selesai' : 'Lanjut',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold),
+                              _currentPage == _totalPages - 1
+                                  ? 'Selesai'
+                                  : 'Lanjut',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             icon: Icon(
-                              _currentPage == _totalPages - 1 ? Icons.check_rounded : Icons.arrow_forward_ios_rounded,
+                              _currentPage == _totalPages - 1
+                                  ? Icons.check_rounded
+                                  : Icons.arrow_forward_ios_rounded,
                               size: 13,
                             ),
                           ),
