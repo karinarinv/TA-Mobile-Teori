@@ -166,7 +166,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     ];
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
         title: const Text('Konversi Kurs & Jam', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0,

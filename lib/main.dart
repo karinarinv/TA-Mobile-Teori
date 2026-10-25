@@ -45,15 +45,32 @@ class MyApp extends StatelessWidget {
             backgroundColor: AppColors.oxblood,
             foregroundColor: AppColors.parchment,
             elevation: 0,
-            titleTextStyle: GoogleFonts.poppins(
+            titleTextStyle: GoogleFonts.playfairDisplay(
               color: AppColors.parchment,
-              fontSize: 18,
+              fontSize: 19,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.3,
             ),
           ),
           scaffoldBackgroundColor: AppColors.background,
-          textTheme: GoogleFonts.poppinsTextTheme(),
+          textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
+            headlineLarge: GoogleFonts.playfairDisplay(
+              fontWeight: FontWeight.bold,
+              color: AppColors.walnut,
+            ),
+            headlineMedium: GoogleFonts.playfairDisplay(
+              fontWeight: FontWeight.bold,
+              color: AppColors.walnut,
+            ),
+            titleLarge: GoogleFonts.playfairDisplay(
+              fontWeight: FontWeight.bold,
+              color: AppColors.walnut,
+            ),
+            titleMedium: GoogleFonts.playfairDisplay(
+              fontWeight: FontWeight.bold,
+              color: AppColors.walnut,
+            ),
+          ),
           useMaterial3: true,
         ),
         home: startLoggedIn ? const HomeShell() : const LoginPage(),

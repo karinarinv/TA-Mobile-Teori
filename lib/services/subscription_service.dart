@@ -20,15 +20,17 @@ class SubscriptionService {
     final isVip = prefs.getBool('vip_user_$username') ?? false;
     if (!isVip) return false;
 
-    // Verifikasi batas waktu aktif
+    // Verifikasi batas waktu aktif 30 hari secara mutlak
     final expiryIso = prefs.getString('vip_expiry_user_$username');
-    if (expiryIso != null) {
-      final expiryDate = DateTime.tryParse(expiryIso);
-      if (expiryDate != null && DateTime.now().isAfter(expiryDate)) {
-        // Masa aktif telah kedaluwarsa secara alami
-        await prefs.setBool('vip_user_$username', false);
-        return false;
-      }
+    if (expiryIso == null) {
+      await prefs.setBool('vip_user_$username', false);
+      return false;
+    }
+    final expiryDate = DateTime.tryParse(expiryIso);
+    if (expiryDate == null || DateTime.now().isAfter(expiryDate)) {
+      // Masa aktif 30 hari telah kedaluwarsa secara alami
+      await prefs.setBool('vip_user_$username', false);
+      return false;
     }
 
     return true;

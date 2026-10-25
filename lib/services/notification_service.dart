@@ -1,49 +1,309 @@
+import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+class AppNotificationItem {
+  final String id;
+  final String title;
+  final String message;
+  final String type; // 'sewa', 'vip', 'kembali', 'promo'
+  final DateTime timestamp;
+  bool isRead;
+
+  AppNotificationItem({
+    required this.id,
+    required this.title,
+    required this.message,
+    required this.type,
+    required this.timestamp,
+    this.isRead = false,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'message': message,
+        'type': type,
+        'timestamp': timestamp.toIso8601String(),
+        'isRead': isRead,
+      };
+
+  factory AppNotificationItem.fromJson(Map<String, dynamic> json) =>
+      AppNotificationItem(
+        id: json['id'] as String? ??
+            '${DateTime.now().millisecondsSinceEpoch}_${json['title']?.hashCode}',
+        title: json['title'] as String? ?? 'Pemberitahuan',
+        message: json['message'] as String? ?? '',
+        type: json['type'] as String? ?? 'sewa',
+        timestamp: DateTime.tryParse(json['timestamp'] as String? ?? '') ??
+            DateTime.now(),
+        isRead: json['isRead'] as bool? ?? false,
+      );
+}
+
 class NotificationService {
   static final _n = FlutterLocalNotificationsPlugin();
+  static const String _storageKey = 'rentbook_stored_notifications';
+  static const String _promoSettingKey = 'setting_daily_promo_enabled';
+
+  static const _d = NotificationDetails(
+    android: AndroidNotificationDetails(
+      'rentbook_channel',
+      'Pemberitahuan RentBook',
+      channelDescription: 'Notifikasi sewa buku, jatuh tempo, dan promo harian.',
+      importance: Importance.high,
+      priority: Priority.high,
+    ),
+  );
 
   static Future<void> init() async {
     tzdata.initializeTimeZones();
-    await _n.initialize(const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher')));
+    await _n.initialize(
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
+    );
     await _n
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
+
+    // Inisialisasi jadwal harian jika aktif
+    if (await isDailyPromoEnabled()) {
+      await scheduleDailyPromoNotifications();
+    }
   }
 
-  static const _d = NotificationDetails(
-      android: AndroidNotificationDetails('rentbook', 'Pengingat Buku',
-          importance: Importance.high, priority: Priority.high));
+  // ============================================================
+  // PENGATURAN NOTIFIKASI PROMO HARIAN
+  // ============================================================
+  static Future<bool> isDailyPromoEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_promoSettingKey) ?? true;
+  }
 
-  /// Notifikasi pembayaran lunas seketika
-  static Future<void> showPaymentSuccess(String title, String amount, String method) async {
-    await _n.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      'Pembayaran Berhasil! ($method)',
-      'Sewa "$title" sebesar $amount telah terkonfirmasi lunas.',
-      _d,
+  static Future<void> setDailyPromoEnabled(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_promoSettingKey, enabled);
+    if (enabled) {
+      await scheduleDailyPromoNotifications();
+    } else {
+      await _n.cancel(8888); // ID khusus promo harian
+    }
+  }
+
+  // ============================================================
+  // PENJADWALAN NOTIFIKASI PROMO HARIAN (PUKUL 09.00)
+  // ============================================================
+  static Future<void> scheduleDailyPromoNotifications() async {
+    try {
+      final now = tz.TZDateTime.now(tz.local);
+      var scheduledDate = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        9, // Pukul 09.00 pagi
+        0,
+      );
+
+      if (scheduledDate.isBefore(now)) {
+        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
+
+      await _n.zonedSchedule(
+        8888,
+        'Promo Sewa Pilihan Hari Ini',
+        'Gunakan voucher DISKON10 untuk potongan sewa 10 persen bagi seluruh koleksi sastra dan fiksi.',
+        scheduledDate,
+        _d,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    } catch (_) {}
+  }
+
+  // ============================================================
+  // PENYIMPANAN RIWAYAT NOTIFIKASI (STORAGE)
+  // ============================================================
+  static Future<List<AppNotificationItem>> getNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_storageKey);
+    if (raw == null || raw.isEmpty) {
+      // Seed default sample notifications (promos & welcome)
+      final initial = [
+        AppNotificationItem(
+          id: 'init_promo_1',
+          title: 'Voucher Sewa Aktif: DISKON10',
+          message:
+              'Dapatkan potongan harga sewa 10 persen untuk seluruh judul buku di katalog RentBook.',
+          type: 'promo',
+          timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+          isRead: false,
+        ),
+        AppNotificationItem(
+          id: 'init_promo_2',
+          title: 'Rekomendasi Buku Klasik Minggu Ini',
+          message:
+              'Koleksi karya sastra klasik pilihan dan buku filosofi telah tersedia untuk dipinjam.',
+          type: 'promo',
+          timestamp: DateTime.now().subtract(const Duration(days: 1)),
+          isRead: true,
+        ),
+      ];
+      await _saveList(initial);
+      return initial;
+    }
+
+    try {
+      final list = jsonDecode(raw) as List;
+      return list.map((e) => AppNotificationItem.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<int> getUnreadCount() async {
+    final list = await getNotifications();
+    return list.where((n) => !n.isRead).length;
+  }
+
+  static Future<void> addNotification({
+    required String title,
+    required String message,
+    required String type,
+  }) async {
+    final list = await getNotifications();
+    list.insert(
+      0,
+      AppNotificationItem(
+        id: '${DateTime.now().millisecondsSinceEpoch}',
+        title: title,
+        message: message,
+        type: type,
+        timestamp: DateTime.now(),
+        isRead: false,
+      ),
+    );
+    // Simpan maksimal 60 notifikasi
+    if (list.length > 60) {
+      list.removeRange(60, list.length);
+    }
+    await _saveList(list);
+  }
+
+  static Future<void> markAsRead(String id) async {
+    final list = await getNotifications();
+    for (final item in list) {
+      if (item.id == id) {
+        item.isRead = true;
+        break;
+      }
+    }
+    await _saveList(list);
+  }
+
+  static Future<void> markAllAsRead() async {
+    final list = await getNotifications();
+    for (final item in list) {
+      item.isRead = true;
+    }
+    await _saveList(list);
+  }
+
+  static Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_storageKey);
+  }
+
+  static Future<void> _saveList(List<AppNotificationItem> list) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonStr = jsonEncode(list.map((e) => e.toJson()).toList());
+    await prefs.setString(_storageKey, jsonStr);
+  }
+
+  // ============================================================
+  // PEMICU NOTIFIKASI SISTEM (AKTIVITAS SEWA, VIP, & JATUH TEMPO)
+  // ============================================================
+
+  /// Notifikasi pembayaran sewa berhasil
+  static Future<void> showPaymentSuccess(
+      String title, String amount, String method) async {
+    final notifTitle = 'Pembayaran Berhasil ($method)';
+    final notifBody = 'Sewa "$title" sebesar $amount telah terkonfirmasi lunas.';
+
+    try {
+      await _n.show(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        notifTitle,
+        notifBody,
+        _d,
+      );
+    } catch (_) {}
+
+    await addNotification(
+      title: notifTitle,
+      message: notifBody,
+      type: 'sewa',
     );
   }
 
-  /// Notifikasi langsung + pengingat jatuh tempo (demo: 1 menit; durasi hari: days).
+  /// Notifikasi aktivasi VIP berhasil
+  static Future<void> showVipSuccess(String method) async {
+    const notifTitle = 'Keanggotaan VIP Aktif';
+    final notifBody =
+        'Langganan RentBook VIP (30 Hari) via $method telah aktif. Nikmati akses eksklusif seluruh fitur.';
+
+    try {
+      await _n.show(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        notifTitle,
+        notifBody,
+        _d,
+      );
+    } catch (_) {}
+
+    await addNotification(
+      title: notifTitle,
+      message: notifBody,
+      type: 'vip',
+    );
+  }
+
+  /// Notifikasi peminjaman & jadwal pengingat jatuh tempo
   static Future<void> scheduleReturn(String title, {int days = 3}) async {
-    await _n.show(
-      1,
-      'Peminjaman Berhasil',
-      '"$title" berhasil disewa untuk $days hari ke depan.',
-      _d,
-    );
-    await _n.zonedSchedule(
-      title.hashCode,
-      'Pengingat Jatuh Tempo!',
-      'Masa sewa "$title" ($days hari) hampir habis. Segera kembalikan tepat waktu.',
-      tz.TZDateTime.now(tz.UTC).add(const Duration(minutes: 1)),
-      _d,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+    final notifTitle = 'Peminjaman Berhasil';
+    final notifBody = '"$title" berhasil disewa untuk $days hari ke depan.';
+
+    try {
+      await _n.show(
+        1,
+        notifTitle,
+        notifBody,
+        _d,
+      );
+
+      // Jadwal reminder jatuh tempo
+      await _n.zonedSchedule(
+        title.hashCode,
+        'Pengingat Batas Pengembalian',
+        'Masa sewa untuk "$title" ($days hari) segera berakhir. Silakan kembalikan tepat waktu.',
+        tz.TZDateTime.now(tz.local).add(Duration(days: days > 1 ? days - 1 : 1)),
+        _d,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+    } catch (_) {}
+
+    await addNotification(
+      title: notifTitle,
+      message: notifBody,
+      type: 'sewa',
     );
   }
 }
