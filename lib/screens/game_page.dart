@@ -1074,6 +1074,60 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   // Halaman Kalah (Sesuai Color Palette Aplikasi & Retro Game)
+  Widget _buildPixelResultBanner({required bool won}) {
+    final ink = const Color(0xFF27171C);
+    return Container(
+      height: 188,
+      width: double.infinity,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: won
+              ? const [Color(0xFF67343A), Color(0xFF3D252D)]
+              : const [Color(0xFF29232B), Color(0xFF4B3035)],
+        ),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFFD4BE9D), width: 2),
+        boxShadow: [BoxShadow(color: ink.withValues(alpha: .22), blurRadius: 16, offset: const Offset(0, 7))],
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(child: CustomPaint(painter: _PixelResultBackdropPainter(won: won))),
+          Positioned(
+            left: 18,
+            top: 18,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+              decoration: BoxDecoration(color: const Color(0xFFEDE2CF), border: Border.all(color: const Color(0xFFB9854D), width: 2), borderRadius: BorderRadius.circular(6)),
+              child: Text(won ? '★  LEVEL CLEAR  ★' : '!  GAME OVER  !', style: const TextStyle(fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.1, color: Color(0xFF67343A))),
+            ),
+          ),
+          Positioned(
+            left: 24,
+            bottom: 17,
+            child: Text(won ? 'RAK EMAS DITEMUKAN!' : 'WIKWOK MENANGKAPMU!', style: const TextStyle(fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: .5, color: Color(0xFFEDE2CF))),
+          ),
+          Positioned(
+            right: 23,
+            bottom: 10,
+            width: 116,
+            height: 132,
+            child: CustomPaint(painter: won ? _CutePixelHappyAdventurerPainter() : _WikwokPixelPainter()),
+          ),
+          if (won) ...[
+            const Positioned(right: 27, top: 20, child: Icon(Icons.star_rounded, color: Color(0xFFF2C66D), size: 24)),
+            const Positioned(right: 149, top: 73, child: Icon(Icons.auto_awesome_rounded, color: Color(0xFFEDE2CF), size: 17)),
+          ] else ...[
+            const Positioned(right: 34, top: 20, child: Icon(Icons.bolt_rounded, color: Color(0xFFE6A66A), size: 24)),
+            const Positioned(right: 151, top: 79, child: Icon(Icons.question_mark_rounded, color: Color(0xFFEDE2CF), size: 18)),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildDefeatView() {
     return Center(
       child: SingleChildScrollView(
@@ -1081,26 +1135,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 88,
-              height: 88,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFEDE2CF),
-                border: Border.all(color: const Color(0xFF67343A), width: 2.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF67343A).withValues(alpha: 0.2),
-                    blurRadius: 18,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: CustomPaint(
-                painter: _WikwokPixelPainter(),
-              ),
-            ),
+            _buildPixelResultBanner(won: false),
             const SizedBox(height: 18),
 
             const Text(
@@ -1251,35 +1286,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 104,
-              height: 104,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFEDE2CF),
-                border: Border.all(color: const Color(0xFF67343A), width: 2.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF67343A).withValues(alpha: 0.25),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: AnimatedBuilder(
-                animation: _pulseController,
-                builder: (context, _) {
-                  final bob = sin(_pulseController.value * 2 * pi) * 3.5;
-                  return Transform.translate(
-                    offset: Offset(0, bob),
-                    child: CustomPaint(
-                      painter: _CutePixelHappyAdventurerPainter(),
-                    ),
-                  );
-                },
-              ),
-            ),
+            _buildPixelResultBanner(won: true),
             const SizedBox(height: 18),
             const Text(
               'SELAMAT, MISI SELESAI!',
@@ -1428,7 +1435,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               ),
             const SizedBox(height: 20),
 
-            SizedBox(
+            if (!_isVoucherUsed) SizedBox(
               width: double.infinity,
               height: 48,
               child: FilledButton.icon(
@@ -2864,6 +2871,34 @@ class _PixelLibraryMazePainter extends CustomPainter {
 // =========================================================================
 // PAINTERS PIXEL ART LUCU UNTUK PANDUAN GAME RETRO ARCADE
 // =========================================================================
+
+class _PixelResultBackdropPainter extends CustomPainter {
+  final bool won;
+  const _PixelResultBackdropPainter({required this.won});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+    final tile = 12.0;
+    for (var row = 0; row < (size.height / tile).ceil(); row++) {
+      for (var col = 0; col < (size.width / tile).ceil(); col++) {
+        if ((row + col) % 2 == 0 && (row * 3 + col) % 4 != 0) {
+          paint.color = (won ? const Color(0xFFEDE2CF) : const Color(0xFFB9854D)).withValues(alpha: .045);
+          canvas.drawRect(Rect.fromLTWH(col * tile, row * tile, tile - 1, tile - 1), paint);
+        }
+      }
+    }
+    paint.color = const Color(0xFFEDE2CF).withValues(alpha: .2);
+    for (var i = 0; i < 5; i++) {
+      final x = size.width * (.12 + i * .13);
+      final y = size.height * (.60 + (i.isEven ? .04 : -.04));
+      canvas.drawRect(Rect.fromLTWH(x, y, 5, 5), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PixelResultBackdropPainter oldDelegate) => oldDelegate.won != won;
+}
 
 // Karakter Penjelajah Bahagia Memegang Buku & Piala (Tampilan Menang)
 class _CutePixelHappyAdventurerPainter extends CustomPainter {

@@ -6,6 +6,7 @@ import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 import 'screens/login_page.dart';
 import 'screens/home_shell.dart';
+import 'screens/splash_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -73,6 +74,8 @@ class MyApp extends StatelessWidget {
           ),
           useMaterial3: true,
         ),
-        home: startLoggedIn ? const HomeShell() : const LoginPage(),
+        home: SplashScreen(
+          destination: startLoggedIn ? const HomeShell() : const LoginPage(),
+        ),
       );
 }

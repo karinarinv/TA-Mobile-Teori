@@ -38,12 +38,71 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   double _discountPercentage = 0.0;
   String? _voucherMessage;
   bool _isVoucherValid = false;
+  bool _hasAvailableVoucher = false;
 
   final List<String> _paymentOptions = [
     'QRIS (GoPay/OVO/Dana)',
     'Transfer Virtual Account',
     'Bayar Tunai',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadVoucherAvailability();
+  }
+
+  Future<void> _loadVoucherAvailability() async {
+    final username = await AuthService.currentSession() ?? 'guest';
+    final prefs = await SharedPreferences.getInstance();
+    final used = prefs.getBool('voucher_diskon10_used_$username') ?? false;
+    if (mounted) setState(() => _hasAvailableVoucher = !used);
+  }
+
+  Future<void> _showVoucherPicker() async {
+    await _loadVoucherAvailability();
+    if (!mounted) return;
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFFFAF7F2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Voucher Saya', style: TextStyle(color: Color(0xFF67343A), fontWeight: FontWeight.bold)),
+        content: _hasAvailableVoucher
+            ? InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _voucherController.text = 'DISKON10';
+                  _applyVoucher();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(color: const Color(0xFFEDE2CF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF67343A).withValues(alpha: .25))),
+                  child: const Row(children: [
+                    Icon(Icons.confirmation_number_rounded, color: Color(0xFF67343A)),
+                    SizedBox(width: 12),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                      Text('DISKON10', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF67343A), letterSpacing: 1)),
+                      SizedBox(height: 3), Text('Potongan 10% untuk sewa buku', style: TextStyle(fontSize: 12, color: Color(0xFF302622))),
+                    ])),
+                    Icon(Icons.chevron_right_rounded, color: Color(0xFF67343A)),
+                  ]),
+                ),
+              )
+            : const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.confirmation_number_outlined, size: 42, color: Color(0xFFB9A99A)),
+                  SizedBox(height: 10),
+                  Text('Belum ada voucher tersedia', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF302622))),
+                  SizedBox(height: 4), Text('Voucher DISKON10 sudah digunakan.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.black54)),
+                ]),
+              ),
+        actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Tutup', style: TextStyle(color: Color(0xFF67343A))))],
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -419,34 +478,26 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 ),
               )
             else
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _voucherController,
-                      textCapitalization: TextCapitalization.characters,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 1),
-                      decoration: InputDecoration(
-                        hintText: 'Kode Voucher',
-                        hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400, letterSpacing: 0),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                        isDense: true,
-                        prefixIcon: const Icon(Icons.confirmation_number_outlined, size: 18),
-                      ),
-                    ),
+              InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: _showVoucherPicker,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFAF7F2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFEADBCE)),
                   ),
-                  const SizedBox(width: 8),
-                  FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF67343A),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-                    ),
-                    onPressed: _applyVoucher,
-                    child: const Text('Gunakan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  ),
-                ],
+                  child: Row(children: [
+                    const Icon(Icons.confirmation_number_outlined, size: 20, color: Color(0xFF67343A)),
+                    const SizedBox(width: 9),
+                    Expanded(child: Text(
+                      _hasAvailableVoucher ? 'Pilih voucher yang tersedia' : 'Tidak ada voucher tersedia',
+                      style: TextStyle(fontSize: 13, color: _hasAvailableVoucher ? const Color(0xFF302622) : Colors.grey.shade600),
+                    )),
+                    const Icon(Icons.chevron_right_rounded, color: Color(0xFF67343A)),
+                  ]),
+                ),
               ),
             if (_voucherMessage != null && !_isVoucherValid)
               Padding(

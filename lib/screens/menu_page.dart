@@ -1,10 +1,15 @@
 import 'dart:io';
+
 import 'package:intl/intl.dart';
+
 import '../services/db_helper.dart';
+
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../constants/app_colors.dart';
 import '../services/auth_service.dart';
 import '../services/notification_service.dart';
@@ -19,8 +24,6 @@ import 'game_page.dart';
 import 'map_page.dart';
 import 'notification_page.dart';
 import 'profile_page.dart';
-
-
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -297,9 +300,10 @@ class _MenuPageState extends State<MenuPage> {
               children: [
                 Container(
                   decoration: const BoxDecoration(
-                    color: Color(
-                      0xFF67343A,
-                    ), // Oxblood solid membungkus sampai ke banner
+                    color: Color(0xFF67343A),
+                    borderRadius: BorderRadius.vertical(
+                      bottom: Radius.circular(24),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black12,
@@ -312,52 +316,71 @@ class _MenuPageState extends State<MenuPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Baris Profil Pengguna, Ikon Panduan & Notifikasi
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 18,
-                          vertical: 12,
-                        ),
-                        child: Row(
-                          children: [
-                            // Avatar bulat mengikuti ProfilePage (diklik mengarah ke ProfilePage)
-                            GestureDetector(
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ProfilePage(),
-                                  ),
-                                );
-                                _loadUser();
-                              },
-                              child: Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: const Color(0xFFEDE2CF),
-                                  border: Border.all(
-                                    color: const Color(0xFFD4BE9D),
-                                    width: 1.8,
-                                  ),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 1),
+                      Container(
+                        color: const Color(0xFF4C272C),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 12,
+                          ),
+                          child: Row(
+                            children: [
+                              // Avatar bulat mengikuti ProfilePage (diklik mengarah ke ProfilePage)
+                              GestureDetector(
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const ProfilePage(),
                                     ),
-                                  ],
-                                ),
-                                child: ClipOval(
-                                  child:
-                                      (_userPhoto != null &&
-                                          File(_userPhoto!).existsSync())
-                                      ? Image.file(
-                                          File(_userPhoto!),
-                                          fit: BoxFit.cover,
-                                          width: 44,
-                                          height: 44,
-                                          errorBuilder: (_, __, ___) => Center(
+                                  );
+                                  _loadUser();
+                                },
+                                child: Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: const Color(0xFFEDE2CF),
+                                    border: Border.all(
+                                      color: const Color(0xFFD4BE9D),
+                                      width: 1.8,
+                                    ),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black12,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipOval(
+                                    child:
+                                        (_userPhoto != null &&
+                                            File(_userPhoto!).existsSync())
+                                        ? Image.file(
+                                            File(_userPhoto!),
+                                            fit: BoxFit.cover,
+                                            width: 44,
+                                            height: 44,
+                                            errorBuilder: (_, __, ___) => Center(
+                                              child: Text(
+                                                _user.isNotEmpty
+                                                    ? _user[0].toUpperCase()
+                                                    : 'R',
+                                                style:
+                                                    GoogleFonts.playfairDisplay(
+                                                      color: const Color(
+                                                        0xFF67343A,
+                                                      ),
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                              ),
+                                            ),
+                                          )
+                                        : Center(
                                             child: Text(
                                               _user.isNotEmpty
                                                   ? _user[0].toUpperCase()
@@ -372,113 +395,122 @@ class _MenuPageState extends State<MenuPage> {
                                                   ),
                                             ),
                                           ),
-                                        )
-                                      : Center(
-                                          child: Text(
-                                            _user.isNotEmpty
-                                                ? _user[0].toUpperCase()
-                                                : 'R',
-                                            style: GoogleFonts.playfairDisplay(
-                                              color: const Color(0xFF67343A),
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-
-                            // Tanggal / Status Keanggotaan
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const ProfilePage(),
-                                    ),
-                                  );
-                                  _loadUser();
-                                },
-                                child: Text(
-                                  '${DateFormat('EEEE, d MMM yyyy', 'id_ID').format(DateTime.now())} • ${_isVip ? "VIP Member" : "Anggota"}',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFFD4BE9D),
                                   ),
                                 ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
 
-                            // Ikon Panduan '?'
-                            IconButton(
-                              tooltip: 'Panduan RentBook',
-                              visualDensity: VisualDensity.compact,
-                              icon: const Icon(
-                                Icons.help_outline_rounded,
-                                color: Color(0xFFEDE2CF),
-                                size: 24,
-                              ),
-                              onPressed: _showHelpDialog,
-                            ),
-
-                            // Ikon Lonceng Notifikasi (Bell) dengan Badge
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                IconButton(
-                                  tooltip: 'Pemberitahuan & Promo',
-                                  visualDensity: VisualDensity.compact,
-                                  icon: const Icon(
-                                    Icons.notifications_none_rounded,
-                                    color: Color(0xFFEDE2CF),
-                                    size: 24,
-                                  ),
-                                  onPressed: () async {
+                              // Tanggal / Status Keanggotaan
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (_) =>
-                                            const NotificationPage(),
+                                        builder: (_) => const ProfilePage(),
                                       ),
                                     );
-                                    _loadNotificationsCount();
+                                    _loadUser();
                                   },
-                                ),
-                                if (_unreadNotifications > 0)
-                                  Positioned(
-                                    top: 6,
-                                    right: 6,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(3),
-                                      decoration: const BoxDecoration(
-                                        color: Color(0xFFC0392B),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      constraints: const BoxConstraints(
-                                        minWidth: 16,
-                                        minHeight: 16,
-                                      ),
-                                      child: Text(
-                                        '$_unreadNotifications',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        DateFormat(
+                                          'EEEE, d MMM yyyy',
+                                          'id_ID',
+                                        ).format(DateTime.now()),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFFD4BE9D),
                                         ),
-                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        _isVip ? 'VIP Member' : 'Anggota',
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFFEDE2CF),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Ikon Panduan '?'
+                              IconButton(
+                                tooltip: 'Panduan RentBook',
+                                visualDensity: VisualDensity.compact,
+                                icon: const Icon(
+                                  Icons.help_outline_rounded,
+                                  color: Color(0xFFEDE2CF),
+                                  size: 24,
+                                ),
+                                onPressed: _showHelpDialog,
+                              ),
+
+                              // Ikon Lonceng Notifikasi (Bell) dengan Badge
+                              Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  IconButton(
+                                    tooltip: 'Pemberitahuan & Promo',
+                                    visualDensity: VisualDensity.compact,
+                                    icon: const Icon(
+                                      Icons.notifications_none_rounded,
+                                      color: Color(0xFFEDE2CF),
+                                      size: 24,
+                                    ),
+                                    onPressed: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const NotificationPage(),
+                                        ),
+                                      );
+                                      _loadNotificationsCount();
+                                    },
+                                  ),
+                                  if (_unreadNotifications > 0)
+                                    Positioned(
+                                      top: 6,
+                                      right: 6,
+                                      child: Container(
+                                        padding: const EdgeInsets.all(3),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFC0392B),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        constraints: const BoxConstraints(
+                                          minWidth: 16,
+                                          minHeight: 16,
+                                        ),
+                                        child: Text(
+                                          '$_unreadNotifications',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            height: 1,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                              ],
-                            ),
-                          ],
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 
@@ -1021,7 +1053,7 @@ class _MenuPageState extends State<MenuPage> {
   static const String pathGambarCariBuku = 'assets/images/cari dan sewa.png';
 
   // 2. Gambar untuk Fitur Kenali Buku (Pindai Cover):
-  static const String pathGambarKenaliBuku ='assets/images/kenali buku.png'; 
+  static const String pathGambarKenaliBuku = 'assets/images/kenali buku.png';
 
   // 3. Gambar untuk Fitur Labirin Game:
   static const String? pathGambarLabirinGame = 'assets/images/labirin.png';
@@ -1030,10 +1062,11 @@ class _MenuPageState extends State<MenuPage> {
   static const String? pathGambarPerpustakaanGps = 'assets/images/gps.png';
 
   // 5. Gambar untuk Fitur Riwayat Blockchain:
-  static const String? pathGambarRiwayatBlockchain = 'assets/images/blockchain.png';
+  static const String? pathGambarRiwayatBlockchain =
+      'assets/images/blockchain.png';
 
   // 6. Gambar untuk Fitur Konversi Kurs:
-  static const String? pathGambarKonversiKurs ='assets/images/konversi.png';
+  static const String? pathGambarKonversiKurs = 'assets/images/konversi.png';
 
   // =========================================================================
   // WIDGET: EKSPLOR FITUR RENTBOOK

@@ -112,6 +112,16 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     return 'Rp ${f.format(n).replaceAll(',', '.')}';
   }
 
+  String _flagFor(String code) {
+    final points = switch (code) {
+      'ID' => [0x1F1EE, 0x1F1E9], 'JP' => [0x1F1EF, 0x1F1F5], 'GB' => [0x1F1EC, 0x1F1E7],
+      'USD' => [0x1F1FA, 0x1F1F8], 'EUR' => [0x1F1EA, 0x1F1FA], 'SGD' => [0x1F1F8, 0x1F1EC],
+      'JPY' => [0x1F1EF, 0x1F1F5], 'GBP' => [0x1F1EC, 0x1F1E7], 'AUD' => [0x1F1E6, 0x1F1FA], 'MYR' => [0x1F1F2, 0x1F1FE],
+      _ => [0x1F30D],
+    };
+    return String.fromCharCodes(points);
+  }
+
   String _formatDate(DateTime d) {
     try {
       return DateFormat('EEEE, d MMM yyyy', 'id_ID').format(d);
@@ -193,6 +203,24 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
           ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF67343A), Color(0xFF92565A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [BoxShadow(color: const Color(0xFF67343A).withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
+                ),
+                child: Row(children: [
+                  Container(width: 48, height: 48, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .15), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.currency_exchange_rounded, color: Color(0xFFEDE2CF), size: 27)),
+                  const SizedBox(width: 14),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('Jelajahi kurs dunia', style: GoogleFonts.poppins(color: const Color(0xFFEDE2CF), fontSize: 16, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 3),
+                    Text('Cek perkiraan harga buku impor dalam rupiah.', style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: .85), fontSize: 11, fontWeight: FontWeight.w500)),
+                  ])),
+                ]),
+              ),
+              const SizedBox(height: 14),
               Card(
                 color: const Color(0xFFFAF7F2),
                 surfaceTintColor: Colors.transparent,
@@ -206,9 +234,9 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Harga Sewa Buku (IDR / Rupiah)',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      Text(
+                        'Masukkan harga buku',
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 14, color: const Color(0xFF302622)),
                       ),
                       const SizedBox(height: 8),
                       TextField(
@@ -264,9 +292,9 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               ),
               const SizedBox(height: 14),
 
-              const Text(
-                'Nilai Konversi ke Mata Uang Asing (Buku Impor)',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+              Text(
+                'Perkiraan harga di luar negeri',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF302622)),
               ),
               const SizedBox(height: 10),
 
@@ -277,14 +305,15 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                 final converted = amount * rate;
                 final info = _currencyInfo[code] ?? (code, code);
 
+                final accent = code == 'JPY' || code == 'SGD' ? const Color(0xFFB9854D) : const Color(0xFF8B5555);
                 return Card(
-                  color: const Color(0xFFFAF7F2),
+                  color: const Color(0xFFFFFDF9),
                   surfaceTintColor: Colors.transparent,
                   margin: const EdgeInsets.only(bottom: 10),
                   elevation: 1,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: Color(0xFFEADBCE)),
+                    side: BorderSide(color: accent.withValues(alpha: .35)),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -294,15 +323,9 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFAF7F2),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                info.$2.split(' ').first,
-                                style: const TextStyle(fontSize: 20),
-                              ),
+                              width: 44, height: 44, alignment: Alignment.center,
+                              decoration: BoxDecoration(color: accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(13)),
+                              child: Text(_flagFor(code), style: const TextStyle(fontSize: 25)),
                             ),
                             const SizedBox(width: 12),
                             Column(
@@ -310,11 +333,11 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               children: [
                                 Text(
                                   code,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                  style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF302622)),
                                 ),
                                 Text(
                                   info.$1,
-                                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                  style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
                                 ),
                               ],
                             ),
@@ -325,15 +348,15 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                           children: [
                             Text(
                               code == 'JPY' ? '¥ ${converted.toStringAsFixed(0)}' : '${info.$2.split(' ').last} ${converted.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w800,
                                 fontSize: 16,
                                 color: Color(0xFF67343A),
                               ),
                             ),
                             Text(
                               '1 $code = ${_formatRupiah((1 / rate).round())}',
-                              style: TextStyle(fontSize: 10, color: Colors.grey.shade500),
+                              style: GoogleFonts.poppins(fontSize: 9, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -350,6 +373,25 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
             padding: const EdgeInsets.all(16),
             children: [
               Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color(0xFF67343A), Color(0xFF92565A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [BoxShadow(color: const Color(0xFF67343A).withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
+                ),
+                child: Row(children: [
+                  Container(width: 52, height: 52, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .14), shape: BoxShape.circle), child: Text(_flagFor('ID'), style: const TextStyle(fontSize: 29))),
+                  const SizedBox(width: 14),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('Waktu Indonesia Barat', style: GoogleFonts.poppins(color: const Color(0xFFEDE2CF), fontSize: 12, fontWeight: FontWeight.w600)),
+                    Text(fTime.format(utc.add(const Duration(hours: 7))), style: GoogleFonts.poppins(color: Colors.white, fontSize: 27, fontWeight: FontWeight.w800, height: 1.2)),
+                    Text(_formatDate(utc.add(const Duration(hours: 7))), style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: .8), fontSize: 10, fontWeight: FontWeight.w500)),
+                  ])),
+                  const Icon(Icons.public_rounded, color: Color(0xFFEDE2CF), size: 32),
+                ]),
+              ),
+              const SizedBox(height: 14),
+              Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFAF7F2),
@@ -363,7 +405,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                     Expanded(
                       child: Text(
                         'Jam operasional perpustakaan acuan: 08:00 - 16:00 waktu setempat.',
-                        style: TextStyle(fontSize: 12, color: const Color(0xFF302622)),
+                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: const Color(0xFF302622)),
                       ),
                     ),
                   ],
@@ -394,13 +436,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Text(z['flag'] as String, style: const TextStyle(fontSize: 20)),
+                            Text(_flagFor(z['flag'] as String), style: const TextStyle(fontSize: 23)),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 z['name'] as String,
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
+                                  fontWeight: FontWeight.w800,
                                   fontSize: 14,
                                   color: isWib ? const Color(0xFF67343A) : Colors.black87,
                                 ),
@@ -432,7 +474,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                         const SizedBox(height: 4),
                         Text(
                           z['city'] as String,
-                          style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                          style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
                         ),
                         const Divider(height: 18),
                         Row(
@@ -465,8 +507,8 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                 Text(
                                   fTime.format(t),
                                   style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.w800,
                                     fontFamily: 'monospace',
                                     color: Color(0xFF67343A),
                                   ),
