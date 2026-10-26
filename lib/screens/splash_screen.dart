@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
+import '../services/game_audio_service.dart';
 
 class SplashScreen extends StatefulWidget {
   final Widget destination;
@@ -12,6 +17,11 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  late final Animation<Offset> _bigISlide;
+  late final Animation<Offset> _smallISlide;
+  late final Animation<Offset> _rSlide;
+  late final Animation<double> _textFade;
+  final List<Timer> _soundTimers = [];
 
   Animation<Offset> _slide(double start, double end, Offset from) =>
       Tween<Offset>(begin: from, end: Offset.zero).animate(
@@ -21,25 +31,28 @@ class _SplashScreenState extends State<SplashScreen>
         ),
       );
 
-  late final Animation<Offset> _iSlide;
-  late final Animation<Offset> _stemSlide;
-  late final Animation<Offset> _rSlide;
-  late final Animation<double> _wordFade;
-
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 3000),
     );
-    _iSlide = _slide(0, .24, const Offset(-1.2, 0));
-    _stemSlide = _slide(.20, .43, const Offset(0, 1.1));
+    _bigISlide = _slide(0, .24, const Offset(-1.2, 0));
+    _smallISlide = _slide(.20, .43, const Offset(0, 1.1));
     _rSlide = _slide(.38, .64, const Offset(1.2, 0));
-    _wordFade = CurvedAnimation(
+    _textFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(.60, .86, curve: Curves.easeIn),
+      curve: const Interval(.60, .84, curve: Curves.easeIn),
     );
+
+    // Three soft 8-bit chimes accompany the pieces as they settle in place.
+    for (final delay in const [520, 1060, 1640]) {
+      _soundTimers.add(Timer(Duration(milliseconds: delay), () {
+        if (mounted) unawaited(GameAudioService.playTing());
+      }));
+    }
+
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) _openApp();
     });
@@ -57,55 +70,29 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  Widget _logoSlice({
-    required double left,
-    required double top,
-    required double width,
-    required double height,
+  Widget _movingLogoPiece({
+    required String asset,
     required Animation<Offset> animation,
+    required double travel,
   }) {
-    return Positioned(
-      left: left,
-      top: top,
-      width: width,
-      height: height,
-      child: ClipRect(
-        child: AnimatedBuilder(
-          animation: animation,
-          builder: (context, child) => Transform.translate(
-            offset: Offset(animation.value.dx * 115, animation.value.dy * 115),
-            child: child,
-          ),
-          child: OverflowBox(
-            alignment: Alignment.topLeft,
-            minWidth: 320,
-            maxWidth: 320,
-            minHeight: 200,
-            maxHeight: 200,
-            child: Transform.translate(
-              offset: Offset(-left, -top),
-              child: ColorFiltered(
-                colorFilter: const ColorFilter.mode(
-                  Color(0xFFD4BE9D),
-                  BlendMode.srcIn,
-                ),
-                child: Image.asset(
-                  'assets/images/rentbook_logo.png',
-                  width: 320,
-                  height: 200,
-                  fit: BoxFit.fill,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
-            ),
-          ),
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) => Transform.translate(
+        offset: Offset(
+          animation.value.dx * travel,
+          animation.value.dy * travel,
         ),
+        child: child,
       ),
+      child: Image.asset(asset, fit: BoxFit.contain),
     );
   }
 
   @override
   void dispose() {
+    for (final timer in _soundTimers) {
+      timer.cancel();
+    }
     _controller.dispose();
     super.dispose();
   }
@@ -114,74 +101,46 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF302622),
-      body: Center(
-        child: SizedBox(
-          width: 320,
-          height: 200,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Initial I mark enters from the left.
-              _logoSlice(
-                left: 25,
-                top: 38,
-                width: 43,
-                height: 129,
-                animation: _iSlide,
-              ),
-              // Short lower stroke rises into place.
-              _logoSlice(
-                left: 67,
-                top: 99,
-                width: 47,
-                height: 68,
-                animation: _stemSlide,
-              ),
-              // R mark arrives from the right.
-              _logoSlice(
-                left: 103,
-                top: 38,
-                width: 77,
-                height: 129,
-                animation: _rSlide,
-              ),
-              // RENTBOOK lettering fades in after the symbol is assembled.
-              Positioned(
-                left: 178,
-                top: 38,
-                width: 126,
-                height: 129,
-                child: FadeTransition(
-                  opacity: _wordFade,
-                  child: ClipRect(
-                    child: OverflowBox(
-                      alignment: Alignment.topLeft,
-                      minWidth: 320,
-                      maxWidth: 320,
-                      minHeight: 200,
-                      maxHeight: 200,
-                      child: Transform.translate(
-                        offset: const Offset(-178, -38),
-                        child: ColorFiltered(
-                          colorFilter: const ColorFilter.mode(
-                            Color(0xFFD4BE9D),
-                            BlendMode.srcIn,
-                          ),
-                          child: Image.asset(
-                            'assets/images/rentbook_logo.png',
-                            width: 320,
-                            height: 200,
-                            fit: BoxFit.fill,
-                            filterQuality: FilterQuality.high,
-                          ),
-                        ),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = math.min(constraints.maxWidth, constraints.maxHeight * .8);
+            final height = width * 1.25;
+
+            return Center(
+              child: SizedBox(
+                width: width,
+                height: height,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _movingLogoPiece(
+                      asset: 'assets/images/splash screen I besar.png',
+                      animation: _bigISlide,
+                      travel: width,
+                    ),
+                    _movingLogoPiece(
+                      asset: 'assets/images/Splash screen i kecil .png',
+                      animation: _smallISlide,
+                      travel: height,
+                    ),
+                    _movingLogoPiece(
+                      asset: 'assets/images/Splash screen R.png',
+                      animation: _rSlide,
+                      travel: width,
+                    ),
+                    FadeTransition(
+                      opacity: _textFade,
+                      child: Image.asset(
+                        'assets/images/Splash screen teks.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
