@@ -19,7 +19,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String? _user, _photo;
+  String? _username, _displayName, _photo;
   int _savedCount = 0;
   int _rentalCount = 0;
   bool _loading = true;
@@ -33,10 +33,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _load() async {
-    _user = await AuthService.currentSession();
-    final rows = await (await DbHelper.db).query('users', where: 'username=?', whereArgs: [_user]);
+    final username = await AuthService.currentSession();
+    String? displayName;
+    String? photo;
+    final rows = username == null
+        ? <Map<String, Object?>>[]
+        : await (await DbHelper.db).query(
+            'users',
+            where: 'username=?',
+            whereArgs: [username],
+          );
     if (rows.isNotEmpty) {
-      _photo = rows.first['photo'] as String?;
+      displayName = rows.first['display_name'] as String?;
+      photo = rows.first['photo'] as String?;
     }
 
     final bookmarks = await BookmarkService.getBookmarks();
@@ -46,6 +55,11 @@ class _ProfilePageState extends State<ProfilePage> {
       final isVip = await SubscriptionService.isVip();
       final expiry = await SubscriptionService.getExpiryDate();
       setState(() {
+        _username = username;
+        _displayName = displayName?.trim().isNotEmpty == true
+            ? displayName!.trim()
+            : username;
+        _photo = photo;
         _savedCount = bookmarks.length;
         _rentalCount = rentals.length;
         _isVip = isVip;
@@ -57,9 +71,83 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _pickImage(ImageSource source) async {
     final f = await ImagePicker().pickImage(source: source, imageQuality: 70);
-    if (f == null) return;
-    await (await DbHelper.db).update('users', {'photo': f.path}, where: 'username=?', whereArgs: [_user]);
+    if (f == null || _username == null) return;
+    await (await DbHelper.db).update(
+      'users',
+      {'photo': f.path},
+      where: 'username=?',
+      whereArgs: [_username],
+    );
     _load();
+  }
+
+  Future<void> _editDisplayName() async {
+    final username = _username;
+    if (username == null) return;
+
+    final controller = TextEditingController(text: _displayName ?? username);
+    final nextName = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Ganti Nama Profil'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 30,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            labelText: 'Nama yang ditampilkan',
+            hintText: 'Masukkan nama',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
+            onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+
+    if (nextName == null || !mounted) {
+      controller.dispose();
+      return;
+    }
+    if (nextName.isEmpty) {
+      controller.dispose();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Nama profil tidak boleh kosong.')),
+      );
+      return;
+    }
+
+    try {
+      final cloudSynced = await AuthService.updateDisplayName(username, nextName);
+      await _load();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            cloudSynced
+                ? 'Nama profil berhasil diperbarui.'
+                : 'Nama tersimpan di perangkat. Sinkronisasi cloud belum berhasil.',
+          ),
+        ),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Nama profil gagal diperbarui.')),
+        );
+      }
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showImagePickerSheet() {
@@ -218,9 +306,23 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Text(
-                      _user ?? 'Pengguna',
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            _displayName ?? _username ?? 'Pengguna',
+                            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Ganti nama',
+                          onPressed: _editDisplayName,
+                          visualDensity: VisualDensity.compact,
+                          icon: const Icon(Icons.edit_rounded, size: 19, color: Color(0xFF67343A)),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Container(

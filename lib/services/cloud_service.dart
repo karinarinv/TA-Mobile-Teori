@@ -22,6 +22,24 @@ class CloudService {
     }
   }
 
+  static Future<bool> update(
+    String table,
+    Map<String, dynamic> values, {
+    required Map<String, String> filters,
+  }) async {
+    try {
+      final uri = Uri.parse('$supabaseUrl/rest/v1/$table').replace(
+        queryParameters: filters.map((key, value) => MapEntry(key, 'eq.$value')),
+      );
+      final r = await http
+          .patch(uri, headers: _h, body: jsonEncode(values))
+          .timeout(const Duration(seconds: 8));
+      return r.statusCode < 300;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static Future<List> select(String table) async {
     try {
       final r = await http

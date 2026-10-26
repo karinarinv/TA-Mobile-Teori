@@ -32,31 +32,36 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1750),
+      duration: const Duration(milliseconds: 2350),
     );
     _open = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(.08, .92, curve: Curves.easeInOutCubic),
+      curve: const Interval(.04, .36, curve: Curves.easeInOutCubic),
     );
     _zoom = TweenSequence<double>([
       TweenSequenceItem(
         tween: Tween(begin: .84, end: 1.02)
             .chain(CurveTween(curve: Curves.easeOutCubic)),
-        weight: 62,
+        weight: 24,
       ),
       TweenSequenceItem(
-        tween: Tween(begin: 1.02, end: 2.45)
+        tween: Tween(begin: 1.02, end: 1.06)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 50,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.06, end: 2.45)
             .chain(CurveTween(curve: Curves.easeInCubic)),
-        weight: 38,
+        weight: 26,
       ),
     ]).animate(_controller);
     _pageTurn = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(.34, .86, curve: Curves.easeInOutCubic),
+      curve: const Interval(.34, .76, curve: Curves.easeInOutCubic),
     );
     _whiteFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(.78, 1, curve: Curves.easeIn),
+      curve: const Interval(.84, 1, curve: Curves.easeIn),
     );
     _pageSound = Timer(const Duration(milliseconds: 250), () {
       if (mounted) unawaited(GameAudioService.playPageTurn());
@@ -296,13 +301,18 @@ class _OpenBookPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    // Three quick page turns add movement while keeping the open-book shape visible.
-    for (var page = 0; page < 3; page++) {
-      final turn = (turnProgress * 3 - page).clamp(0.0, 1.0).toDouble();
+    // Flip a stack of pages in sequence so the opening reads as a quick page riffle.
+    const pageCount = 8;
+    for (var page = 0; page < pageCount; page++) {
+      final turn = (turnProgress * pageCount - page)
+          .clamp(0.0, 1.0)
+          .toDouble();
       final angle = turn * 3.141592653589793;
       final direction = angle < 1.5707963267948966 ? 1.0 : -1.0;
       final pageWidth = spread * math.cos(angle).abs();
-      final curl = 11 * progress * (1 - (2 * turn - 1).abs());
+      final curl = (9 + page % 3 * 2) *
+          progress *
+          (1 - (2 * turn - 1).abs());
       final sheet = Path()
         ..moveTo(centerX, top + 5)
         ..cubicTo(

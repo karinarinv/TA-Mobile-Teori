@@ -192,6 +192,7 @@ class _MenuPageState extends State<MenuPage> {
   Future<void> _loadUser() async {
     final u = await AuthService.currentSession();
     String? photo;
+    String? displayName;
     if (u != null && u.isNotEmpty) {
       try {
         final rows = await (await DbHelper.db).query(
@@ -201,13 +202,18 @@ class _MenuPageState extends State<MenuPage> {
         );
         if (rows.isNotEmpty) {
           photo = rows.first['photo'] as String?;
+          displayName = rows.first['display_name'] as String?;
         }
       } catch (_) {}
     }
     final isVip = await SubscriptionService.isVip();
     if (mounted) {
       setState(() {
-        if (u != null && u.isNotEmpty) _user = u;
+        if (u != null && u.isNotEmpty) {
+          _user = displayName?.trim().isNotEmpty == true
+              ? displayName!.trim()
+              : u;
+        }
         _userPhoto = photo;
         _isVip = isVip;
       });

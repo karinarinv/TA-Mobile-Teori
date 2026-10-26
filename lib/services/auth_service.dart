@@ -24,7 +24,12 @@ static String _hash(String pass, String salt) {
     final db = await DbHelper.db;
     final salt = _newSalt();
     try {
-      final row = {'username': user, 'salt': salt, 'hash': _hash(pass, salt)};
+      final row = {
+        'username': user,
+        'display_name': user,
+        'salt': salt,
+        'hash': _hash(pass, salt),
+      };
       await db.insert('users', row);
       await CloudService.insert('users', row); // sinkron ke online
       return true;
@@ -50,6 +55,23 @@ static String _hash(String pass, String salt) {
 
   static Future<String?> currentSession() async =>
       (await SharedPreferences.getInstance()).getString('session_user');
+
+  static Future<bool> updateDisplayName(String username, String displayName) async {
+    final normalizedName = displayName.trim();
+    if (normalizedName.isEmpty) return false;
+
+    await (await DbHelper.db).update(
+      'users',
+      {'display_name': normalizedName},
+      where: 'username = ?',
+      whereArgs: [username],
+    );
+    return CloudService.update(
+      'users',
+      {'display_name': normalizedName},
+      filters: {'username': username},
+    );
+  }
 
   static Future<void> logout() async =>
       (await SharedPreferences.getInstance()).remove('session_user');
