@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     // Three soft 8-bit chimes accompany the pieces as they settle in place.
-    for (final delay in const [520, 1060, 1640]) {
+    for (final delay in const [740, 1310, 1950]) {
       _soundTimers.add(Timer(Duration(milliseconds: delay), () {
         if (mounted) unawaited(GameAudioService.playTing());
       }));
@@ -74,17 +74,26 @@ class _SplashScreenState extends State<SplashScreen>
     required String asset,
     required Animation<Offset> animation,
     required double travel,
+    required double left,
+    required double top,
+    required double scale,
   }) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (context, child) => Transform.translate(
-        offset: Offset(
-          animation.value.dx * travel,
-          animation.value.dy * travel,
+    return Positioned(
+      left: left * scale,
+      top: top * scale,
+      width: 151 * scale,
+      height: 189 * scale,
+      child: AnimatedBuilder(
+        animation: animation,
+        builder: (context, child) => Transform.translate(
+          offset: Offset(
+            animation.value.dx * travel,
+            animation.value.dy * travel,
+          ),
+          child: child,
         ),
-        child: child,
+        child: Image.asset(asset, fit: BoxFit.fill),
       ),
-      child: Image.asset(asset, fit: BoxFit.contain),
     );
   }
 
@@ -104,40 +113,57 @@ class _SplashScreenState extends State<SplashScreen>
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final width = math.min(constraints.maxWidth, constraints.maxHeight * .8);
-            final height = width * 1.25;
+            final scale = math.min(
+              1.0,
+              math.min(constraints.maxWidth * .9 / 320, constraints.maxHeight / 190),
+            );
+            final width = 320 * scale;
+            final height = 190 * scale;
 
             return Center(
               child: SizedBox(
                 width: width,
                 height: height,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    _movingLogoPiece(
-                      asset: 'assets/images/splash screen I besar.png',
-                      animation: _bigISlide,
-                      travel: width,
-                    ),
-                    _movingLogoPiece(
-                      asset: 'assets/images/Splash screen i kecil .png',
-                      animation: _smallISlide,
-                      travel: height,
-                    ),
-                    _movingLogoPiece(
-                      asset: 'assets/images/Splash screen R.png',
-                      animation: _rSlide,
-                      travel: width,
-                    ),
-                    FadeTransition(
+                child: Stack(clipBehavior: Clip.none, children: [
+                  // Final positions assemble the mark from left to right.
+                  _movingLogoPiece(
+                    asset: 'assets/images/splash screen I besar.png',
+                    animation: _bigISlide,
+                    travel: width,
+                    left: -30,
+                    top: -10,
+                    scale: scale,
+                  ),
+                  _movingLogoPiece(
+                    asset: 'assets/images/Splash screen i kecil .png',
+                    animation: _smallISlide,
+                    travel: height,
+                    left: 13,
+                    top: -6,
+                    scale: scale,
+                  ),
+                  _movingLogoPiece(
+                    asset: 'assets/images/Splash screen R.png',
+                    animation: _rSlide,
+                    travel: width,
+                    left: 65,
+                    top: -10,
+                    scale: scale,
+                  ),
+                  Positioned(
+                    left: 188 * scale,
+                    top: -17 * scale,
+                    width: 151 * scale,
+                    height: 189 * scale,
+                    child: FadeTransition(
                       opacity: _textFade,
                       child: Image.asset(
                         'assets/images/Splash screen teks.png',
-                        fit: BoxFit.contain,
+                        fit: BoxFit.fill,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ]),
               ),
             );
           },
