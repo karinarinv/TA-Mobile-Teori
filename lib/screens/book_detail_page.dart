@@ -66,10 +66,12 @@ class _BookDetailPageState extends State<BookDetailPage> {
     if (!mounted) return;
     setState(() => _isBookmarked = nowSaved);
 
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
-        duration: const Duration(milliseconds: 1800),
+        duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
         backgroundColor: const Color(0xFF67343A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -84,9 +86,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 label: 'Lihat',
                 textColor: const Color(0xFFEDE2CF),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  Navigator.push(
-                    context,
+                  messenger.hideCurrentSnackBar();
+                  navigator.push(
                     MaterialPageRoute(builder: (_) => const SavedBooksPage()),
                   );
                 },

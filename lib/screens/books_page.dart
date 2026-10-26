@@ -470,7 +470,10 @@ class _BooksPageState extends State<BooksPage> {
                                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                 ),
                                 const SizedBox(height: 6),
-                                Row(
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 4,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -487,7 +490,6 @@ class _BooksPageState extends State<BooksPage> {
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
                                     if (rating != null) ...[
                                       Icon(Icons.star, size: 13, color: Colors.amber.shade800),
                                       const SizedBox(width: 2),

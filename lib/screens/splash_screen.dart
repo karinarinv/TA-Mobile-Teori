@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -22,6 +23,8 @@ class _SplashScreenState extends State<SplashScreen>
   late final AnimationController _controller;
   late final Animation<double> _open;
   late final Animation<double> _zoom;
+  late final Animation<double> _pageTurn;
+  late final Animation<double> _whiteFade;
   Timer? _pageSound;
 
   @override
@@ -29,16 +32,33 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2300),
+      duration: const Duration(milliseconds: 1750),
     );
     _open = CurvedAnimation(
       parent: _controller,
       curve: const Interval(.08, .92, curve: Curves.easeInOutCubic),
     );
-    _zoom = Tween<double>(begin: .84, end: 1.07).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    _zoom = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween(begin: .84, end: 1.02)
+            .chain(CurveTween(curve: Curves.easeOutCubic)),
+        weight: 62,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 1.02, end: 2.45)
+            .chain(CurveTween(curve: Curves.easeInCubic)),
+        weight: 38,
+      ),
+    ]).animate(_controller);
+    _pageTurn = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(.34, .86, curve: Curves.easeInOutCubic),
     );
-    _pageSound = Timer(const Duration(milliseconds: 370), () {
+    _whiteFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(.78, 1, curve: Curves.easeIn),
+    );
+    _pageSound = Timer(const Duration(milliseconds: 250), () {
       if (mounted) unawaited(GameAudioService.playPageTurn());
     });
     _controller.addStatusListener((status) {
@@ -51,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         pageBuilder: (_, __, ___) => widget.destination,
-        transitionDuration: const Duration(milliseconds: 350),
+        transitionDuration: const Duration(milliseconds: 280),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
       ),
@@ -117,44 +137,59 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: _background,
       body: SafeArea(
-        child: Center(
-          child: AnimatedBuilder(
+        child: AnimatedBuilder(
             animation: _controller,
             builder: (context, _) {
               final open = _open.value;
               final coverFade = (1 - ((open - .72) / .28).clamp(0.0, 1.0))
                   .toDouble();
 
-              return Transform.scale(
-                scale: _zoom.value,
-                child: SizedBox(
-                  width: 310,
-                  height: 330,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _OpenBookPainter(progress: open),
-                        ),
-                      ),
-                      Opacity(
-                        opacity: coverFade,
-                        child: Transform(
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  Center(
+                    child: Transform.scale(
+                      scale: _zoom.value,
+                      child: SizedBox(
+                        width: 310,
+                        height: 330,
+                        child: Stack(
                           alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, .0017)
-                            ..rotateY(-1.43 * open),
-                          child: _bookCover(),
+                          children: [
+                            Positioned.fill(
+                              child: CustomPaint(
+                                painter: _OpenBookPainter(
+                                  progress: open,
+                                  turnProgress: _pageTurn.value,
+                                ),
+                              ),
+                            ),
+                            Opacity(
+                              opacity: coverFade,
+                              child: Transform(
+                                alignment: Alignment.center,
+                                transform: Matrix4.identity()
+                                  ..setEntry(3, 2, .0017)
+                                  ..rotateY(-1.43 * open),
+                                child: _bookCover(),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: ColoredBox(
+                        color: Colors.white.withValues(alpha: _whiteFade.value),
+                      ),
+                    ),
+                  ),
+                ],
               );
             },
           ),
-        ),
       ),
     );
   }
@@ -225,8 +260,9 @@ class _BookCoverOrnamentPainter extends CustomPainter {
 
 class _OpenBookPainter extends CustomPainter {
   final double progress;
+  final double turnProgress;
 
-  const _OpenBookPainter({required this.progress});
+  const _OpenBookPainter({required this.progress, required this.turnProgress});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -259,6 +295,42 @@ class _OpenBookPainter extends CustomPainter {
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .82 * progress)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
+
+    // Three quick page turns add movement while keeping the open-book shape visible.
+    for (var page = 0; page < 3; page++) {
+      final turn = (turnProgress * 3 - page).clamp(0.0, 1.0).toDouble();
+      final angle = turn * 3.141592653589793;
+      final direction = angle < 1.5707963267948966 ? 1.0 : -1.0;
+      final pageWidth = spread * math.cos(angle).abs();
+      final curl = 11 * progress * (1 - (2 * turn - 1).abs());
+      final sheet = Path()
+        ..moveTo(centerX, top + 5)
+        ..cubicTo(
+          centerX + direction * pageWidth * .36,
+          top - curl,
+          centerX + direction * pageWidth * .78,
+          top + curl * .35,
+          centerX + direction * pageWidth,
+          top + 10,
+        )
+        ..lineTo(centerX + direction * pageWidth, bottom - 8)
+        ..cubicTo(
+          centerX + direction * pageWidth * .72,
+          bottom + curl * .4,
+          centerX + direction * pageWidth * .34,
+          bottom - curl,
+          centerX,
+          bottom - 5,
+        )
+        ..close();
+      canvas.drawShadow(sheet, Colors.black.withValues(alpha: .12 * progress), 5, true);
+      canvas.drawPath(
+        sheet,
+        Paint()..color = const Color(0xFFFFFDF7).withValues(alpha: .94 * progress),
+      );
+      canvas.drawPath(sheet, pageEdge..strokeWidth = .8..style = PaintingStyle.stroke);
+    }
+
     for (var i = 0; i < 4; i++) {
       final y = bottom - 5 + i * 1.7;
       canvas.drawLine(Offset(centerX - spread, y), Offset(centerX, y + 4), pageEdge);
@@ -285,5 +357,5 @@ class _OpenBookPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _OpenBookPainter oldDelegate) =>
-      oldDelegate.progress != progress;
+      oldDelegate.progress != progress || oldDelegate.turnProgress != turnProgress;
 }
