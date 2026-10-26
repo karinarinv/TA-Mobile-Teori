@@ -11,12 +11,14 @@ class UsernameChangeResult {
   final String message;
   final DateTime? availableAt;
   final bool cloudSynced;
+  final String cloudSyncDetails;
 
   const UsernameChangeResult({
     required this.success,
     required this.message,
     this.availableAt,
     this.cloudSynced = false,
+    this.cloudSyncDetails = '',
   });
 }
 
@@ -137,7 +139,7 @@ static String _hash(String pass, String salt) {
     }
 
     final displayName = currentRows.first['display_name'] as String?;
-    final values = <String, Object?>{
+    final values = <String, dynamic>{
       'username': newUsername,
       'username_changed_at': now.toIso8601String(),
       if (displayName == null || displayName.trim() == oldUsername)
@@ -182,13 +184,20 @@ static String _hash(String pass, String salt) {
         filters: {'username': oldUsername},
       ),
     ]);
-    final cloudSynced = cloudResults.every((synced) => synced);
+    final usersSync = cloudResults[0];
+    final ledgerSync = cloudResults[1];
+    final cloudSynced = usersSync.success && ledgerSync.success;
+    final cloudSyncDetails = [
+      if (!usersSync.success) 'users: ${usersSync.message}',
+      if (!ledgerSync.success) 'ledger: ${ledgerSync.message}',
+    ].join('\n');
     return UsernameChangeResult(
       success: true,
       cloudSynced: cloudSynced,
       message: cloudSynced
           ? 'Username berhasil diganti.'
-          : 'Username berubah di perangkat, tetapi sinkronisasi cloud belum berhasil.',
+          : 'Username berubah di perangkat, tetapi sinkronisasi Supabase gagal.',
+      cloudSyncDetails: cloudSyncDetails,
     );
   }
 

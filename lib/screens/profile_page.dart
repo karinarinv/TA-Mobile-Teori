@@ -136,7 +136,14 @@ class _ProfilePageState extends State<ProfilePage> {
           ? result.message
           : '${result.message} Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(result.availableAt!)}.';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
+        SnackBar(
+          duration: const Duration(seconds: 7),
+          content: Text(
+            result.cloudSyncDetails.isEmpty
+                ? message
+                : '$message\n${result.cloudSyncDetails}',
+          ),
+        ),
       );
     } catch (_) {
       if (mounted) {
