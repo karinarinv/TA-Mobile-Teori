@@ -17,29 +17,23 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _brandReveal;
   final List<Timer> _soundTimers = [];
 
   static const _background = Color(0xFF302622);
-  static const _parchment = Color(0xFFD4BE9D);
-  static const _oxblood = Color(0xFF67343A);
+  static const _logoTint = Color(0xFFEDE2CF);
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 4400),
-    );
-    _brandReveal = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(.42, .68, curve: Curves.easeInOutCubic),
+      duration: const Duration(milliseconds: 2800),
     );
 
-    // Soft 8-bit chimes accompany the books and the brand reveal.
-    for (final delay in const [700, 1450, 2250]) {
+    // Gentle page-turn sounds accompany the falling books.
+    for (final delay in const [450, 1350]) {
       _soundTimers.add(Timer(Duration(milliseconds: delay), () {
-        if (mounted) unawaited(GameAudioService.playTing());
+        if (mounted) unawaited(GameAudioService.playPageTurn());
       }));
     }
 
@@ -60,39 +54,6 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  Widget _brandCard(double width) {
-    return Container(
-      width: width,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFAF7F2),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: _parchment, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: .35),
-            blurRadius: 26,
-            spreadRadius: 2,
-            offset: const Offset(0, 9),
-          ),
-          BoxShadow(
-            color: _parchment.withValues(alpha: .18),
-            blurRadius: 34,
-            spreadRadius: 5,
-          ),
-        ],
-      ),
-      child: ColorFiltered(
-        colorFilter: const ColorFilter.mode(_oxblood, BlendMode.srcIn),
-        child: Image.asset(
-          'assets/images/rentbook_logo.png',
-          fit: BoxFit.contain,
-          filterQuality: FilterQuality.high,
-        ),
-      ),
-    );
-  }
-
   @override
   void dispose() {
     for (final timer in _soundTimers) {
@@ -109,7 +70,8 @@ class _SplashScreenState extends State<SplashScreen>
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final logoWidth = math.min(290.0, constraints.maxWidth * .80);
+            final logoWidth = math.min(270.0, constraints.maxWidth * .76);
+            final logoHeight = logoWidth * (204 / 326);
 
             return AnimatedBuilder(
               animation: _controller,
@@ -122,49 +84,30 @@ class _SplashScreenState extends State<SplashScreen>
                   fit: StackFit.expand,
                   children: [
                     const ColoredBox(color: _background),
+                    Center(
+                      child: SizedBox(
+                        width: logoWidth,
+                        height: logoHeight,
+                        child: ColorFiltered(
+                          colorFilter: const ColorFilter.mode(
+                            _logoTint,
+                            BlendMode.srcIn,
+                          ),
+                          child: Image.asset(
+                            'assets/images/rentbook_logo.png',
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.high,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Draw the falling books last so they cross in front of the logo.
                     Positioned.fill(
                       child: Opacity(
                         opacity: fade,
                         child: CustomPaint(
                           painter: _FallingBooksPainter(progress: progress),
                         ),
-                      ),
-                    ),
-                    Center(
-                      child: AnimatedBuilder(
-                        animation: _brandReveal,
-                        builder: (context, _) {
-                          final reveal = _brandReveal.value;
-                          return Stack(
-                            alignment: Alignment.centerLeft,
-                            children: [
-                              ClipRect(
-                                clipper: _HorizontalWipeClipper(reveal),
-                                child: _brandCard(logoWidth),
-                              ),
-                              if (reveal > .015 && reveal < .985)
-                                Positioned(
-                                  left: logoWidth * reveal - 1,
-                                  top: 5,
-                                  bottom: 5,
-                                  child: Container(
-                                    width: 3,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: .9),
-                                      borderRadius: BorderRadius.circular(3),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: _parchment.withValues(alpha: .8),
-                                          blurRadius: 12,
-                                          spreadRadius: 2,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          );
-                        },
                       ),
                     ),
                   ],
@@ -176,18 +119,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
-
-class _HorizontalWipeClipper extends CustomClipper<Rect> {
-  final double progress;
-  const _HorizontalWipeClipper(this.progress);
-
-  @override
-  Rect getClip(Size size) => Rect.fromLTWH(0, 0, size.width * progress, size.height);
-
-  @override
-  bool shouldReclip(covariant _HorizontalWipeClipper oldClipper) =>
-      oldClipper.progress != progress;
 }
 
 class _FallingBook {

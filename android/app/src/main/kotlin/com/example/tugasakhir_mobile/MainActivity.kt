@@ -71,6 +71,10 @@ class MainActivity : FlutterFragmentActivity() {
                     playTing()
                     result.success(true)
                 }
+                "playPageTurn" -> {
+                    playPageTurn()
+                    result.success(true)
+                }
                 "playWin" -> {
                     playWin()
                     result.success(true)
@@ -408,6 +412,65 @@ class MainActivity : FlutterFragmentActivity() {
                 try { winTrack?.release() } catch (_: Exception) {}
                 winTrack = null
                 isWinPlaying = false
+            }
+        }
+    }
+
+    // Efek suara gesekan halaman buku.
+    private fun playPageTurn() {
+        thread {
+            var audioTrack: AudioTrack? = null
+            try {
+                val sampleRate = 22050
+                val durationMs = 420
+                val sampleCount = sampleRate * durationMs / 1000
+                val minBufferSize = AudioTrack.getMinBufferSize(
+                    sampleRate,
+                    AudioFormat.CHANNEL_OUT_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT
+                )
+                audioTrack = AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_GAME)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                            .setSampleRate(sampleRate)
+                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(maxOf(minBufferSize, sampleCount * 2))
+                    .setTransferMode(AudioTrack.MODE_STREAM)
+                    .build()
+
+                val samples = ShortArray(sampleCount)
+                var seed = 0x2468ACE
+                var lowPass = 0.0
+                for (i in samples.indices) {
+                    seed = seed xor (seed shl 13)
+                    seed = seed xor (seed ushr 17)
+                    seed = seed xor (seed shl 5)
+                    val noise = seed.toDouble() / Int.MAX_VALUE
+                    lowPass += (noise - lowPass) * .24
+
+                    val t = i.toDouble() / sampleCount
+                    val envelope = minOf(1.0, t * 9) * minOf(1.0, (1 - t) * 5)
+                    val flutter = .72 + .28 * sin(2.0 * Math.PI * 13 * t)
+                    val rustle = (noise * .62 + lowPass * .38) * 2300 * envelope * flutter
+                    samples[i] = rustle.toInt().coerceIn(-32767, 32767).toShort()
+                }
+
+                audioTrack.play()
+                audioTrack.write(samples, 0, samples.size)
+                audioTrack.stop()
+            } catch (_: Exception) {
+                // Keep the splash screen working if audio is unavailable.
+            } finally {
+                audioTrack?.release()
             }
         }
     }

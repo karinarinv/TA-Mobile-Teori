@@ -81,13 +81,18 @@ class SubscriptionService {
     BuildContext context, {
     required String featureName,
     required VoidCallback onAllowed,
+    VoidCallback? onSubscribed,
   }) async {
     final vip = await isVip();
     if (vip) {
       onAllowed();
     } else {
       if (!context.mounted) return;
-      showPaywallDialog(context, featureName: featureName, onSubscribed: null);
+      showPaywallDialog(
+        context,
+        featureName: featureName,
+        onSubscribed: onSubscribed,
+      );
     }
   }
 

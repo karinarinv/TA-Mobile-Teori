@@ -61,16 +61,16 @@ class _MenuPageState extends State<MenuPage> {
   // Koleksi Buku Terkurasi
   final List<Map<String, dynamic>> _masterBooks = [
     {
-      'title': 'The Book, Think and Grow Rich',
-      'authors': 'Napoleon Hill',
-      'image': 'https://covers.openlibrary.org/b/id/8231996-L.jpg',
-      'category': 'Bisnis',
+      'title': 'As Long as the Lemon Trees Grow',
+      'authors': 'Zoulfa Katouh',
+      'image': 'https://covers.openlibrary.org/b/isbn/9781526648525-L.jpg',
+      'category': 'Sejarah',
       'rating': 4.9,
       'pricePerDay': 4000,
-      'publishedDate': '1937',
-      'publisher': 'The Ralston Society',
-      'pageCount': 238,
-      'description': 'Sebuah adikarya literatur pengembangan diri dan kesuksesan finansial terpopuler sepanjang masa. Merangkum 13 prinsip sukses yang digali selama lebih dari 20 tahun dari ratusan tokoh sukses dunia.',
+      'publishedDate': '2022',
+      'publisher': 'Bloomsbury Publishing',
+      'pageCount': 448,
+      'description': 'Salama, mahasiswi farmasi yang menjadi relawan di rumah sakit Homs selama Revolusi Suriah, berjuang memilih antara meninggalkan tanah air demi keselamatan atau bertahan membantu sesama. Di tengah konflik dan kehilangan, ia menemukan harapan serta cinta.',
     },
     {
       'title': 'The Stranger in the Lifeboat',
@@ -732,7 +732,9 @@ class _MenuPageState extends State<MenuPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Chatbot Kurator Buku AI',
+                                    'Asisten Buku AI',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.bold,
@@ -741,7 +743,7 @@ class _MenuPageState extends State<MenuPage> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Tanya rekomendasi bacaan & sinopsis cerdas kapan saja',
+                                    'Cari rekomendasi bacaan dan tanya sinopsis.',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11,
                                       color: const Color(0xFFEDE2CF)
@@ -1085,10 +1087,12 @@ class _MenuPageState extends State<MenuPage> {
         imageAsset: pathGambarKenaliBuku,
         fallbackIcon: Icons.camera_enhance_rounded,
         fallbackColor: const Color(0xFF4C3B71),
+        requiresVip: true,
         onTap: () => SubscriptionService.checkAccess(
           context,
           featureName: 'Kenali Buku',
           onAllowed: () => go(const AiVisionPage()),
+          onSubscribed: () => _loadUser(),
         ),
       ),
       _ServiceItem(
@@ -1096,10 +1100,12 @@ class _MenuPageState extends State<MenuPage> {
         imageAsset: pathGambarLabirinGame,
         fallbackIcon: Icons.sports_esports_rounded,
         fallbackColor: const Color(0xFFB45309),
+        requiresVip: true,
         onTap: () => SubscriptionService.checkAccess(
           context,
           featureName: 'Labirin Perpustakaan',
           onAllowed: () => go(const GamePage()),
+          onSubscribed: () => _loadUser(),
         ),
       ),
       _ServiceItem(
@@ -1121,10 +1127,12 @@ class _MenuPageState extends State<MenuPage> {
         imageAsset: pathGambarKonversiKurs,
         fallbackIcon: Icons.currency_exchange_rounded,
         fallbackColor: const Color(0xFF3B506B),
+        requiresVip: true,
         onTap: () => SubscriptionService.checkAccess(
           context,
           featureName: 'Konversi Kurs & Jam',
           onAllowed: () => go(const ConverterPage()),
+          onSubscribed: () => _loadUser(),
         ),
       ),
     ];
@@ -1134,10 +1142,10 @@ class _MenuPageState extends State<MenuPage> {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: services.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 12,
-        mainAxisExtent: 104,
+        crossAxisCount: 2,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+        mainAxisExtent: 124,
       ),
       itemBuilder: (context, i) {
         final s = services[i];
@@ -1159,14 +1167,46 @@ class _MenuPageState extends State<MenuPage> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: s.imageAsset != null
-                        ? Image.asset(
-                            s.imageAsset!,
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                _buildFallbackServiceIllustration(s),
-                          )
-                        : _buildFallbackServiceIllustration(s),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        s.imageAsset != null
+                            ? Image.asset(
+                                s.imageAsset!,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) =>
+                                    _buildFallbackServiceIllustration(s),
+                              )
+                            : _buildFallbackServiceIllustration(s),
+                        if (s.requiresVip && !_isVip)
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xCC302622),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.lock_rounded,
+                                  color: Color(0xFFEDE2CF),
+                                  size: 22,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'VIP',
+                                  style: GoogleFonts.plusJakartaSans(
+                                    color: const Color(0xFFD4AF37),
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -1224,6 +1264,7 @@ class _ServiceItem {
   final IconData fallbackIcon;
   final Color fallbackColor;
   final VoidCallback onTap;
+  final bool requiresVip;
 
   _ServiceItem({
     required this.title,
@@ -1231,6 +1272,7 @@ class _ServiceItem {
     required this.fallbackIcon,
     required this.fallbackColor,
     required this.onTap,
+    this.requiresVip = false,
   });
 }
 

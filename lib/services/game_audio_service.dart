@@ -33,6 +33,12 @@ class GameAudioService {
     } catch (_) {}
   }
 
+  static Future<void> playPageTurn() async {
+    try {
+      await _channel.invokeMethod('playPageTurn');
+    } catch (_) {}
+  }
+
   static Future<void> playJumpscare() async {
     try {
       await _channel.invokeMethod('playJumpscare');
