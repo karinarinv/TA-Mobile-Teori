@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
           style: GoogleFonts.poppins(color: _cParchment, fontWeight: FontWeight.w500),
         ),
         backgroundColor: isError ? _cOxblood : _cWalnut,
-        duration: const Duration(milliseconds: 2000),
+        duration: Duration(seconds: isError ? 6 : 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -75,9 +75,14 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       if (_isRegister) {
-        final ok = await AuthService.register(username, password);
-        if (ok) {
-          _msg('Registrasi berhasil! Silakan masuk ke akun Anda.');
+        final result = await AuthService.register(username, password);
+        if (result.localSuccess) {
+          _msg(
+            result.cloudSynced
+                ? 'Registrasi berhasil! Silakan masuk ke akun Anda.'
+                : 'Akun tersimpan di perangkat, tetapi gagal dikirim ke Supabase: ${result.cloudMessage}',
+            isError: !result.cloudSynced,
+          );
           setState(() {
             _isRegister = false;
             _p.clear();

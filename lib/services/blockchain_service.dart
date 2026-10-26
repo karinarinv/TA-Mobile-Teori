@@ -7,6 +7,7 @@ import '../config.dart';
 import 'auth_service.dart';
 import 'db_helper.dart';
 import 'cloud_service.dart';
+import 'notification_service.dart';
 
 class BlockchainService {
   static String _calc(Object? data, Object? prev, Object? ts) =>
@@ -70,9 +71,16 @@ class BlockchainService {
     };
 
     await db.insert('ledger', row);
-    try {
-      await CloudService.insert('ledger', row); // sinkron ke online
-    } catch (_) {}
+    final sync = await CloudService.insertDetailed('ledger', row);
+    if (!sync.success) {
+      try {
+        await NotificationService.addNotification(
+          title: 'Transaksi belum tersinkron',
+          message: 'Transaksi tersimpan di perangkat, tetapi Supabase menolak pengiriman: ${sync.message}',
+          type: 'sewa',
+        );
+      } catch (_) {}
+    }
   }
 
   static Future<List<Map<String, Object?>>> all([String? user]) async {

@@ -22,6 +22,18 @@ class UsernameChangeResult {
   });
 }
 
+class RegistrationResult {
+  final bool localSuccess;
+  final bool cloudSynced;
+  final String cloudMessage;
+
+  const RegistrationResult({
+    required this.localSuccess,
+    required this.cloudSynced,
+    this.cloudMessage = '',
+  });
+}
+
 class AuthService {
   static const usernameChangeCooldown = Duration(days: 30);
 
@@ -38,7 +50,7 @@ static String _hash(String pass, String salt) {
     return base64Encode(List<int>.generate(16, (_) => r.nextInt(256)));
   }
 
-  static Future<bool> register(String user, String pass) async {
+  static Future<RegistrationResult> register(String user, String pass) async {
     final db = await DbHelper.db;
     final salt = _newSalt();
     try {
@@ -49,10 +61,17 @@ static String _hash(String pass, String salt) {
         'hash': _hash(pass, salt),
       };
       await db.insert('users', row);
-      await CloudService.insert('users', row); // sinkron ke online
-      return true;
+      final cloudResult = await CloudService.insertDetailed('users', row);
+      return RegistrationResult(
+        localSuccess: true,
+        cloudSynced: cloudResult.success,
+        cloudMessage: cloudResult.message,
+      );
     } catch (_) {
-      return false; // username sudah dipakai
+      return const RegistrationResult(
+        localSuccess: false,
+        cloudSynced: false,
+      ); // username sudah dipakai di database lokal
     }
   }
 

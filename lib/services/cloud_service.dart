@@ -19,13 +19,34 @@ class CloudService {
       };
 
   static Future<bool> insert(String table, Map<String, dynamic> body) async {
+    final result = await insertDetailed(table, body);
+    return result.success;
+  }
+
+  static Future<CloudUpdateResult> insertDetailed(
+    String table,
+    Map<String, dynamic> body,
+  ) async {
     try {
       final r = await http
-          .post(Uri.parse('$supabaseUrl/rest/v1/$table'), headers: _h, body: jsonEncode(body))
+          .post(
+            Uri.parse('$supabaseUrl/rest/v1/$table'),
+            headers: _h,
+            body: jsonEncode(body),
+          )
           .timeout(const Duration(seconds: 8));
-      return r.statusCode < 300;
-    } catch (_) {
-      return false; // offline: data tetap aman di SQLite lokal
+      if (r.statusCode >= 300) {
+        return CloudUpdateResult(
+          success: false,
+          message: _responseMessage(r.body, r.statusCode),
+        );
+      }
+      return const CloudUpdateResult(success: true, message: 'Berhasil');
+    } catch (error) {
+      return CloudUpdateResult(
+        success: false,
+        message: 'Request gagal: $error',
+      );
     }
   }
 
