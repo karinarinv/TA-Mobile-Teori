@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import '../widgets/tilt_cover.dart';
 import '../widgets/rental_bottom_sheet.dart';
 import '../services/bookmark_service.dart';
@@ -17,11 +20,38 @@ class BookDetailPage extends StatefulWidget {
 
 class _BookDetailPageState extends State<BookDetailPage> {
   bool _isBookmarked = false;
+  String? _openLibraryDescription;
 
   @override
   void initState() {
     super.initState();
     _checkBookmark();
+    _loadOpenLibraryDescription();
+  }
+
+  Future<void> _loadOpenLibraryDescription() async {
+    final currentDescription = widget.book['description']?.toString().trim() ?? '';
+    final workKey = widget.book['openLibraryKey']?.toString();
+    if (currentDescription.isNotEmpty || workKey == null || workKey.isEmpty) {
+      return;
+    }
+
+    try {
+      final uri = Uri.https('openlibrary.org', '$workKey.json');
+      final response = await http.get(uri).timeout(const Duration(seconds: 6));
+      if (response.statusCode != 200) return;
+
+      final work = jsonDecode(response.body) as Map<String, dynamic>;
+      final rawDescription = work['description'];
+      final description = rawDescription is Map
+          ? rawDescription['value']?.toString().trim()
+          : rawDescription?.toString().trim();
+      if (description != null && description.isNotEmpty && mounted) {
+        setState(() => _openLibraryDescription = description);
+      }
+    } catch (_) {
+      // Detail buku tetap dapat dibuka walau layanan sinopsis sedang gagal.
+    }
   }
 
   Future<void> _checkBookmark() async {
@@ -78,21 +108,22 @@ class _BookDetailPageState extends State<BookDetailPage> {
     final title = book['title']?.toString() ?? 'Tanpa Judul';
     final authors = book['authors']?.toString() ?? 'Penulis tidak diketahui';
     final img = book['image']?.toString();
-    final description = (book['description']?.toString() ?? '').trim().isEmpty
-        ? 'Tidak ada sinopsis tersedia.'
-        : book['description'].toString();
-    final publisher = (book['publisher']?.toString() ?? '').trim().isEmpty
-        ? 'Penerbit tidak diketahui'
-        : book['publisher'].toString();
-    final publishedDate = (book['publishedDate']?.toString() ?? '').trim().isEmpty
-        ? '-'
-        : book['publishedDate'].toString();
-    
-    final pageCount = (book['pageCount'] as num?)?.toInt() ?? 240;
-    final category = (book['category']?.toString() ?? '').trim().isEmpty
-        ? 'Fiksi & Novel'
-        : book['category'].toString();
-    final rating = (book['rating'] as num?)?.toDouble() ?? 4.5;
+    final savedDescription = book['description']?.toString().trim() ?? '';
+    final description = savedDescription.isNotEmpty
+        ? savedDescription
+        : _openLibraryDescription ?? 'Sinopsis belum tersedia dari penyedia data.';
+    final publisher = (book['publisher']?.toString() ?? '').trim();
+    final publishedDate = (book['publishedDate']?.toString() ?? '').trim();
+    final pageCount = (book['pageCount'] as num?)?.toInt();
+    final category = (book['category']?.toString() ?? '').trim();
+    final rating = (book['rating'] as num?)?.toDouble();
+    final languageCode = (book['language']?.toString() ?? '').trim();
+    final language = switch (languageCode) {
+      'en' => 'English',
+      'id' => 'Bahasa Indonesia',
+      '' => 'Tidak tersedia',
+      _ => languageCode,
+    };
     final pricePerDay = (book['pricePerDay'] as num?)?.toInt() ?? 5000;
 
     return Scaffold(
@@ -222,13 +253,20 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _buildBadge(Icons.star, '${rating.toStringAsFixed(1)} / 5.0', Colors.amber.shade800, Colors.amber.shade50),
-                        const SizedBox(width: 8),
-                        _buildBadge(Icons.category_outlined, category, const Color(0xFF67343A), const Color(0xFFEDE2CF)),
-                        const SizedBox(width: 8),
-                        _buildBadge(Icons.menu_book_outlined, '$pageCount Hal', Colors.teal, Colors.teal.shade50),
-                        const SizedBox(width: 8),
-                        _buildBadge(Icons.calendar_today_outlined, publishedDate, Colors.deepPurple, Colors.deepPurple.shade50),
+                        if (rating != null) ...[
+                          _buildBadge(Icons.star, '${rating.toStringAsFixed(1)} / 5.0', Colors.amber.shade800, Colors.amber.shade50),
+                          const SizedBox(width: 8),
+                        ],
+                        if (category.isNotEmpty) ...[
+                          _buildBadge(Icons.category_outlined, category, const Color(0xFF67343A), const Color(0xFFEDE2CF)),
+                          const SizedBox(width: 8),
+                        ],
+                        if (pageCount != null) ...[
+                          _buildBadge(Icons.menu_book_outlined, '$pageCount Hal', Colors.teal, Colors.teal.shade50),
+                          const SizedBox(width: 8),
+                        ],
+                        if (publishedDate.isNotEmpty)
+                          _buildBadge(Icons.calendar_today_outlined, publishedDate, Colors.deepPurple, Colors.deepPurple.shade50),
                       ],
                     ),
                   ),
@@ -272,21 +310,21 @@ class _BookDetailPageState extends State<BookDetailPage> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade50,
+                            color: const Color(0xFFEDE2CF),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.green.shade200),
+                            border: Border.all(color: const Color(0xFFD4BE9D)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Icon(Icons.check_circle, size: 15, color: Colors.green),
+                              Icon(Icons.menu_book_rounded, size: 15, color: Color(0xFF67343A)),
                               SizedBox(width: 4),
                               Text(
-                                'Stok Siap Sewa',
+                                'Data katalog',
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.green,
+                                  color: Color(0xFF67343A),
                                 ),
                               ),
                             ],
@@ -321,11 +359,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildSpecBox(Icons.business_rounded, 'Penerbit', publisher),
+                        child: _buildSpecBox(Icons.business_rounded, 'Penerbit', publisher.isEmpty ? 'Tidak tersedia' : publisher),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: _buildSpecBox(Icons.calendar_month_rounded, 'Tanggal Rilis', publishedDate),
+                        child: _buildSpecBox(Icons.calendar_month_rounded, 'Tanggal Rilis', publishedDate.isEmpty ? 'Tidak tersedia' : publishedDate),
                       ),
                     ],
                   ),
@@ -333,11 +371,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: _buildSpecBox(Icons.translate_rounded, 'Bahasa', 'Indonesia / Resmi'),
+                        child: _buildSpecBox(Icons.translate_rounded, 'Bahasa', language),
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: _buildSpecBox(Icons.verified_user_rounded, 'Keamanan', 'Ledger SHA-256'),
+                        child: _buildSpecBox(
+                          Icons.menu_book_rounded,
+                          'Jumlah Halaman',
+                          pageCount == null ? 'Tidak tersedia' : '$pageCount halaman',
+                        ),
                       ),
                     ],
                   ),

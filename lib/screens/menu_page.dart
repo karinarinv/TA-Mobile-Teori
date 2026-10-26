@@ -63,7 +63,7 @@ class _MenuPageState extends State<MenuPage> {
     {
       'title': 'As Long as the Lemon Trees Grow',
       'authors': 'Zoulfa Katouh',
-      'image': 'https://covers.openlibrary.org/b/isbn/9781526648525-L.jpg',
+      'image': 'https://cdn.gramedia.com/uploads/product-metas/ese--a5-o2.jpeg',
       'category': 'Sejarah',
       'rating': 4.9,
       'pricePerDay': 4000,
@@ -1083,6 +1083,20 @@ class _MenuPageState extends State<MenuPage> {
         onTap: () => go(const BooksPage()),
       ),
       _ServiceItem(
+        title: 'Perpustakaan GPS',
+        imageAsset: pathGambarPerpustakaanGps,
+        fallbackIcon: Icons.location_on_rounded,
+        fallbackColor: const Color(0xFF43634B),
+        onTap: () => go(const MapPage()),
+      ),
+      _ServiceItem(
+        title: 'Riwayat Blockchain',
+        imageAsset: pathGambarRiwayatBlockchain,
+        fallbackIcon: Icons.lock_clock_rounded,
+        fallbackColor: const Color(0xFF7C3F2B),
+        onTap: () => go(const BlockchainPage()),
+      ),
+      _ServiceItem(
         title: 'Kenali Buku',
         imageAsset: pathGambarKenaliBuku,
         fallbackIcon: Icons.camera_enhance_rounded,
@@ -1109,20 +1123,6 @@ class _MenuPageState extends State<MenuPage> {
         ),
       ),
       _ServiceItem(
-        title: 'Perpustakaan GPS',
-        imageAsset: pathGambarPerpustakaanGps,
-        fallbackIcon: Icons.location_on_rounded,
-        fallbackColor: const Color(0xFF43634B),
-        onTap: () => go(const MapPage()),
-      ),
-      _ServiceItem(
-        title: 'Riwayat Blockchain',
-        imageAsset: pathGambarRiwayatBlockchain,
-        fallbackIcon: Icons.lock_clock_rounded,
-        fallbackColor: const Color(0xFF7C3F2B),
-        onTap: () => go(const BlockchainPage()),
-      ),
-      _ServiceItem(
         title: 'Konversi Kurs & Jam',
         imageAsset: pathGambarKonversiKurs,
         fallbackIcon: Icons.currency_exchange_rounded,
@@ -1142,10 +1142,10 @@ class _MenuPageState extends State<MenuPage> {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: services.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
-        mainAxisExtent: 124,
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 12,
+        mainAxisExtent: 104,
       ),
       itemBuilder: (context, i) {
         final s = services[i];

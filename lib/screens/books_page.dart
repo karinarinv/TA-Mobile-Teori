@@ -112,8 +112,12 @@ class _BooksPageState extends State<BooksPage> {
       if (r.statusCode == 200) {
         final data = jsonDecode(r.body) as Map<String, dynamic>;
         final items = (data['items'] as List?) ?? [];
+        if (items.isEmpty) {
+          await _searchOpenLibrary(q);
+          return;
+        }
 
-        final parsedBooks = items.map((item) {
+        final parsedBooks = items.map<Map<String, dynamic>?>((item) {
           final v = (item['volumeInfo'] as Map<String, dynamic>?) ?? {};
           final imageLinks = v['imageLinks'] as Map<String, dynamic>?;
           String? img = imageLinks?['thumbnail'] as String? ?? imageLinks?['smallThumbnail'] as String?;
@@ -121,32 +125,19 @@ class _BooksPageState extends State<BooksPage> {
 
           final authorsList = (v['authors'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
           final authors = authorsList.join(', ');
-          final title = v['title'] as String? ?? 'Tanpa Judul';
-          final categories = (v['categories'] as List?)?.cast<String>() ?? ['Novel & Fiksi'];
+          final title = v['title'] as String?;
+          if (title == null || title.trim().isEmpty) return null;
+          final categories = (v['categories'] as List?)?.cast<String>() ?? const <String>[];
           
           // Ambil deskripsi asli & bersihkan dari tag HTML
           String rawDesc = (v['description'] as String?) ?? '';
           String cleanDesc = _cleanHtml(rawDesc);
 
-          // Jika API tidak memberikan deskripsi, buat sinopsis khusus berdasarkan judul & penulis
-          if (cleanDesc.isEmpty) {
-            cleanDesc = 'Buku "$title" karya $authors menyajikan narasi yang mendalam dan penuh wawasan. Karya ini menjadi salah satu bacaan yang paling diminati dalam kategori ${categories.first} dan sangat direkomendasikan untuk Anda sewa di RentBook.';
-          }
-
           // Ambil penerbit & tanggal rilis asli
-          String publisher = (v['publisher'] as String?) ?? '';
-          if (publisher.isEmpty) {
-            publisher = 'Penerbit Utama';
-          }
-
-          String publishedDate = (v['publishedDate'] as String?) ?? '';
-          if (publishedDate.isEmpty) {
-            final yearHash = 2016 + (title.hashCode.abs() % 8);
-            publishedDate = '$yearHash';
-          }
-
-          final pageCount = (v['pageCount'] as num?)?.toInt() ?? (180 + (title.hashCode.abs() % 160));
-          final rating = ((v['averageRating'] as num?)?.toDouble() ?? (4.0 + (title.hashCode.abs() % 10) / 10)).clamp(3.8, 5.0);
+          final publisher = v['publisher'] as String?;
+          final publishedDate = v['publishedDate'] as String?;
+          final pageCount = (v['pageCount'] as num?)?.toInt();
+          final rating = (v['averageRating'] as num?)?.toDouble();
 
           return {
             'title': title,
@@ -156,14 +147,12 @@ class _BooksPageState extends State<BooksPage> {
             'publisher': publisher,
             'publishedDate': publishedDate,
             'pageCount': pageCount,
-            'category': categories.first,
-            'rating': double.parse(rating.toStringAsFixed(1)),
+            'category': categories.firstOrNull,
+            'language': v['language'] as String?,
+            'rating': rating,
             'pricePerDay': _calcPrice(title),
           };
-        }).toList();
-
-        // Urutkan A - Z
-        parsedBooks.sort((a, b) => (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase()));
+        }).whereType<Map<String, dynamic>>().toList();
 
         setState(() {
           _books = parsedBooks;
@@ -190,6 +179,7 @@ class _BooksPageState extends State<BooksPage> {
       final uri = Uri.https('openlibrary.org', '/search.json', {
         'q': q,
         'limit': '30',
+        'fields': 'key,title,author_name,cover_i,first_publish_year,publisher,number_of_pages_median,subject',
       });
 
       final r = await http.get(uri).timeout(const Duration(seconds: 10));
@@ -201,7 +191,8 @@ class _BooksPageState extends State<BooksPage> {
         final docs = (data['docs'] as List?) ?? [];
 
         final parsedBooks = docs.map((doc) {
-          final title = doc['title'] as String? ?? 'Tanpa Judul';
+          final title = doc['title'] as String?;
+          if (title == null || title.trim().isEmpty) return null;
           final authorsList = (doc['author_name'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
           final authors = authorsList.join(', ');
           final coverId = doc['cover_i'];
@@ -210,27 +201,25 @@ class _BooksPageState extends State<BooksPage> {
             img = 'https://covers.openlibrary.org/b/id/$coverId-M.jpg';
           }
 
-          final firstYear = doc['first_publish_year']?.toString() ?? '${2015 + (title.hashCode.abs() % 9)}';
-          final publisher = (doc['publisher'] as List?)?.firstOrNull?.toString() ?? 'Penerbit Pilihan';
-          final pageCount = (doc['number_of_pages_median'] as num?)?.toInt() ?? (200 + (title.hashCode.abs() % 150));
-          final subjects = (doc['subject'] as List?)?.cast<String>() ?? ['Koleksi Popular'];
-          final rating = (4.0 + (title.hashCode.abs() % 9) / 10).clamp(4.0, 5.0);
+          final firstYear = doc['first_publish_year']?.toString();
+          final publisher = (doc['publisher'] as List?)?.firstOrNull?.toString();
+          final pageCount = (doc['number_of_pages_median'] as num?)?.toInt();
+          final subjects = (doc['subject'] as List?)?.cast<String>() ?? const <String>[];
 
           return {
             'title': title,
             'authors': authors,
             'image': img,
-            'description': 'Buku "$title" merupakan karya populer dari $authors. Novel ini menghadirkan alur cerita yang unik dan memikat, menjadikannya pilihan favorit para pembaca di RentBook.',
+            'description': '',
+            'openLibraryKey': doc['key'] as String?,
             'publisher': publisher,
             'publishedDate': firstYear,
             'pageCount': pageCount,
-            'category': subjects.first,
-            'rating': double.parse(rating.toStringAsFixed(1)),
+            'category': subjects.firstOrNull,
+            'rating': null,
             'pricePerDay': _calcPrice(title),
           };
-        }).toList();
-
-        parsedBooks.sort((a, b) => (a['title'] as String).toLowerCase().compareTo((b['title'] as String).toLowerCase()));
+        }).whereType<Map<String, dynamic>>().toList();
 
         setState(() {
           _books = parsedBooks;
@@ -381,7 +370,7 @@ class _BooksPageState extends State<BooksPage> {
                 final authors = item['authors'] as String;
                 final img = item['image'] as String?;
                 final pricePerDay = (item['pricePerDay'] as num?)?.toInt() ?? 5000;
-                final rating = item['rating']?.toString() ?? '4.5';
+                final rating = item['rating'] as num?;
 
                 return Card(
                   color: const Color(0xFFFAF7F2),
@@ -499,16 +488,22 @@ class _BooksPageState extends State<BooksPage> {
                                       ),
                                     ),
                                     const SizedBox(width: 8),
-                                    Icon(Icons.star, size: 13, color: Colors.amber.shade800),
-                                    const SizedBox(width: 2),
-                                    Text(
-                                      rating,
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey.shade700,
-                                        fontWeight: FontWeight.w600,
+                                    if (rating != null) ...[
+                                      Icon(Icons.star, size: 13, color: Colors.amber.shade800),
+                                      const SizedBox(width: 2),
+                                      Text(
+                                        rating.toStringAsFixed(1),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey.shade700,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
-                                    ),
+                                    ] else
+                                      Text(
+                                        'Rating belum tersedia',
+                                        style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                                      ),
                                   ],
                                 ),
                               ],

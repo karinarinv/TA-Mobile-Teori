@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
@@ -16,27 +15,32 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  final List<Timer> _soundTimers = [];
+  static const _background = Color(0xFFEDE2CF);
+  static const _coverColor = Color(0xFF67343A);
+  static const _logoColor = Color(0xFFEDE2CF);
 
-  static const _background = Color(0xFF302622);
-  static const _logoTint = Color(0xFFEDE2CF);
+  late final AnimationController _controller;
+  late final Animation<double> _open;
+  late final Animation<double> _zoom;
+  Timer? _pageSound;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2800),
+      duration: const Duration(milliseconds: 2300),
     );
-
-    // Gentle page-turn sounds accompany the falling books.
-    for (final delay in const [450, 1350]) {
-      _soundTimers.add(Timer(Duration(milliseconds: delay), () {
-        if (mounted) unawaited(GameAudioService.playPageTurn());
-      }));
-    }
-
+    _open = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(.08, .92, curve: Curves.easeInOutCubic),
+    );
+    _zoom = Tween<double>(begin: .84, end: 1.07).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
+    );
+    _pageSound = Timer(const Duration(milliseconds: 370), () {
+      if (mounted) unawaited(GameAudioService.playPageTurn());
+    });
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) _openApp();
     });
@@ -47,18 +51,63 @@ class _SplashScreenState extends State<SplashScreen>
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         pageBuilder: (_, __, ___) => widget.destination,
-        transitionDuration: const Duration(milliseconds: 450),
+        transitionDuration: const Duration(milliseconds: 350),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
       ),
     );
   }
 
+  Widget _bookCover() {
+    return Container(
+      width: 204,
+      height: 282,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF82464C), _coverColor, Color(0xFF4E252B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: [0, .28, 1],
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFD4BE9D), width: 1.5),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x55271A16),
+            blurRadius: 22,
+            offset: Offset(7, 13),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(painter: _BookCoverOrnamentPainter()),
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(28),
+              child: ColorFiltered(
+                colorFilter: const ColorFilter.mode(
+                  _logoColor,
+                  BlendMode.srcIn,
+                ),
+                child: Image.asset(
+                  'assets/images/rentbook_logo.png',
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    for (final timer in _soundTimers) {
-      timer.cancel();
-    }
+    _pageSound?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -68,228 +117,173 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       backgroundColor: _background,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final logoWidth = math.min(270.0, constraints.maxWidth * .76);
-            final logoHeight = logoWidth * (204 / 326);
+        child: Center(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, _) {
+              final open = _open.value;
+              final coverFade = (1 - ((open - .72) / .28).clamp(0.0, 1.0))
+                  .toDouble();
 
-            return AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                final progress = _controller.value;
-                final fade =
-                    (1 - ((progress - .80) / .17).clamp(0.0, 1.0)).toDouble();
-
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    const ColoredBox(color: _background),
-                    Center(
-                      child: SizedBox(
-                        width: logoWidth,
-                        height: logoHeight,
-                        child: ColorFiltered(
-                          colorFilter: const ColorFilter.mode(
-                            _logoTint,
-                            BlendMode.srcIn,
-                          ),
-                          child: Image.asset(
-                            'assets/images/rentbook_logo.png',
-                            fit: BoxFit.contain,
-                            filterQuality: FilterQuality.high,
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Draw the falling books last so they cross in front of the logo.
-                    Positioned.fill(
-                      child: Opacity(
-                        opacity: fade,
+              return Transform.scale(
+                scale: _zoom.value,
+                child: SizedBox(
+                  width: 310,
+                  height: 330,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Positioned.fill(
                         child: CustomPaint(
-                          painter: _FallingBooksPainter(progress: progress),
+                          painter: _OpenBookPainter(progress: open),
                         ),
                       ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
+                      Opacity(
+                        opacity: coverFade,
+                        child: Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..setEntry(3, 2, .0017)
+                            ..rotateY(-1.43 * open),
+                          child: _bookCover(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
   }
 }
 
-class _FallingBook {
-  final double x;
-  final double delay;
-  final double width;
-  final double height;
-  final double angle;
-  final double phase;
-  final Color cover;
-  final String title;
+class _BookCoverOrnamentPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final gold = Paint()
+      ..color = const Color(0xFFD4BE9D).withValues(alpha: .76)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+    final fineGold = Paint()
+      ..color = const Color(0xFFD4BE9D).withValues(alpha: .42)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = .7;
 
-  const _FallingBook({
-    required this.x,
-    required this.delay,
-    required this.width,
-    required this.height,
-    required this.angle,
-    required this.phase,
-    required this.cover,
-    required this.title,
-  });
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(12, 12, size.width - 24, size.height - 24),
+        const Radius.circular(4),
+      ),
+      gold,
+    );
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(17, 17, size.width - 34, size.height - 34),
+        const Radius.circular(3),
+      ),
+      fineGold,
+    );
+
+    for (final corner in const [
+      Offset(22, 22),
+      Offset(-1, 22),
+      Offset(22, -1),
+      Offset(-1, -1),
+    ]) {
+      canvas.save();
+      canvas.translate(
+        corner.dx < 0 ? size.width - 22 : corner.dx,
+        corner.dy < 0 ? size.height - 22 : corner.dy,
+      );
+      canvas.scale(corner.dx < 0 ? -1 : 1, corner.dy < 0 ? -1 : 1);
+      final flourish = Path()
+        ..moveTo(0, 28)
+        ..cubicTo(0, 11, 8, 0, 28, 0)
+        ..cubicTo(18, 4, 17, 13, 27, 14)
+        ..cubicTo(19, 18, 13, 17, 14, 27)
+        ..cubicTo(8, 19, 4, 22, 0, 28)
+        ..close();
+      canvas.drawPath(flourish, gold);
+      canvas.drawCircle(const Offset(5, 5), 2.2, fineGold);
+      canvas.restore();
+    }
+
+    canvas.drawLine(
+      Offset(size.width * .2, size.height * .83),
+      Offset(size.width * .8, size.height * .83),
+      fineGold,
+    );
+    canvas.drawCircle(Offset(size.width / 2, size.height * .83), 3, gold);
+  }
+
+  @override
+  bool shouldRepaint(covariant _BookCoverOrnamentPainter oldDelegate) => false;
 }
 
-class _FallingBooksPainter extends CustomPainter {
+class _OpenBookPainter extends CustomPainter {
   final double progress;
 
-  static const _books = [
-    _FallingBook(x: .08, delay: .00, width: 46, height: 66, angle: -.28, phase: .2, cover: Color(0xFF8B4448), title: 'CERITA'),
-    _FallingBook(x: .28, delay: .12, width: 54, height: 76, angle: .22, phase: 1.3, cover: Color(0xFFAD7447), title: 'PUSTAKA'),
-    _FallingBook(x: .51, delay: .04, width: 42, height: 61, angle: -.42, phase: 2.4, cover: Color(0xFF435A4D), title: 'KISAH'),
-    _FallingBook(x: .76, delay: .20, width: 52, height: 72, angle: .34, phase: 3.1, cover: Color(0xFF665078), title: 'DUNIA'),
-    _FallingBook(x: .93, delay: .08, width: 43, height: 64, angle: -.16, phase: 4.3, cover: Color(0xFFB15F3C), title: 'BACA'),
-    _FallingBook(x: .17, delay: .31, width: 56, height: 78, angle: .39, phase: 5.1, cover: Color(0xFF40566B), title: 'PETUALANGAN'),
-    _FallingBook(x: .40, delay: .25, width: 45, height: 65, angle: -.31, phase: .8, cover: Color(0xFF9A653D), title: 'RAHASIA'),
-    _FallingBook(x: .64, delay: .35, width: 58, height: 80, angle: .14, phase: 2.8, cover: Color(0xFF754348), title: 'KENANGAN'),
-    _FallingBook(x: .85, delay: .29, width: 48, height: 68, angle: -.37, phase: 3.7, cover: Color(0xFF596748), title: 'IMAJINASI'),
-    _FallingBook(x: .03, delay: .46, width: 50, height: 72, angle: .25, phase: 4.9, cover: Color(0xFF725542), title: 'SAJAK'),
-    _FallingBook(x: .34, delay: .48, width: 44, height: 63, angle: -.19, phase: 1.7, cover: Color(0xFF93594D), title: 'BINTANG'),
-    _FallingBook(x: .57, delay: .43, width: 52, height: 74, angle: .43, phase: 5.8, cover: Color(0xFF4E536A), title: 'RAK EMAS'),
-    _FallingBook(x: .79, delay: .52, width: 45, height: 65, angle: -.26, phase: 2.1, cover: Color(0xFFAA7B3E), title: 'MIMPI'),
-    _FallingBook(x: .98, delay: .41, width: 55, height: 77, angle: .18, phase: .5, cover: Color(0xFF50665D), title: 'PETUALANGAN'),
-  ];
-
-  const _FallingBooksPainter({required this.progress});
+  const _OpenBookPainter({required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.save();
-    canvas.clipRect(Offset.zero & size);
-    for (final book in _books) {
-      final local = ((progress - book.delay) / (1 - book.delay))
-          .clamp(0.0, 1.0)
-          .toDouble();
-      if (local <= 0 || progress >= .98) continue;
+    if (progress <= 0) return;
 
-      final fall = Curves.easeIn.transform(local);
-      final sway = math.sin(local * math.pi * 3 + book.phase) * size.width * .035;
-      final x = size.width * book.x + sway;
-      final y = -book.height * 1.4 + fall * (size.height + book.height * 2.8);
-      final rotation = book.angle + math.sin(local * math.pi * 4 + book.phase) * .14;
-      final alpha = ((1 - ((progress - .80) / .17).clamp(0.0, 1.0)) * 255).round();
+    final centerX = size.width / 2;
+    final top = size.height * .13;
+    final bottom = size.height * .87;
+    final spread = size.width * .47 * progress;
 
-      canvas.save();
-      canvas.translate(x, y);
-      canvas.rotate(rotation);
-      _drawBook(canvas, book, alpha);
-      canvas.restore();
-    }
-    canvas.restore();
-  }
-
-  void _drawBook(Canvas canvas, _FallingBook book, int alpha) {
-    final w = book.width;
-    final h = book.height;
-    final rect = Rect.fromLTWH(-w / 2, -h / 2, w, h);
-    final shadow = Path()
-      ..addRRect(RRect.fromRectAndRadius(rect.shift(const Offset(3, 4)), const Radius.circular(3)));
-    canvas.drawShadow(shadow, Colors.black.withAlpha(alpha), 5, true);
-
-    final pages = Paint()..color = const Color(0xFFF3E7D1).withAlpha(alpha);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(rect.shift(Offset(w * .11, h * .055)), const Radius.circular(3)),
-      pages,
-    );
-
-    final edge = Paint()..color = _shade(book.cover, .65).withAlpha(alpha);
-    final pageEdge = Path()
-      ..moveTo(rect.right, rect.top + 5)
-      ..lineTo(rect.right + w * .1, rect.top + 9)
-      ..lineTo(rect.right + w * .1, rect.bottom - 2)
-      ..lineTo(rect.right, rect.bottom - 5)
+    final leftPage = Path()
+      ..moveTo(centerX, top + 4)
+      ..cubicTo(centerX - spread * .34, top - 5, centerX - spread * .78, top - 1, centerX - spread, top + 9)
+      ..lineTo(centerX - spread, bottom - 8)
+      ..cubicTo(centerX - spread * .62, bottom - 1, centerX - spread * .25, bottom + 2, centerX, bottom - 5)
       ..close();
-    canvas.drawPath(pageEdge, edge);
+    final rightPage = Path()
+      ..moveTo(centerX, top + 4)
+      ..cubicTo(centerX + spread * .34, top - 5, centerX + spread * .78, top - 1, centerX + spread, top + 9)
+      ..lineTo(centerX + spread, bottom - 8)
+      ..cubicTo(centerX + spread * .62, bottom - 1, centerX + spread * .25, bottom + 2, centerX, bottom - 5)
+      ..close();
 
-    final cover = Paint()..color = book.cover.withAlpha(alpha);
-    final coverRect = RRect.fromRectAndRadius(rect, const Radius.circular(3));
-    canvas.drawRRect(coverRect, cover);
+    canvas.drawShadow(leftPage, Colors.black.withValues(alpha: .2 * progress), 8, true);
+    canvas.drawShadow(rightPage, Colors.black.withValues(alpha: .2 * progress), 8, true);
+    canvas.drawPath(leftPage, Paint()..color = const Color(0xFFFFFCF3).withValues(alpha: progress));
+    canvas.drawPath(rightPage, Paint()..color = const Color(0xFFFFFCF3).withValues(alpha: progress));
 
-    final spine = Paint()..color = _shade(book.cover, .72).withAlpha(alpha);
-    canvas.drawRRect(
-      RRect.fromRectAndCorners(
-        Rect.fromLTWH(rect.left, rect.top, w * .16, h),
-        topLeft: const Radius.circular(3),
-        bottomLeft: const Radius.circular(3),
-      ),
-      spine,
-    );
-
-    final foil = Paint()
-      ..color = const Color(0xFFE7C98F).withAlpha((alpha * .88).round())
+    final pageEdge = Paint()
+      ..color = const Color(0xFFD4BE9D).withValues(alpha: .82 * progress)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(rect.deflate(4), const Radius.circular(2)),
-      foil,
-    );
-    canvas.drawLine(
-      Offset(rect.left + w * .16, rect.top + 5),
-      Offset(rect.left + w * .16, rect.bottom - 5),
-      foil,
-    );
+    for (var i = 0; i < 4; i++) {
+      final y = bottom - 5 + i * 1.7;
+      canvas.drawLine(Offset(centerX - spread, y), Offset(centerX, y + 4), pageEdge);
+      canvas.drawLine(Offset(centerX, y + 4), Offset(centerX + spread, y), pageEdge);
+    }
 
-    final medallion = Paint()..color = const Color(0xFFE7C98F).withAlpha(alpha);
-    canvas.drawCircle(Offset(0, -h * .18), math.min(w, h) * .095, medallion);
-    final symbol = Paint()
-      ..color = book.cover.withAlpha(alpha)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.1;
-    final badge = Path()
-      ..moveTo(-w * .055, -h * .20)
-      ..lineTo(0, -h * .16)
-      ..lineTo(w * .055, -h * .20)
-      ..lineTo(w * .055, -h * .14)
-      ..lineTo(0, -h * .17)
-      ..lineTo(-w * .055, -h * .14)
-      ..close();
-    canvas.drawPath(badge, symbol);
+    final textRule = Paint()
+      ..color = const Color(0xFFB9A687).withValues(alpha: .48 * progress)
+      ..strokeWidth = 1;
+    for (var i = 0; i < 5; i++) {
+      final y = top + 34 + i * 17;
+      if (y < bottom - 20) {
+        canvas.drawLine(Offset(centerX - spread * .82, y), Offset(centerX - spread * .16, y + 2), textRule);
+        canvas.drawLine(Offset(centerX + spread * .16, y + 2), Offset(centerX + spread * .82, y), textRule);
+      }
+    }
 
-    final title = TextPainter(
-      text: TextSpan(
-        text: book.title,
-        style: TextStyle(
-          color: const Color(0xFFFFF4DD).withAlpha(alpha),
-          fontSize: book.width * .13,
-          fontWeight: FontWeight.w800,
-          letterSpacing: .15,
-          height: 1.1,
-        ),
-      ),
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-      maxLines: 2,
-      ellipsis: '…',
-    )..layout(maxWidth: w * .68);
-    title.paint(canvas, Offset(-title.width / 2 + w * .07, -h * .02));
-
-    final bottomRule = Paint()
-      ..color = const Color(0xFFE7C98F).withAlpha((alpha * .75).round())
-      ..strokeWidth = 1.1;
-    canvas.drawLine(Offset(-w * .12, h * .27), Offset(w * .19, h * .27), bottomRule);
+    final binding = Paint()
+      ..color = const Color(0xFF8D7460).withValues(alpha: .45 * progress)
+      ..strokeWidth = 2;
+    canvas.drawLine(Offset(centerX, top + 5), Offset(centerX, bottom - 6), binding);
+    canvas.drawLine(Offset(centerX - 3, top + 8), Offset(centerX - 3, bottom - 8), pageEdge);
   }
 
-  Color _shade(Color color, double amount) => Color.fromARGB(
-        color.alpha,
-        (color.red * amount).round(),
-        (color.green * amount).round(),
-        (color.blue * amount).round(),
-      );
-
   @override
-  bool shouldRepaint(covariant _FallingBooksPainter oldDelegate) =>
+  bool shouldRepaint(covariant _OpenBookPainter oldDelegate) =>
       oldDelegate.progress != progress;
 }
