@@ -119,7 +119,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
       final text = rawData.startsWith('PINJAM:') ? rawData.substring(7) : rawData;
       return Text(
         text,
-        style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.walnut),
+        style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.walnut),
       );
     }
 
@@ -144,7 +144,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
       children: [
         Text(
           titlePart,
-          style: GoogleFonts.playfairDisplay(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.walnut),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.walnut),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -391,11 +391,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
       appBar: AppBar(
         title: Text(
           'Riwayat Blockchain',
-          style: GoogleFonts.playfairDisplay(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: AppColors.parchment,
-          ),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         elevation: 0,
         backgroundColor: AppColors.oxblood,
@@ -443,7 +439,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                               const SizedBox(height: 2),
                               Text(
                                 '${_rows.length} Blok',
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.oxblood,
@@ -476,7 +472,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                               const SizedBox(height: 2),
                               Text(
                                 _formatRupiah(totalExpense),
-                                style: GoogleFonts.playfairDisplay(
+                                style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green.shade900,
@@ -619,7 +615,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       children: [
                         Text(
                           'Ethereum Sepolia Explorer',
-                          style: GoogleFonts.playfairDisplay(
+                          style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                             color: AppColors.walnut,

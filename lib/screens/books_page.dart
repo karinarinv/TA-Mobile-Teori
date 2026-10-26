@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:sensors_plus/sensors_plus.dart';
 import '../widgets/rental_bottom_sheet.dart';
@@ -261,11 +262,11 @@ class _BooksPageState extends State<BooksPage> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            Text('Katalog Buku RentBook', style: TextStyle(fontSize: 18)),
+          children: [
+            Text('Katalog Buku RentBook', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
             Text(
               'Goyang HP untuk rekomendasi acak',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.normal),
+              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.normal),
             ),
           ],
         ),

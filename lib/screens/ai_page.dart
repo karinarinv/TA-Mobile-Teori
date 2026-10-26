@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 import '../config.dart';
 
 class AiPage extends StatefulWidget {
@@ -151,9 +152,9 @@ class _AiPageState extends State<AiPage> {
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text('Asisten Buku AI', style: TextStyle(fontSize: 18)),
-            Text('Didukung Google Gemini', style: TextStyle(fontSize: 11, fontWeight: FontWeight.normal)),
+          children: [
+            Text('Asisten Buku AI', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
+            Text('Didukung Google Gemini', style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.normal)),
           ],
         ),
         actions: [

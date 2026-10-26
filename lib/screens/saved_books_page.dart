@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/bookmark_service.dart';
 import '../widgets/rental_bottom_sheet.dart';
 import 'book_detail_page.dart';
@@ -72,7 +73,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Buku Tersimpan (${_savedBooks.length})'),
+        title: Text('Buku Tersimpan (${_savedBooks.length})', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())

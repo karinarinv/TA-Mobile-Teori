@@ -1084,7 +1084,7 @@ class _MenuPageState extends State<MenuPage> {
         onTap: () => go(const BlockchainPage()),
       ),
       _ServiceItem(
-        title: 'Konversi Kurs',
+        title: 'Konversi Kurs & Jam',
         imageAsset: pathGambarKonversiKurs,
         fallbackIcon: Icons.currency_exchange_rounded,
         fallbackColor: const Color(0xFF3B506B),

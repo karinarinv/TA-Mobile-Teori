@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import '../services/cloud_service.dart';
@@ -531,7 +532,7 @@ class _MapPageState extends State<MapPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Perpustakaan Terdekat'),
+        title: Text('Perpustakaan Terdekat', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

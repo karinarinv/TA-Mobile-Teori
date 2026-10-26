@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -168,7 +169,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     return Scaffold(
       backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
-        title: const Text('Konversi Kurs & Jam', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Konversi Kurs & Jam', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
         elevation: 0,
         backgroundColor: const Color(0xFF67343A),
         foregroundColor: const Color(0xFFEDE2CF),

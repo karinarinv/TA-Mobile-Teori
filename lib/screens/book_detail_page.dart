@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../widgets/tilt_cover.dart';
 import '../widgets/rental_bottom_sheet.dart';
@@ -96,7 +97,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Buku'),
+        title: Text('Detail Buku', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
         actions: [
           IconButton(
             icon: Icon(
