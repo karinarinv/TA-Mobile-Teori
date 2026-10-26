@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../services/blockchain_service.dart';
 import '../services/notification_service.dart';
+import '../services/subscription_service.dart';
 import '../screens/blockchain_page.dart';
 import '../main.dart';
 
@@ -39,6 +40,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   String? _voucherMessage;
   bool _isVoucherValid = false;
   bool _hasAvailableVoucher = false;
+  bool _isVipUser = false;
 
   final List<String> _paymentOptions = [
     'QRIS (GoPay/OVO/Dana)',
@@ -54,14 +56,24 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
 
   Future<void> _loadVoucherAvailability() async {
     final username = await AuthService.currentSession() ?? 'guest';
+    final isVip = await SubscriptionService.isVip();
     final prefs = await SharedPreferences.getInstance();
     final used = prefs.getBool('voucher_diskon10_used_$username') ?? false;
-    if (mounted) setState(() => _hasAvailableVoucher = !used);
+    if (mounted) {
+      setState(() {
+        _isVipUser = isVip;
+        _hasAvailableVoucher = isVip && !used;
+        if (!isVip) {
+          _appliedVoucher = null;
+          _isVoucherValid = false;
+        }
+      });
+    }
   }
 
   Future<void> _showVoucherPicker() async {
     await _loadVoucherAvailability();
-    if (!mounted) return;
+    if (!mounted || !_isVipUser) return;
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -111,6 +123,14 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   }
 
   Future<void> _applyVoucher() async {
+    final isVip = await SubscriptionService.isVip();
+    if (!isVip) {
+      setState(() {
+        _isVoucherValid = false;
+        _voucherMessage = 'Voucher diskon hanya tersedia untuk Member VIP.';
+      });
+      return;
+    }
     final code = _voucherController.text.trim().toUpperCase();
     if (code.isEmpty) return;
 
@@ -439,10 +459,59 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                   'Punya Voucher Diskon?',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
+                if (_isVipUser) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEF3C7),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: const Color(0xFFF59E0B)),
+                    ),
+                    child: const Text(
+                      'VIP',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFFB45309),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
             const SizedBox(height: 8),
-            if (_appliedVoucher != null)
+            if (!_isVipUser)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFAF7F2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFEADBCE)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.workspace_premium_rounded,
+                      size: 20,
+                      color: Color(0xFFB45309),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Voucher diskon hanya tersedia untuk Member VIP.',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else if (_appliedVoucher != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(

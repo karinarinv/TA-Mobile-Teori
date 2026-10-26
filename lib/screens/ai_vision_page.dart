@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../config.dart';
 import '../constants/app_colors.dart';
 import 'books_page.dart';
@@ -20,30 +21,61 @@ class _AiVisionPageState extends State<AiVisionPage> {
   File? _selectedImage;
   bool _analyzing = false;
   Map<String, dynamic>? _analysisResult;
-  
+
+  @override
+  void initState() {
+    super.initState();
+    _retrieveLostData();
+  }
+
+  Future<void> _retrieveLostData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('ai_vision_camera_pending');
+      final response = await _picker.retrieveLostData();
+      if (response.isEmpty) return;
+      if (response.file != null) {
+        setState(() {
+          _selectedImage = File(response.file!.path);
+          _analysisResult = null;
+        });
+        _analyzeImageWithGemini(_selectedImage!);
+      }
+    } catch (_) {}
+  }
 
   Future<void> _pickImage(ImageSource source) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (source == ImageSource.camera) {
+      await prefs.setBool('ai_vision_camera_pending', true);
+    }
     try {
       final picked = await _picker.pickImage(
         source: source,
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
+        requestFullMetadata: false,
       );
+      await prefs.remove('ai_vision_camera_pending');
 
       if (picked == null) return;
 
       setState(() {
         _selectedImage = File(picked.path);
         _analysisResult = null;
-        // error = null;
       });
 
       _analyzeImageWithGemini(_selectedImage!);
     } catch (e) {
-      setState(() {
-        // error = 'Gagal mengambil gambar: $e';
-      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal membuka kamera atau gambar: $e'),
+            backgroundColor: AppColors.oxblood,
+          ),
+        );
+      }
     }
   }
 
@@ -56,9 +88,13 @@ class _AiVisionPageState extends State<AiVisionPage> {
 
       const promptText = 
           'Kamu adalah AI vision scanner buku pintar pada aplikasi "RentBook". '
-          'Tolong analisis gambar sampul atau halaman buku ini. '
-          'Kembalikan HANYA format JSON valid tanpa tanda markdown (tanpa ```json) dengan struktur berikut: '
-          '{"title": "Judul Buku", "author": "Nama Penulis", "genre": "Genre/Kategori", "summary": "Ringkasan cerita atau inti buku 2-3 kalimat menarik", "why_read": "Alasan kenapa buku ini sangat rekomendasi untuk disewa"}';
+          'Tolong analisis objek pada gambar ini dengan cermat. '
+          'Pertama, tentukan apakah gambar ini memperlihatkan buku fisik, novel, komik, majalah, atau sampul/halaman bahan bacaan lainnya. '
+          'Jika BUKAN buku atau novel (misalnya foto orang, selfie, pemandangan, makanan, minuman, hewan, kendaraan, pakaian, elektronik, perabot, atau objek umum lainnya), kembalikan JSON dengan: '
+          '{"is_book": false, "title": "Bukan Buku / Novel", "author": "-", "genre": "Bukan Buku", "summary": "Gambar yang dipindai terdeteksi bukan merupakan buku atau novel. Sistem mendeteksi objek non-buku. Silakan unggah atau foto sampul buku fisik yang ingin Anda cari.", "why_read": "Katalog RentBook khusus menyediakan peminjaman buku fisik dan novel."} '
+          'Jika BENAR adalah buku/novel/bacaan, kembalikan JSON dengan: '
+          '{"is_book": true, "title": "Judul Buku", "author": "Nama Penulis", "genre": "Genre/Kategori", "summary": "Ringkasan cerita atau inti buku 2-3 kalimat menarik", "why_read": "Alasan kenapa buku ini sangat rekomendasi untuk disewa"} '
+          'PENTING: Kembalikan HANYA format JSON valid tanpa tanda markdown (tanpa ```json).';
 
       final body = {
         'contents': [
@@ -116,6 +152,14 @@ class _AiVisionPageState extends State<AiVisionPage> {
         // Bersihkan jika ada format ```json
         String cleanJson = responseText.replaceAll('```json', '').replaceAll('```', '').trim();
         final parsed = jsonDecode(cleanJson) as Map<String, dynamic>;
+        
+        final rawIsBook = parsed['is_book'];
+        final title = (parsed['title'] ?? '').toString().toLowerCase();
+        final genre = (parsed['genre'] ?? '').toString().toLowerCase();
+        final bool isBook = (rawIsBook == true) ||
+            (rawIsBook != false && !title.contains('bukan buku') && !genre.contains('bukan buku'));
+        parsed['is_book'] = isBook;
+
         setState(() {
           _analysisResult = parsed;
           _analyzing = false;
@@ -132,6 +176,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
   void _fallbackAnalysis() {
     setState(() {
       _analysisResult = {
+        'is_book': true,
         'title': 'Buku Terdeteksi (Hasil AI Vision)',
         'author': 'Penulis Terkemuka',
         'genre': 'Literatur & Pengetahuan',
@@ -140,6 +185,12 @@ class _AiVisionPageState extends State<AiVisionPage> {
       };
       _analyzing = false;
     });
+  }
+
+  @override
+  void dispose() {
+    SharedPreferences.getInstance().then((p) => p.remove('ai_vision_camera_pending'));
+    super.dispose();
   }
 
   @override
@@ -459,32 +510,59 @@ class _AiVisionPageState extends State<AiVisionPage> {
                     ),
                     const SizedBox(height: 18),
 
-                    // Tombol Cari di Katalog
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.oxblood,
-                          foregroundColor: AppColors.parchment,
-                          padding: const EdgeInsets.symmetric(vertical: 13),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        onPressed: () {
-                          
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const BooksPage(),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.search_rounded, size: 18),
-                        label: Text(
-                          'Cari Buku Ini di Katalog',
-                          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13.5),
+                    // Tombol Cari di Katalog (Hanya tampil jika objek adalah buku/novel)
+                    if (_analysisResult!['is_book'] == true) ...[
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.oxblood,
+                            foregroundColor: AppColors.parchment,
+                            padding: const EdgeInsets.symmetric(vertical: 13),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const BooksPage(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.search_rounded, size: 18),
+                          label: Text(
+                            'Cari Buku Ini di Katalog',
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 13.5),
+                          ),
                         ),
                       ),
-                    ),
+                    ] else ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFAF7F2),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFEADBCE)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.info_outline_rounded, size: 20, color: AppColors.tobacco),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                'Tombol pencarian katalog dinonaktifkan karena foto yang dipindai bukan merupakan buku atau novel.',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  color: AppColors.walnut,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -648,19 +648,21 @@ class _BlockchainPageState extends State<BlockchainPage> {
             SliverFillRemaining(
               hasScrollBody: false,
               child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.shade400),
-                      const SizedBox(height: 12),
+                      Icon(Icons.inventory_2_outlined, size: 44, color: Colors.grey.shade400),
+                      const SizedBox(height: 10),
                       Text(
                         _filter.isEmpty
                             ? 'Belum ada transaksi sewa.\nSewa buku terlebih dahulu di katalog buku.'
                             : 'Tidak ditemukan transaksi yang cocok dengan "$_filter"',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.plusJakartaSans(color: Colors.grey.shade600),
+                        style: GoogleFonts.plusJakartaSans(color: Colors.grey.shade600, fontSize: 13),
                       ),
                     ],
                   ),
@@ -669,9 +671,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
             )
           else
             SliverPadding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 top: 4,
-                bottom: 24 + bottomInset,
+                bottom: 32,
               ),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(

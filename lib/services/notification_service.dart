@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+import 'auth_service.dart';
 
 class AppNotificationItem {
   final String id;
@@ -45,7 +46,14 @@ class AppNotificationItem {
 
 class NotificationService {
   static final _n = FlutterLocalNotificationsPlugin();
-  static const String _storageKey = 'rentbook_stored_notifications';
+  static Future<String> _getStorageKey() async {
+    final user = await AuthService.currentSession();
+    if (user != null && user.trim().isNotEmpty) {
+      return 'rentbook_stored_notifications_${user.trim()}';
+    }
+    return 'rentbook_stored_notifications_guest';
+  }
+
   static const String _promoSettingKey = 'setting_daily_promo_enabled';
 
   static const _d = NotificationDetails(
@@ -132,7 +140,8 @@ class NotificationService {
   // ============================================================
   static Future<List<AppNotificationItem>> getNotifications() async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_storageKey);
+    final key = await _getStorageKey();
+    final raw = prefs.getString(key);
     if (raw == null || raw.isEmpty) {
       // Seed default sample notifications (promos & welcome)
       final initial = [
@@ -217,13 +226,15 @@ class NotificationService {
 
   static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_storageKey);
+    final key = await _getStorageKey();
+    await prefs.remove(key);
   }
 
   static Future<void> _saveList(List<AppNotificationItem> list) async {
     final prefs = await SharedPreferences.getInstance();
+    final key = await _getStorageKey();
     final jsonStr = jsonEncode(list.map((e) => e.toJson()).toList());
-    await prefs.setString(_storageKey, jsonStr);
+    await prefs.setString(key, jsonStr);
   }
 
   // ============================================================

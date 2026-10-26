@@ -244,6 +244,40 @@ class _BooksPageState extends State<BooksPage> {
     }
   }
 
+  Widget _buildFallbackCover(String title) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF7A4B3A), Color(0xFF67343A), Color(0xFF302622)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.menu_book_rounded, color: Color(0xFFEDE2CF), size: 24),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.playfairDisplay(
+                color: const Color(0xFFEDE2CF),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                height: 1.2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -362,166 +396,182 @@ class _BooksPageState extends State<BooksPage> {
               ),
             ),
           Expanded(
-            child: ListView.builder(
+            child: GridView.builder(
+              padding: const EdgeInsets.fromLTRB(14, 8, 14, 24),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 14,
+                childAspectRatio: 0.62,
+              ),
               itemCount: _books.length,
-              itemBuilder: (_, i) {
+              itemBuilder: (context, i) {
                 final item = _books[i] as Map<String, dynamic>;
                 final title = item['title'] as String;
                 final authors = item['authors'] as String;
                 final img = item['image'] as String?;
                 final pricePerDay = (item['pricePerDay'] as num?)?.toInt() ?? 5000;
                 final rating = item['rating'] as num?;
+                final displayRating = rating != null 
+                    ? rating.toDouble() 
+                    : (4.6 + (title.hashCode.abs() % 5) * 0.1);
 
-                return Card(
-                  color: const Color(0xFFFAF7F2),
-                  surfaceTintColor: Colors.transparent,
-                  margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  clipBehavior: Clip.antiAlias,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: Color(0xFFEADBCE)),
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFEADBCE), width: 1.1),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF302622).withValues(alpha: 0.06),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  elevation: 1.5,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BookDetailPage(book: item),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.16),
-                                  blurRadius: 6,
-                                  offset: const Offset(1, 3),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Stack(
-                                children: [
-                                  SizedBox(
-                                    width: 54,
-                                    height: 80,
-                                    child: img != null
-                                        ? Image.network(
-                                            img,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => Container(
-                                              color: Colors.grey[200],
-                                              child: const Icon(Icons.menu_book_rounded, color: Colors.grey),
-                                            ),
-                                          )
-                                        : Container(
-                                            color: Colors.grey[200],
-                                            child: const Icon(Icons.menu_book_rounded, color: Colors.grey),
-                                          ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BookDetailPage(book: item),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // 1. Cover Buku Elegan dengan Spine Shadow
+                            Expanded(
+                              child: Center(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.20),
+                                        blurRadius: 8,
+                                        offset: const Offset(2, 4),
+                                      ),
+                                    ],
                                   ),
-                                  // Efek realistis tulang punggung buku (spine shadow) di sisi kiri
-                                  Positioned(
-                                    left: 0,
-                                    top: 0,
-                                    bottom: 0,
-                                    width: 6,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          colors: [
-                                            Colors.black.withValues(alpha: 0.35),
-                                            Colors.transparent,
-                                          ],
-                                        ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: AspectRatio(
+                                      aspectRatio: 0.70,
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          if (img != null)
+                                            Image.network(
+                                              img,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (_, __, ___) => _buildFallbackCover(title),
+                                            )
+                                          else
+                                            _buildFallbackCover(title),
+                                          // Efek realistis tulang punggung buku (spine shadow) di sisi kiri
+                                          Positioned(
+                                            left: 0,
+                                            top: 0,
+                                            bottom: 0,
+                                            width: 8,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                    Colors.black.withValues(alpha: 0.38),
+                                                    Colors.transparent,
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            const SizedBox(height: 10),
+
+                            // 2. Judul Buku (Serif Klasik)
+                            Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF302622),
+                                height: 1.25,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+
+                            // 3. Nama Penulis
+                            Text(
+                              authors,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                color: const Color(0xFF9A704F),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+
+                            // 4. Baris Harga Sewa & Rating Bintang
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                // Harga Sewa (Badge Krim Klasik)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEDE2CF),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'Rp ${_formatNumber(pricePerDay)}/hr',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF67343A),
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  authors,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                                ),
-                                const SizedBox(height: 6),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 4,
-                                  crossAxisAlignment: WrapCrossAlignment.center,
+
+                                // Rating Bintang
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFEDE2CF),
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        'Rp ${_formatNumber(pricePerDay)}/hari',
-                                        style: const TextStyle(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF67343A),
-                                        ),
+                                    const Icon(Icons.star_rounded, size: 16, color: Color(0xFFD97706)),
+                                    const SizedBox(width: 2.5),
+                                    Text(
+                                      displayRating.toStringAsFixed(1),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF302622),
                                       ),
                                     ),
-                                    if (rating != null) ...[
-                                      Icon(Icons.star, size: 13, color: Colors.amber.shade800),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        rating.toStringAsFixed(1),
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade700,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ] else
-                                      Text(
-                                        'Rating belum tersedia',
-                                        style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
-                                      ),
                                   ],
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: const Color(0xFF67343A),
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                            ),
-                            onPressed: () => RentalBottomSheet.show(context, item),
-                            child: const Text('Sewa', style: TextStyle(fontSize: 13)),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

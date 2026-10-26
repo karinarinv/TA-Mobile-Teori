@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../services/game_audio_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   final Widget destination;
@@ -69,7 +70,20 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) _openApp();
     });
-    _controller.forward();
+    _checkPendingAndStart();
+  }
+
+  Future<void> _checkPendingAndStart() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool('ai_vision_camera_pending') == true) {
+        if (mounted) _openApp();
+        return;
+      }
+    } catch (_) {}
+    if (mounted) {
+      _controller.forward();
+    }
   }
 
   void _openApp() {

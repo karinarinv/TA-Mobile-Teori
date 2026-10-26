@@ -790,29 +790,34 @@ class _MenuPageState extends State<MenuPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Pilihan untukmu',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 19,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF302622),
-                            ),
-                          ),
-                          if (_lastRentedGenre != null &&
-                              _lastRentedGenre!.isNotEmpty)
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
                             Text(
-                              'Berdasarkan bacaan terakhir: $_lastRentedGenre',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                color: const Color(0xFF9A704F),
-                                fontWeight: FontWeight.w600,
+                              'Pilihan untukmu',
+                              style: GoogleFonts.playfairDisplay(
+                                fontSize: 19,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF302622),
                               ),
                             ),
-                        ],
+                            if (_lastRentedGenre != null &&
+                                _lastRentedGenre!.isNotEmpty)
+                              Text(
+                                'Berdasarkan bacaan terakhir: $_lastRentedGenre',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  color: const Color(0xFF9A704F),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
+                      const SizedBox(width: 8),
                       GestureDetector(
                         onTap: () => go(const BooksPage()),
                         child: Text(
