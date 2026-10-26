@@ -33,17 +33,21 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2350),
+      duration: const Duration(milliseconds: 2800),
     );
     _open = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(.04, .36, curve: Curves.easeInOutCubic),
+      curve: const Interval(.23, .52, curve: Curves.easeInOutCubic),
     );
     _zoom = TweenSequence<double>([
       TweenSequenceItem(
-        tween: Tween(begin: .84, end: 1.02)
+        tween: Tween(begin: .9, end: .9),
+        weight: 23,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: .9, end: 1.02)
             .chain(CurveTween(curve: Curves.easeOutCubic)),
-        weight: 24,
+        weight: 12,
       ),
       TweenSequenceItem(
         tween: Tween(begin: 1.02, end: 1.06)
@@ -58,13 +62,13 @@ class _SplashScreenState extends State<SplashScreen>
     ]).animate(_controller);
     _pageTurn = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(.34, .76, curve: Curves.easeInOutCubic),
+      curve: const Interval(.49, .8, curve: Curves.easeInOutCubic),
     );
     _whiteFade = CurvedAnimation(
       parent: _controller,
       curve: const Interval(.84, 1, curve: Curves.easeIn),
     );
-    _pageSound = Timer(const Duration(milliseconds: 250), () {
+    _pageSound = Timer(const Duration(milliseconds: 700), () {
       if (mounted) unawaited(GameAudioService.playPageTurn());
     });
     _controller.addStatusListener((status) {
