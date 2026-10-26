@@ -5,12 +5,20 @@ class DbHelper {
   static Database? _db;
   static Future<Database> get db async => _db ??= await openDatabase(
         join(await getDatabasesPath(), 'rentbook.db'),
-        version: 2,
+        version: 4,
         onCreate: (d, v) async {
           await d.execute(
-              'CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, salt TEXT, hash TEXT, photo TEXT)');
+              'CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, display_name TEXT, username_changed_at TEXT, salt TEXT, hash TEXT, photo TEXT)');
           await d.execute(
               'CREATE TABLE ledger(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT, prev_hash TEXT, hash TEXT, ts TEXT, tx_hash TEXT, username TEXT)');
+        },
+        onUpgrade: (d, oldVersion, newVersion) async {
+          if (oldVersion < 3) {
+            await d.execute('ALTER TABLE users ADD COLUMN display_name TEXT');
+          }
+          if (oldVersion < 4) {
+            await d.execute('ALTER TABLE users ADD COLUMN username_changed_at TEXT');
+          }
         },
         onOpen: (d) async {
           try {

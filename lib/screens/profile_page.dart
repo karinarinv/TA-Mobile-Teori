@@ -4,6 +4,7 @@ import '../services/subscription_service.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/db_helper.dart';
 import '../services/bookmark_service.dart';
@@ -19,7 +20,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String? _user, _photo;
+  String? _username, _photo;
+  DateTime? _usernameChangeAvailableAt;
   int _savedCount = 0;
   int _rentalCount = 0;
   bool _loading = true;
@@ -33,10 +35,27 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _load() async {
-    _user = await AuthService.currentSession();
-    final rows = await (await DbHelper.db).query('users', where: 'username=?', whereArgs: [_user]);
+    final username = await AuthService.currentSession();
+    String? photo;
+    DateTime? usernameChangeAvailableAt;
+    final rows = username == null
+        ? <Map<String, Object?>>[]
+        : await (await DbHelper.db).query(
+            'users',
+            where: 'username=?',
+            whereArgs: [username],
+          );
     if (rows.isNotEmpty) {
-      _photo = rows.first['photo'] as String?;
+      photo = rows.first['photo'] as String?;
+      final lastUsernameChange = DateTime.tryParse(
+        rows.first['username_changed_at'] as String? ?? '',
+      );
+      final nextUsernameChange = lastUsernameChange?.add(
+        AuthService.usernameChangeCooldown,
+      );
+      if (nextUsernameChange != null && DateTime.now().isBefore(nextUsernameChange)) {
+        usernameChangeAvailableAt = nextUsernameChange;
+      }
     }
 
     final bookmarks = await BookmarkService.getBookmarks();
@@ -46,6 +65,9 @@ class _ProfilePageState extends State<ProfilePage> {
       final isVip = await SubscriptionService.isVip();
       final expiry = await SubscriptionService.getExpiryDate();
       setState(() {
+        _username = username;
+        _photo = photo;
+        _usernameChangeAvailableAt = usernameChangeAvailableAt;
         _savedCount = bookmarks.length;
         _rentalCount = rentals.length;
         _isVip = isVip;
@@ -57,9 +79,74 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _pickImage(ImageSource source) async {
     final f = await ImagePicker().pickImage(source: source, imageQuality: 70);
-    if (f == null) return;
-    await (await DbHelper.db).update('users', {'photo': f.path}, where: 'username=?', whereArgs: [_user]);
+    if (f == null || _username == null) return;
+    await (await DbHelper.db).update(
+      'users',
+      {'photo': f.path},
+      where: 'username=?',
+      whereArgs: [_username],
+    );
     _load();
+  }
+
+  Future<void> _changeUsername() async {
+    final currentUsername = _username;
+    if (currentUsername == null) return;
+
+    final controller = TextEditingController(text: currentUsername);
+    final requestedUsername = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Ganti Username'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 20,
+          textCapitalization: TextCapitalization.none,
+          decoration: const InputDecoration(
+            labelText: 'Username baru',
+            prefixText: '@',
+            helperText: '3-20 karakter: huruf, angka, underscore',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
+            onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+
+    if (requestedUsername == null || !mounted) {
+      controller.dispose();
+      return;
+    }
+
+    try {
+      final result = await AuthService.changeUsername(requestedUsername);
+      if (result.success) await _load();
+      if (!mounted) return;
+      final message = result.availableAt == null
+          ? result.message
+          : '${result.message} Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(result.availableAt!)}.';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Username gagal diperbarui.')),
+        );
+      }
+    } finally {
+      controller.dispose();
+    }
   }
 
   void _showImagePickerSheet() {
@@ -219,8 +306,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      _user ?? 'Pengguna',
+                      _username ?? 'Pengguna',
                       style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    TextButton.icon(
+                      onPressed: _usernameChangeAvailableAt == null
+                          ? _changeUsername
+                          : null,
+                      icon: const Icon(Icons.alternate_email_rounded, size: 16),
+                      label: Text(
+                        _usernameChangeAvailableAt == null
+                            ? 'Ganti username (sekali tiap 30 hari)'
+                            : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF67343A),
+                        visualDensity: VisualDensity.compact,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Container(
