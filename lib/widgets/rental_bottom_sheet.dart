@@ -45,7 +45,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   final List<String> _paymentOptions = [
     'QRIS (GoPay/OVO/Dana)',
     'Transfer Virtual Account',
-    'Bayar Tunai',
   ];
 
   @override
@@ -429,7 +428,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     IconData icon = Icons.payment;
                     if (opt.contains('QRIS')) icon = Icons.qr_code_2;
                     if (opt.contains('Transfer')) icon = Icons.account_balance;
-                    if (opt.contains('Tunai')) icon = Icons.storefront;
 
                     return DropdownMenuItem(
                       value: opt,
@@ -689,7 +687,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         final ledgerData = 'SEWA: $title | Durasi: $_duration Hari | Biaya: $totalFormatted$voucherNote | Batas: $dueDateStr | Bayar: $_paymentMethod';
         await BlockchainService.addTransaction(ledgerData);
         await NotificationService.scheduleReturn(title, days: _duration);
-        await NotificationService.showPaymentSuccess(title, totalFormatted, 'Tunai di Kasir');
         GameAudioService.playWin();
 
         final username = await AuthService.currentSession() ?? 'guest';

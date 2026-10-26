@@ -126,11 +126,7 @@ class _NotificationPageState extends State<NotificationPage> {
       appBar: AppBar(
         title: Text(
           'Pemberitahuan',
-          style: GoogleFonts.playfairDisplay(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: AppColors.parchment,
-          ),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)
         ),
         elevation: 0,
         backgroundColor: AppColors.oxblood,
