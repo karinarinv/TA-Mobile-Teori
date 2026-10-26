@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
 import '../services/game_audio_service.dart';
@@ -1490,7 +1491,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       return Scaffold(
         backgroundColor: const Color(0xFFFAF7F2),
         appBar: AppBar(
-          title: const Text('Misi Gagal', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text('Misi Gagal',style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
           elevation: 0,
           backgroundColor: const Color(0xFF67343A),
           foregroundColor: const Color(0xFFEDE2CF),
@@ -1506,7 +1507,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       return Scaffold(
         backgroundColor: const Color(0xFFFAF7F2),
         appBar: AppBar(
-          title: const Text('Kemenangan Labirin Buku', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text('Kemenangan Labirin Buku', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
           elevation: 0,
           backgroundColor: const Color(0xFF67343A),
           foregroundColor: const Color(0xFFEDE2CF),

@@ -509,7 +509,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         Icon(Icons.shield_outlined, size: 14, color: Colors.grey.shade500),
                         const SizedBox(width: 6),
                         Text(
-                          'RentBook v2.0 • Ledger Lokal Terenkripsi SHA-256',
+                          'RentBook v1.0 • Ledger Lokal Terenkripsi SHA-256',
                           style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
                         ),
                       ],
