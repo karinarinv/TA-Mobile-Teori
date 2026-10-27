@@ -102,7 +102,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final requestedUsername = await showDialog<String>(
       context: context,
-      builder: (_) => _ChangeUsernameDialog(initialUsername: currentUsername),
+      builder: (_) => _ChangeUsernameDialog(
+        initialUsername: currentUsername,
+        availableAt: _usernameChangeAvailableAt,
+      ),
     );
 
     if (requestedUsername == null || !mounted) return;
@@ -487,10 +490,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           _usernameChangeAvailableAt == null
                                           ? 'Ganti username'
                                           : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
-                                      onPressed:
-                                          _usernameChangeAvailableAt == null
-                                          ? _changeUsername
-                                          : null,
+                                      onPressed: _changeUsername,
                                       visualDensity: VisualDensity.compact,
                                       constraints:
                                           const BoxConstraints.tightFor(
@@ -501,10 +501,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       icon: Icon(
                                         Icons.edit_rounded,
                                         size: 18,
-                                        color:
-                                            _usernameChangeAvailableAt == null
-                                            ? const Color(0xFF9A704F)
-                                            : Colors.grey.shade500,
+                                        color: const Color(0xFF9A704F),
                                       ),
                                     ),
                                   ],
@@ -1099,8 +1096,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
 class _ChangeUsernameDialog extends StatefulWidget {
   final String initialUsername;
+  final DateTime? availableAt;
 
-  const _ChangeUsernameDialog({required this.initialUsername});
+  const _ChangeUsernameDialog({
+    required this.initialUsername,
+    required this.availableAt,
+  });
 
   @override
   State<_ChangeUsernameDialog> createState() => _ChangeUsernameDialogState();
@@ -1128,7 +1129,22 @@ class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        if (widget.availableAt != null) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0EFED),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE0DEDA)),
+            ),
+            child: Text(
+              'Anda bisa mengganti username lagi pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.',
+              style: TextStyle(color: Colors.grey.shade700),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ] else Container(
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -1143,7 +1159,8 @@ class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
         const SizedBox(height: 12),
         TextField(
           controller: _controller,
-          autofocus: true,
+          autofocus: widget.availableAt == null,
+          readOnly: widget.availableAt != null,
           maxLength: 20,
           textCapitalization: TextCapitalization.none,
           decoration: const InputDecoration(
@@ -1151,15 +1168,16 @@ class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
             prefixText: '@',
             helperText: '3-20 karakter: huruf, angka, underscore',
           ),
+          enabled: widget.availableAt == null,
         ),
       ],
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Batal'),
+        child: Text(widget.availableAt == null ? 'Batal' : 'Tutup'),
       ),
-      FilledButton(
+      if (widget.availableAt == null) FilledButton(
         style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
         onPressed: () => Navigator.pop(context, _controller.text.trim()),
         child: const Text('Simpan'),

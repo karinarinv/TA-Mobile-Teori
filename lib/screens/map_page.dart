@@ -80,19 +80,30 @@ class _MapPageState extends State<MapPage> {
       return;
     }
 
-    final libraries = <LibraryItem>[];
+    // Supabase may contain repeated rows for the same branch, including rows
+    // where only some fields were filled. Merge those rows before displaying.
+    final librariesByKey = <String, LibraryItem>{};
     for (final row in result.rows) {
       final latitude = double.tryParse('${row['lat']}');
       final longitude = double.tryParse('${row['lng']}');
       final name = row['name']?.toString().trim() ?? '';
-      if (name.isEmpty || latitude == null || longitude == null) continue;
+      if (name.isEmpty ||
+          latitude == null ||
+          longitude == null ||
+          !latitude.isFinite ||
+          !longitude.isFinite ||
+          latitude < -90 ||
+          latitude > 90 ||
+          longitude < -180 ||
+          longitude > 180) {
+        continue;
+      }
 
       final rawFacilities = row['facilities'];
       final facilities = rawFacilities is List
           ? rawFacilities.map((value) => value.toString()).toList()
           : const <String>[];
-      libraries.add(
-        LibraryItem(
+      final item = LibraryItem(
           name: name,
           location: LatLng(latitude, longitude),
           address: row['address']?.toString() ?? '',
@@ -100,9 +111,24 @@ class _MapPageState extends State<MapPage> {
           phone: row['phone']?.toString() ?? '',
           rating: (row['rating'] as num?)?.toDouble() ?? 0,
           facilities: facilities,
-        ),
-      );
+        );
+      final key = '${name.toLowerCase()}|${latitude.toStringAsFixed(5)}|${longitude.toStringAsFixed(5)}';
+      final existing = librariesByKey[key];
+      if (existing == null) {
+        librariesByKey[key] = item;
+      } else {
+        librariesByKey[key] = LibraryItem(
+          name: existing.name,
+          location: existing.location,
+          address: _firstNonEmpty(existing.address, item.address),
+          hours: _firstNonEmpty(existing.hours, item.hours),
+          phone: _firstNonEmpty(existing.phone, item.phone),
+          rating: existing.rating > 0 ? existing.rating : item.rating,
+          facilities: {...existing.facilities, ...item.facilities}.toList(),
+        );
+      }
     }
+    final libraries = librariesByKey.values.toList();
 
     setState(() {
       _libraries = libraries;
@@ -112,6 +138,9 @@ class _MapPageState extends State<MapPage> {
       _loadingLibraries = false;
     });
   }
+
+  String _firstNonEmpty(String first, String second) =>
+      first.trim().isNotEmpty ? first : second;
 
   Future<void> _refreshLibraries() async {
     await _loadCloud();
