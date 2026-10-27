@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../config.dart';
 import '../constants/app_colors.dart';
 import '../services/blockchain_service.dart';
@@ -65,14 +66,14 @@ class _BlockchainPageState extends State<BlockchainPage> {
 
   void _simulate() {
     if (_rows.isEmpty) return;
-    final copy = _rows.reversed.map((e) => Map<String, Object?>.from(e)).toList();
+    final copy = _rows.reversed
+        .map((e) => Map<String, Object?>.from(e))
+        .toList();
     copy.first['data'] = '${copy.first['data']} (DIUBAH)';
     final ok = BlockchainService.verifyRows(copy);
     setState(() {
       _ok = ok;
-      _msg = ok
-          ? 'Valid'
-          : 'SIMULASI: Data blok #1 diubah dalam memori, hash tidak cocok lagi dan rantai TERDETEKSI RUSAK! (Data asli di database tetap aman).';
+      _msg = ok ? 'Valid' : 'SIMULASI: Data blok #1 diubah dalam memori, hash tidak cocok lagi dan rantai TERDETEKSI RUSAK! (Data asli di database tetap aman).';
     });
   }
 
@@ -116,15 +117,24 @@ class _BlockchainPageState extends State<BlockchainPage> {
 
   Widget _buildTransactionDetails(String rawData) {
     if (!rawData.contains('|')) {
-      final text = rawData.startsWith('PINJAM:') ? rawData.substring(7) : rawData;
+      final text = rawData.startsWith('PINJAM:')
+          ? rawData.substring(7)
+          : rawData;
       return Text(
         text,
-        style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.walnut),
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+          color: AppColors.walnut,
+        ),
       );
     }
 
     final parts = rawData.split('|').map((p) => p.trim()).toList();
-    final titlePart = parts[0].replaceFirst('SEWA:', '').replaceFirst('PINJAM:', '').trim();
+    final titlePart = parts[0]
+        .replaceFirst('SEWA:', '')
+        .replaceFirst('PINJAM:', '')
+        .trim();
 
     String? duration;
     String? price;
@@ -133,7 +143,8 @@ class _BlockchainPageState extends State<BlockchainPage> {
 
     for (int i = 1; i < parts.length; i++) {
       final p = parts[i];
-      if (p.startsWith('Durasi:')) duration = p.replaceFirst('Durasi:', '').trim();
+      if (p.startsWith('Durasi:'))
+        duration = p.replaceFirst('Durasi:', '').trim();
       if (p.startsWith('Biaya:')) price = p.replaceFirst('Biaya:', '').trim();
       if (p.startsWith('Batas:')) due = p.replaceFirst('Batas:', '').trim();
       if (p.startsWith('Bayar:')) method = p.replaceFirst('Bayar:', '').trim();
@@ -144,7 +155,11 @@ class _BlockchainPageState extends State<BlockchainPage> {
       children: [
         Text(
           titlePart,
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.walnut),
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: AppColors.walnut,
+          ),
         ),
         const SizedBox(height: 8),
         Wrap(
@@ -162,11 +177,19 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.payments_outlined, size: 14, color: Colors.green),
+                    const Icon(
+                      Icons.payments_outlined,
+                      size: 14,
+                      color: Colors.green,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       price,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
                     ),
                   ],
                 ),
@@ -181,11 +204,19 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.timer_outlined, size: 14, color: AppColors.oxblood),
+                    const Icon(
+                      Icons.timer_outlined,
+                      size: 14,
+                      color: AppColors.oxblood,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       duration,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.oxblood),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.oxblood,
+                      ),
                     ),
                   ],
                 ),
@@ -200,11 +231,19 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.calendar_today, size: 13, color: Colors.deepOrange),
+                    const Icon(
+                      Icons.calendar_today,
+                      size: 13,
+                      color: Colors.deepOrange,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'Batas: $due',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.deepOrange),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.deepOrange,
+                      ),
                     ),
                   ],
                 ),
@@ -219,7 +258,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 ),
                 child: Text(
                   method,
-                  style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
           ],
@@ -253,7 +295,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.parchment,
                     borderRadius: BorderRadius.circular(6),
@@ -306,13 +351,20 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     children: [
                       Text(
                         'Waktu: ${_s(r['ts'])}',
-                        style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.textSecondary),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       InkWell(
                         onTap: () => _copyHash(hashStr, blockId),
                         child: Row(
                           children: [
-                            const Icon(Icons.copy, size: 12, color: AppColors.oxblood),
+                            const Icon(
+                              Icons.copy,
+                              size: 12,
+                              color: AppColors.oxblood,
+                            ),
                             const SizedBox(width: 3),
                             Text(
                               'Salin Hash',
@@ -354,15 +406,24 @@ class _BlockchainPageState extends State<BlockchainPage> {
               width: double.infinity,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  backgroundColor: hasTx ? AppColors.oxblood : AppColors.tobacco,
+                  backgroundColor: hasTx
+                      ? AppColors.oxblood
+                      : AppColors.tobacco,
                   foregroundColor: AppColors.parchment,
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 icon: const Icon(Icons.open_in_new, size: 14),
                 label: Text(
-                  hasTx ? 'Cek Transaksi di Etherscan' : 'Cek Akun di Etherscan',
-                  style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold),
+                  hasTx
+                      ? 'Cek Transaksi di Etherscan'
+                      : 'Cek Akun di Etherscan',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 onPressed: () => _openEtherscan(txHash),
               ),
@@ -383,8 +444,6 @@ class _BlockchainPageState extends State<BlockchainPage> {
           }).toList();
 
     final totalExpense = _calculateTotalExpense();
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.background,
@@ -406,7 +465,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
         ],
       ),
       body: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
         slivers: [
           SliverToBoxAdapter(
             child: Container(
@@ -490,11 +551,21 @@ class _BlockchainPageState extends State<BlockchainPage> {
 
                   TextField(
                     controller: _searchCtrl,
-                    style: GoogleFonts.plusJakartaSans(fontSize: 13, color: AppColors.textPrimary),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      color: AppColors.textPrimary,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Cari judul buku atau metode bayar...',
-                      hintStyle: GoogleFonts.plusJakartaSans(fontSize: 12.5, color: Colors.grey.shade500),
-                      prefixIcon: const Icon(Icons.search, size: 20, color: AppColors.oxblood),
+                      hintStyle: GoogleFonts.plusJakartaSans(
+                        fontSize: 12.5,
+                        color: Colors.grey.shade500,
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        size: 20,
+                        color: AppColors.oxblood,
+                      ),
                       suffixIcon: _filter.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear, size: 18),
@@ -505,7 +576,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
                             )
                           : null,
                       isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 18,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(28),
                         borderSide: const BorderSide(color: AppColors.border),
@@ -516,7 +590,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(28),
-                        borderSide: const BorderSide(color: AppColors.oxblood, width: 1.6),
+                        borderSide: const BorderSide(
+                          color: AppColors.oxblood,
+                          width: 1.6,
+                        ),
                       ),
                       filled: true,
                       fillColor: Colors.white,
@@ -532,7 +609,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
                           style: FilledButton.styleFrom(
                             backgroundColor: AppColors.oxblood,
                             foregroundColor: AppColors.parchment,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                           onPressed: _verify,
                           icon: const Icon(Icons.verified, size: 18),
@@ -544,7 +623,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.walnut,
                           side: const BorderSide(color: AppColors.border),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         onPressed: _simulate,
                         icon: const Icon(Icons.bug_report_outlined, size: 18),
@@ -566,20 +647,27 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 decoration: BoxDecoration(
                   color: _ok ? Colors.green.shade50 : Colors.red.shade50,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: _ok ? Colors.green.shade300 : Colors.red.shade300),
+                  border: Border.all(
+                    color: _ok ? Colors.green.shade300 : Colors.red.shade300,
+                  ),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(_ok ? Icons.check_circle : Icons.warning_amber_rounded,
-                        color: _ok ? Colors.green : Colors.red, size: 20),
+                    Icon(
+                      _ok ? Icons.check_circle : Icons.warning_amber_rounded,
+                      color: _ok ? Colors.green : Colors.red,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _msg!,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
-                          color: _ok ? Colors.green.shade900 : Colors.red.shade900,
+                          color: _ok
+                              ? Colors.green.shade900
+                              : Colors.red.shade900,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -606,7 +694,11 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       color: AppColors.oxblood.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.language_rounded, color: AppColors.oxblood, size: 20),
+                    child: const Icon(
+                      Icons.language_rounded,
+                      color: AppColors.oxblood,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -623,7 +715,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         ),
                         Text(
                           'Akun: ${_s(sepoliaWalletAddress)}',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: AppColors.textSecondary),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -633,11 +728,19 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       visualDensity: VisualDensity.compact,
                       foregroundColor: AppColors.oxblood,
                       side: const BorderSide(color: AppColors.oxblood),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     onPressed: () => _openEtherscan(),
                     icon: const Icon(Icons.open_in_new, size: 14),
-                    label: const Text('Etherscan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    label: const Text(
+                      'Etherscan',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -655,14 +758,21 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.inventory_2_outlined, size: 44, color: Colors.grey.shade400),
+                      Icon(
+                        Icons.inventory_2_outlined,
+                        size: 44,
+                        color: Colors.grey.shade400,
+                      ),
                       const SizedBox(height: 10),
                       Text(
                         _filter.isEmpty
                             ? 'Belum ada transaksi sewa.\nSewa buku terlebih dahulu di katalog buku.'
                             : 'Tidak ditemukan transaksi yang cocok dengan "$_filter"',
                         textAlign: TextAlign.center,
-                        style: GoogleFonts.plusJakartaSans(color: Colors.grey.shade600, fontSize: 13),
+                        style: GoogleFonts.plusJakartaSans(
+                          color: Colors.grey.shade600,
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -671,10 +781,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.only(
-                top: 4,
-                bottom: 32,
-              ),
+              padding: const EdgeInsets.only(top: 4, bottom: 32),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, i) => _buildBlockCard(filtered[i], i),

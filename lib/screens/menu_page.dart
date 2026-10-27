@@ -1656,12 +1656,12 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
           desc: 'Taklukkan labirin 3 lantai, kumpulkan buku-buku di lorong, dan raih Buku Emas beserta voucher diskon spesial.',
         ),
         _buildSectionItem(
-          title: 'Keanggotaan VIP Club (Rp 29.000 / bln)',
+          title: 'VIP 1 Bulan Rp29.000 • 1 Tahun Rp299.000 promo',
           desc: 'Dapatkan akses eksklusif untuk 3 fitur utama: Minigame Labirin Perpustakaan, Konversi Kurs & Jam Dunia, serta AI Vision Scanner.',
         ),
         _buildSectionItem(
           title: 'Masa Aktif Natural Tanpa Jebakan',
-          desc: 'Status VIP berlaku 30 hari sejak pembayaran. Setelah masa aktif berakhir, akun Anda otomatis kembali menjadi Reguler tanpa pemotongan saldo tersembunyi.',
+          desc: 'Paket VIP 1 bulan berlaku 30 hari, sedangkan paket 1 tahun berlaku 365 hari sejak aktivasi. Setelah masa aktif berakhir, akun Anda otomatis kembali menjadi Reguler.',
         ),
       ],
     );

@@ -1,10 +1,13 @@
 import 'package:google_fonts/google_fonts.dart';
 
 import '../services/subscription_service.dart';
+
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+
 import '../services/auth_service.dart';
 import '../services/db_helper.dart';
 import '../services/bookmark_service.dart';
@@ -26,6 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
   int _rentalCount = 0;
   bool _loading = true;
   bool _isVip = false;
+  String _vipPlanName = '-';
   String _vipExpiry = '';
 
   @override
@@ -53,7 +57,8 @@ class _ProfilePageState extends State<ProfilePage> {
       final nextUsernameChange = lastUsernameChange?.add(
         AuthService.usernameChangeCooldown,
       );
-      if (nextUsernameChange != null && DateTime.now().isBefore(nextUsernameChange)) {
+      if (nextUsernameChange != null &&
+          DateTime.now().isBefore(nextUsernameChange)) {
         usernameChangeAvailableAt = nextUsernameChange;
       }
     }
@@ -63,6 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (mounted) {
       final isVip = await SubscriptionService.isVip();
+      final vipPlanName = await SubscriptionService.getPlanName();
       final expiry = await SubscriptionService.getExpiryDate();
       setState(() {
         _username = username;
@@ -71,6 +77,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _savedCount = bookmarks.length;
         _rentalCount = rentals.length;
         _isVip = isVip;
+        _vipPlanName = vipPlanName;
         _vipExpiry = expiry;
         _loading = false;
       });
@@ -174,7 +181,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.photo_library, color: Color(0xFF67343A)),
+                  child: const Icon(
+                    Icons.photo_library,
+                    color: Color(0xFF67343A),
+                  ),
                 ),
                 title: const Text('Pilih dari Galeri'),
                 onTap: () {
@@ -247,7 +257,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF302622),
-                    side: const BorderSide(color: Color(0xFFEADBCE), width: 1.2),
+                    side: const BorderSide(
+                      color: Color(0xFFEADBCE),
+                      width: 1.2,
+                    ),
                     padding: const EdgeInsets.symmetric(vertical: 11),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -334,20 +347,30 @@ class _ProfilePageState extends State<ProfilePage> {
               onRefresh: _load,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 18,
+                ),
                 child: Column(
                   children: [
                     // 1. KARTU HEADER PROFIL PENGGUNA
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 22,
+                        horizontal: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFFEADBCE), width: 1.2),
+                        border: Border.all(
+                          color: const Color(0xFFEADBCE),
+                          width: 1.2,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF302622).withValues(alpha: 0.05),
+                            color: const Color(0xFF302622)
+                                .withValues(alpha: 0.05),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -368,14 +391,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                       shape: BoxShape.circle,
                                       gradient: LinearGradient(
                                         colors: _isVip
-                                            ? const [Color(0xFFD4AF37), Color(0xFFB45309), Color(0xFF67343A)]
-                                            : const [Color(0xFFEADBCE), Color(0xFFEDE2CF)],
+                                            ? const [
+                                                Color(0xFFD4AF37),
+                                                Color(0xFFB45309),
+                                                Color(0xFF67343A),
+                                              ]
+                                            : const [
+                                                Color(0xFFEADBCE),
+                                                Color(0xFFEDE2CF),
+                                              ],
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFF302622).withValues(alpha: 0.16),
+                                          color: const Color(0xFF302622)
+                                              .withValues(alpha: 0.16),
                                           blurRadius: 10,
                                           offset: const Offset(0, 4),
                                         ),
@@ -384,9 +415,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: CircleAvatar(
                                       radius: 50,
                                       backgroundColor: const Color(0xFFEDE2CF),
-                                      backgroundImage: _photo != null ? FileImage(File(_photo!)) : null,
+                                      backgroundImage: _photo != null
+                                          ? FileImage(File(_photo!))
+                                          : null,
                                       child: _photo == null
-                                          ? const Icon(Icons.person, size: 52, color: Color(0xFF67343A))
+                                          ? const Icon(
+                                              Icons.person,
+                                              size: 52,
+                                              color: Color(0xFF67343A),
+                                            )
                                           : null,
                                     ),
                                   ),
@@ -401,15 +438,24 @@ class _ProfilePageState extends State<ProfilePage> {
                                       decoration: BoxDecoration(
                                         color: const Color(0xFF67343A),
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.2),
+                                            color: Colors.black.withValues(
+                                              alpha: 0.2,
+                                            ),
                                             blurRadius: 4,
                                           ),
                                         ],
                                       ),
-                                      child: const Icon(Icons.camera_alt_rounded, size: 15, color: Color(0xFFEDE2CF)),
+                                      child: const Icon(
+                                        Icons.camera_alt_rounded,
+                                        size: 15,
+                                        color: Color(0xFFEDE2CF),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -437,22 +483,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ),
                                     IconButton(
-                                      tooltip: _usernameChangeAvailableAt == null
+                                      tooltip:
+                                          _usernameChangeAvailableAt == null
                                           ? 'Ganti username'
                                           : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
-                                      onPressed: _usernameChangeAvailableAt == null
+                                      onPressed:
+                                          _usernameChangeAvailableAt == null
                                           ? _changeUsername
                                           : null,
                                       visualDensity: VisualDensity.compact,
-                                      constraints: const BoxConstraints.tightFor(
-                                        width: 34,
-                                        height: 34,
-                                      ),
+                                      constraints:
+                                          const BoxConstraints.tightFor(
+                                            width: 34,
+                                            height: 34,
+                                          ),
                                       padding: EdgeInsets.zero,
                                       icon: Icon(
                                         Icons.edit_rounded,
                                         size: 18,
-                                        color: _usernameChangeAvailableAt == null
+                                        color:
+                                            _usernameChangeAvailableAt == null
                                             ? const Color(0xFF9A704F)
                                             : Colors.grey.shade500,
                                       ),
@@ -466,11 +516,17 @@ class _ProfilePageState extends State<ProfilePage> {
 
                           // Badge Status Keanggotaan Sesuai Color Palette
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4.5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 4.5,
+                            ),
                             decoration: BoxDecoration(
                               gradient: _isVip
                                   ? const LinearGradient(
-                                      colors: [Color(0xFF67343A), Color(0xFF4A1F25)],
+                                      colors: [
+                                        Color(0xFF67343A),
+                                        Color(0xFF4A1F25),
+                                      ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     )
@@ -478,13 +534,16 @@ class _ProfilePageState extends State<ProfilePage> {
                               color: _isVip ? null : const Color(0xFFEDE2CF),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: _isVip ? const Color(0xFFD4AF37) : const Color(0xFFEADBCE),
+                                color: _isVip
+                                    ? const Color(0xFFD4AF37)
+                                    : const Color(0xFFEADBCE),
                                 width: 1.2,
                               ),
                               boxShadow: _isVip
                                   ? [
                                       BoxShadow(
-                                        color: const Color(0xFF67343A).withValues(alpha: 0.25),
+                                        color: const Color(0xFF67343A)
+                                            .withValues(alpha: 0.25),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -495,25 +554,32 @@ class _ProfilePageState extends State<ProfilePage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  _isVip ? Icons.stars_rounded : Icons.person_outline_rounded,
+                                  _isVip
+                                      ? Icons.stars_rounded
+                                      : Icons.person_outline_rounded,
                                   size: 14,
-                                  color: _isVip ? const Color(0xFFD4AF37) : const Color(0xFF67343A),
+                                  color: _isVip
+                                      ? const Color(0xFFD4AF37)
+                                      : const Color(0xFF67343A),
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  _isVip ? 'MEMBER VIP AKTIF' : 'MEMBER REGULER',
+                                  _isVip
+                                      ? 'MEMBER VIP • $_vipPlanName'
+                                      : 'MEMBER REGULER',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.8,
-                                    color: _isVip ? const Color(0xFFEDE2CF) : const Color(0xFF67343A),
+                                    color: _isVip
+                                        ? const Color(0xFFEDE2CF)
+                                        : const Color(0xFF67343A),
                                   ),
                                 ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 8),
-
                         ],
                       ),
                     ),
@@ -526,18 +592,24 @@ class _ProfilePageState extends State<ProfilePage> {
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFF5E2B31), Color(0xFF4A1F25), Color(0xFF302622)],
+                            colors: [
+                              Color(0xFF5E2B31),
+                              Color(0xFF4A1F25),
+                              Color(0xFF302622),
+                            ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
-                            color: const Color(0xFFD4AF37).withValues(alpha: 0.65),
+                            color: const Color(0xFFD4AF37)
+                                .withValues(alpha: 0.65),
                             width: 1.4,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF302622).withValues(alpha: 0.22),
+                              color: const Color(0xFF302622)
+                                  .withValues(alpha: 0.22),
                               blurRadius: 14,
                               offset: const Offset(0, 6),
                             ),
@@ -551,10 +623,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFEDE2CF).withValues(alpha: 0.15),
+                                    color: const Color(0xFFEDE2CF)
+                                        .withValues(alpha: 0.15),
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: const Color(0xFFD4AF37).withValues(alpha: 0.6),
+                                      color: const Color(0xFFD4AF37)
+                                          .withValues(alpha: 0.6),
                                       width: 1.2,
                                     ),
                                   ),
@@ -567,7 +641,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         'Keanggotaan VIP Club',
@@ -591,14 +666,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 // Badge VIP Aktif Eksklusif (Sesuai Color Palette)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4.5,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFEDE2CF),
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: const Color(0xFFD4AF37), width: 1.2),
+                                    border: Border.all(
+                                      color: const Color(0xFFD4AF37),
+                                      width: 1.2,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.2),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         blurRadius: 6,
                                         offset: const Offset(0, 2),
                                       ),
@@ -614,7 +697,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'VIP AKTIF',
+                                        'VIP AKTIF • $_vipPlanName',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.w800,
@@ -633,7 +716,8 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    const Color(0xFFD4AF37).withValues(alpha: 0.45),
+                                    const Color(0xFFD4AF37)
+                                        .withValues(alpha: 0.45),
                                     Colors.transparent,
                                   ],
                                 ),
@@ -651,7 +735,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
-                                    'Masa aktif 30 hari • Berlaku hingga $_vipExpiry',
+                                    'Paket $_vipPlanName • aktif hingga $_vipExpiry',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w600,
@@ -668,7 +752,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Akses tak terbatas: Labirin Perpustakaan, Konversi Kurs & Scan Cover AI.',
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 10.5,
-                                  color: const Color(0xFFD4BE9D).withValues(alpha: 0.85),
+                                  color: const Color(0xFFD4BE9D)
+                                      .withValues(alpha: 0.85),
                                   height: 1.3,
                                 ),
                               ),
@@ -687,10 +772,14 @@ class _ProfilePageState extends State<ProfilePage> {
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFFD4BE9D), width: 1.3),
+                          border: Border.all(
+                            color: const Color(0xFFD4BE9D),
+                            width: 1.3,
+                          ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF302622).withValues(alpha: 0.05),
+                              color: const Color(0xFF302622)
+                                  .withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -740,8 +829,13 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: FilledButton.styleFrom(
                                 backgroundColor: const Color(0xFF67343A),
                                 foregroundColor: const Color(0xFFEDE2CF),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
                               ),
                               onPressed: () {
                                 SubscriptionService.showPaywallDialog(
@@ -769,10 +863,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: const Color(0xFFEADBCE), width: 1.1),
+                        border: Border.all(
+                          color: const Color(0xFFEADBCE),
+                          width: 1.1,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF302622).withValues(alpha: 0.04),
+                            color: const Color(0xFF302622)
+                                .withValues(alpha: 0.04),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -799,69 +897,140 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFFEADBCE)),
+                                border: Border.all(
+                                  color: const Color(0xFFEADBCE),
+                                ),
                               ),
-                              child: const Icon(Icons.collections_bookmark_rounded, color: Color(0xFF67343A), size: 19),
+                              child: const Icon(
+                                Icons.collections_bookmark_rounded,
+                                color: Color(0xFF67343A),
+                                size: 19,
+                              ),
                             ),
                             title: Text(
                               'Buku Tersimpan',
-                              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: const Color(0xFF302622)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.5,
+                                color: const Color(0xFF302622),
+                              ),
                             ),
                             subtitle: Text(
                               '$_savedCount buku favorit tersimpan',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: const Color(0xFF6B564A)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11.5,
+                                color: const Color(0xFF6B564A),
+                              ),
                             ),
-                            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF9A704F)),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: Color(0xFF9A704F),
+                            ),
                             onTap: () async {
-                              await Navigator.push(context, MaterialPageRoute(builder: (_) => const SavedBooksPage()));
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const SavedBooksPage(),
+                                ),
+                              );
                               _load();
                             },
                           ),
-                          const Divider(height: 1, indent: 16, endIndent: 16, color: Color(0xFFEADBCE)),
+                          const Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: Color(0xFFEADBCE),
+                          ),
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFFEADBCE)),
+                                border: Border.all(
+                                  color: const Color(0xFFEADBCE),
+                                ),
                               ),
-                              child: const Icon(Icons.lock_clock_rounded, color: Color(0xFF67343A), size: 19),
+                              child: const Icon(
+                                Icons.lock_clock_rounded,
+                                color: Color(0xFF67343A),
+                                size: 19,
+                              ),
                             ),
                             title: Text(
                               'Riwayat Sewa (Blockchain)',
-                              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: const Color(0xFF302622)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.5,
+                                color: const Color(0xFF302622),
+                              ),
                             ),
                             subtitle: Text(
                               '$_rentalCount transaksi sewa tercatat di blockchain',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: const Color(0xFF6B564A)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11.5,
+                                color: const Color(0xFF6B564A),
+                              ),
                             ),
-                            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF9A704F)),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: Color(0xFF9A704F),
+                            ),
                             onTap: () async {
-                              await Navigator.push(context, MaterialPageRoute(builder: (_) => const BlockchainPage()));
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const BlockchainPage(),
+                                ),
+                              );
                               _load();
                             },
                           ),
-                          const Divider(height: 1, indent: 16, endIndent: 16, color: Color(0xFFEADBCE)),
+                          const Divider(
+                            height: 1,
+                            indent: 16,
+                            endIndent: 16,
+                            color: Color(0xFFEADBCE),
+                          ),
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFFEADBCE)),
+                                border: Border.all(
+                                  color: const Color(0xFFEADBCE),
+                                ),
                               ),
-                              child: const Icon(Icons.add_a_photo_outlined, color: Color(0xFF67343A), size: 19),
+                              child: const Icon(
+                                Icons.add_a_photo_outlined,
+                                color: Color(0xFF67343A),
+                                size: 19,
+                              ),
                             ),
                             title: Text(
                               'Perbarui Foto Profil',
-                              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: const Color(0xFF302622)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13.5,
+                                color: const Color(0xFF302622),
+                              ),
                             ),
                             subtitle: Text(
                               'Pilih foto baru dari kamera atau galeri ponsel',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: const Color(0xFF6B564A)),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11.5,
+                                color: const Color(0xFF6B564A),
+                              ),
                             ),
-                            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF9A704F)),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 14,
+                              color: Color(0xFF9A704F),
+                            ),
                             onTap: _showImagePickerSheet,
                           ),
                         ],
@@ -876,9 +1045,14 @@ class _ProfilePageState extends State<ProfilePage> {
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xFF67343A),
                           backgroundColor: Colors.white,
-                          side: const BorderSide(color: Color(0xFF67343A), width: 1.4),
+                          side: const BorderSide(
+                            color: Color(0xFF67343A),
+                            width: 1.4,
+                          ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           elevation: 0,
                         ),
                         onPressed: _logout,
@@ -899,11 +1073,18 @@ class _ProfilePageState extends State<ProfilePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.shield_outlined, size: 14, color: Color(0xFF9A704F)),
+                        const Icon(
+                          Icons.shield_outlined,
+                          size: 14,
+                          color: Color(0xFF9A704F),
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'RentBook • Keamanan SHA-256 Terenkripsi',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFF9A704F)),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF9A704F),
+                          ),
                         ),
                       ],
                     ),
@@ -942,36 +1123,47 @@ class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-        title: const Text('Ganti Username'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Username dapat diganti kembali setelah 30 hari.'),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _controller,
-              autofocus: true,
-              maxLength: 20,
-              textCapitalization: TextCapitalization.none,
-              decoration: const InputDecoration(
-                labelText: 'Username baru',
-                prefixText: '@',
-                helperText: '3-20 karakter: huruf, angka, underscore',
-              ),
-            ),
-          ],
+    title: const Text('Ganti Username'),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFAF7F2),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFEADBCE)),
+          ),
+          child: const Text(
+            'Username hanya bisa diganti sekali setiap 30 hari. Setelah disimpan, kamu bisa menggantinya lagi 30 hari kemudian.',
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _controller,
+          autofocus: true,
+          maxLength: 20,
+          textCapitalization: TextCapitalization.none,
+          decoration: const InputDecoration(
+            labelText: 'Username baru',
+            prefixText: '@',
+            helperText: '3-20 karakter: huruf, angka, underscore',
           ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
-            onPressed: () => Navigator.pop(context, _controller.text.trim()),
-            child: const Text('Simpan'),
-          ),
-        ],
-      );
+        ),
+      ],
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('Batal'),
+      ),
+      FilledButton(
+        style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
+        onPressed: () => Navigator.pop(context, _controller.text.trim()),
+        child: const Text('Simpan'),
+      ),
+    ],
+  );
 }

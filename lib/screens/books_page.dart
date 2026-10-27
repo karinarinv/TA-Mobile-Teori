@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:sensors_plus/sensors_plus.dart';
-import '../widgets/rental_bottom_sheet.dart';
+
 import 'book_detail_page.dart';
 import 'saved_books_page.dart';
 
@@ -45,7 +46,9 @@ class _BooksPageState extends State<BooksPage> {
 
     _sub = userAccelerometerEventStream().listen((e) {
       final g = sqrt(e.x * e.x + e.y * e.y + e.z * e.z);
-      if (g > 16 && DateTime.now().difference(_lastShake).inSeconds > 3 && !_loading) {
+      if (g > 16 &&
+          DateTime.now().difference(_lastShake).inSeconds > 3 &&
+          !_loading) {
         _lastShake = DateTime.now();
         const genres = [
           'fiction',
@@ -55,7 +58,7 @@ class _BooksPageState extends State<BooksPage> {
           'novel',
           'technology',
           'art',
-          'fantasy'
+          'fantasy',
         ];
         _q.text = genres[Random().nextInt(genres.length)];
         _search();
@@ -81,7 +84,7 @@ class _BooksPageState extends State<BooksPage> {
     return s.replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (match) => '.');
   }
 
-  // Membersihkan tag HTML bawaan Google Books 
+  // Membersihkan tag HTML bawaan Google Books
   String _cleanHtml(String htmlString) {
     RegExp exp = RegExp(r"<[^>]*>", multiLine: true, caseSensitive: true);
     return htmlString.replaceAll(exp, '').trim();
@@ -117,42 +120,51 @@ class _BooksPageState extends State<BooksPage> {
           return;
         }
 
-        final parsedBooks = items.map<Map<String, dynamic>?>((item) {
-          final v = (item['volumeInfo'] as Map<String, dynamic>?) ?? {};
-          final imageLinks = v['imageLinks'] as Map<String, dynamic>?;
-          String? img = imageLinks?['thumbnail'] as String? ?? imageLinks?['smallThumbnail'] as String?;
-          if (img != null) img = img.replaceFirst('http://', 'https://');
+        final parsedBooks = items
+            .map<Map<String, dynamic>?>((item) {
+              final v = (item['volumeInfo'] as Map<String, dynamic>?) ?? {};
+              final imageLinks = v['imageLinks'] as Map<String, dynamic>?;
+              String? img =
+                  imageLinks?['thumbnail'] as String? ??
+                  imageLinks?['smallThumbnail'] as String?;
+              if (img != null) img = img.replaceFirst('http://', 'https://');
 
-          final authorsList = (v['authors'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
-          final authors = authorsList.join(', ');
-          final title = v['title'] as String?;
-          if (title == null || title.trim().isEmpty) return null;
-          final categories = (v['categories'] as List?)?.cast<String>() ?? const <String>[];
-          
-          // Ambil deskripsi asli & bersihkan dari tag HTML
-          String rawDesc = (v['description'] as String?) ?? '';
-          String cleanDesc = _cleanHtml(rawDesc);
+              final authorsList =
+                  (v['authors'] as List?)?.cast<String>() ??
+                  ['Penulis tidak diketahui'];
+              final authors = authorsList.join(', ');
+              final title = v['title'] as String?;
+              if (title == null || title.trim().isEmpty) return null;
+              final categories =
+                  (v['categories'] as List?)?.cast<String>() ??
+                  const <String>[];
 
-          // Ambil penerbit & tanggal rilis asli
-          final publisher = v['publisher'] as String?;
-          final publishedDate = v['publishedDate'] as String?;
-          final pageCount = (v['pageCount'] as num?)?.toInt();
-          final rating = (v['averageRating'] as num?)?.toDouble();
+              // Ambil deskripsi asli & bersihkan dari tag HTML
+              String rawDesc = (v['description'] as String?) ?? '';
+              String cleanDesc = _cleanHtml(rawDesc);
 
-          return {
-            'title': title,
-            'authors': authors,
-            'image': img,
-            'description': cleanDesc,
-            'publisher': publisher,
-            'publishedDate': publishedDate,
-            'pageCount': pageCount,
-            'category': categories.firstOrNull,
-            'language': v['language'] as String?,
-            'rating': rating,
-            'pricePerDay': _calcPrice(title),
-          };
-        }).whereType<Map<String, dynamic>>().toList();
+              // Ambil penerbit & tanggal rilis asli
+              final publisher = v['publisher'] as String?;
+              final publishedDate = v['publishedDate'] as String?;
+              final pageCount = (v['pageCount'] as num?)?.toInt();
+              final rating = (v['averageRating'] as num?)?.toDouble();
+
+              return {
+                'title': title,
+                'authors': authors,
+                'image': img,
+                'description': cleanDesc,
+                'publisher': publisher,
+                'publishedDate': publishedDate,
+                'pageCount': pageCount,
+                'category': categories.firstOrNull,
+                'language': v['language'] as String?,
+                'rating': rating,
+                'pricePerDay': _calcPrice(title),
+              };
+            })
+            .whereType<Map<String, dynamic>>()
+            .toList();
 
         setState(() {
           _books = parsedBooks;
@@ -190,36 +202,44 @@ class _BooksPageState extends State<BooksPage> {
         final data = jsonDecode(r.body) as Map<String, dynamic>;
         final docs = (data['docs'] as List?) ?? [];
 
-        final parsedBooks = docs.map((doc) {
-          final title = doc['title'] as String?;
-          if (title == null || title.trim().isEmpty) return null;
-          final authorsList = (doc['author_name'] as List?)?.cast<String>() ?? ['Penulis tidak diketahui'];
-          final authors = authorsList.join(', ');
-          final coverId = doc['cover_i'];
-          String? img;
-          if (coverId != null) {
-            img = 'https://covers.openlibrary.org/b/id/$coverId-M.jpg';
-          }
+        final parsedBooks = docs
+            .map((doc) {
+              final title = doc['title'] as String?;
+              if (title == null || title.trim().isEmpty) return null;
+              final authorsList =
+                  (doc['author_name'] as List?)?.cast<String>() ??
+                  ['Penulis tidak diketahui'];
+              final authors = authorsList.join(', ');
+              final coverId = doc['cover_i'];
+              String? img;
+              if (coverId != null) {
+                img = 'https://covers.openlibrary.org/b/id/$coverId-M.jpg';
+              }
 
-          final firstYear = doc['first_publish_year']?.toString();
-          final publisher = (doc['publisher'] as List?)?.firstOrNull?.toString();
-          final pageCount = (doc['number_of_pages_median'] as num?)?.toInt();
-          final subjects = (doc['subject'] as List?)?.cast<String>() ?? const <String>[];
+              final firstYear = doc['first_publish_year']?.toString();
+              final publisher = (doc['publisher'] as List?)?.firstOrNull
+                  ?.toString();
+              final pageCount = (doc['number_of_pages_median'] as num?)
+                  ?.toInt();
+              final subjects =
+                  (doc['subject'] as List?)?.cast<String>() ?? const <String>[];
 
-          return {
-            'title': title,
-            'authors': authors,
-            'image': img,
-            'description': '',
-            'openLibraryKey': doc['key'] as String?,
-            'publisher': publisher,
-            'publishedDate': firstYear,
-            'pageCount': pageCount,
-            'category': subjects.firstOrNull,
-            'rating': null,
-            'pricePerDay': _calcPrice(title),
-          };
-        }).whereType<Map<String, dynamic>>().toList();
+              return {
+                'title': title,
+                'authors': authors,
+                'image': img,
+                'description': '',
+                'openLibraryKey': doc['key'] as String?,
+                'publisher': publisher,
+                'publishedDate': firstYear,
+                'pageCount': pageCount,
+                'category': subjects.firstOrNull,
+                'rating': null,
+                'pricePerDay': _calcPrice(title),
+              };
+            })
+            .whereType<Map<String, dynamic>>()
+            .toList();
 
         setState(() {
           _books = parsedBooks;
@@ -258,7 +278,11 @@ class _BooksPageState extends State<BooksPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.menu_book_rounded, color: Color(0xFFEDE2CF), size: 24),
+            const Icon(
+              Icons.menu_book_rounded,
+              color: Color(0xFFEDE2CF),
+              size: 24,
+            ),
             const SizedBox(height: 6),
             Text(
               title,
@@ -286,10 +310,19 @@ class _BooksPageState extends State<BooksPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Katalog Buku RentBook', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
+            Text(
+              'Katalog Buku RentBook',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 17,
+              ),
+            ),
             Text(
               'Goyang HP untuk rekomendasi acak',
-              style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.normal),
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ],
         ),
@@ -317,10 +350,16 @@ class _BooksPageState extends State<BooksPage> {
               onSubmitted: (_) => _search(),
               decoration: InputDecoration(
                 hintText: 'Cari judul, penulis, atau genre...',
-                hintStyle: TextStyle(fontSize: 12.5, color: Colors.grey.shade500),
+                hintStyle: TextStyle(
+                  fontSize: 12.5,
+                  color: Colors.grey.shade500,
+                ),
                 filled: true,
                 fillColor: const Color(0xFFFAF7F2),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
                   borderSide: const BorderSide(color: Color(0xFFEADBCE)),
@@ -331,9 +370,15 @@ class _BooksPageState extends State<BooksPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
-                  borderSide: const BorderSide(color: Color(0xFF67343A), width: 1.6),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF67343A),
+                    width: 1.6,
+                  ),
                 ),
-                prefixIcon: const Icon(Icons.menu_book, color: Color(0xFF67343A)),
+                prefixIcon: const Icon(
+                  Icons.menu_book,
+                  color: Color(0xFF67343A),
+                ),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search, color: Color(0xFF67343A)),
                   onPressed: _search,
@@ -358,18 +403,27 @@ class _BooksPageState extends State<BooksPage> {
                     label: Text(genre),
                     selected: isSelected,
                     showCheckmark: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 4,
+                      vertical: 1,
+                    ),
                     labelStyle: TextStyle(
                       fontSize: 11.5,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                      color: isSelected ? const Color(0xFFEDE2CF) : const Color(0xFF302622),
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                      color: isSelected
+                          ? const Color(0xFFEDE2CF)
+                          : const Color(0xFF302622),
                     ),
                     backgroundColor: const Color(0xFFFAF7F2),
                     selectedColor: const Color(0xFF67343A),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
-                        color: isSelected ? const Color(0xFF67343A) : const Color(0xFFEADBCE),
+                        color: isSelected
+                            ? const Color(0xFF67343A)
+                            : const Color(0xFFEADBCE),
                       ),
                     ),
                     onSelected: (_) {
@@ -410,17 +464,21 @@ class _BooksPageState extends State<BooksPage> {
                 final title = item['title'] as String;
                 final authors = item['authors'] as String;
                 final img = item['image'] as String?;
-                final pricePerDay = (item['pricePerDay'] as num?)?.toInt() ?? 5000;
+                final pricePerDay =
+                    (item['pricePerDay'] as num?)?.toInt() ?? 5000;
                 final rating = item['rating'] as num?;
-                final displayRating = rating != null 
-                    ? rating.toDouble() 
+                final displayRating = rating != null
+                    ? rating.toDouble()
                     : (4.6 + (title.hashCode.abs() % 5) * 0.1);
 
                 return Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xFFEADBCE), width: 1.1),
+                    border: Border.all(
+                      color: const Color(0xFFEADBCE),
+                      width: 1.1,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0xFF302622).withValues(alpha: 0.06),
@@ -454,7 +512,9 @@ class _BooksPageState extends State<BooksPage> {
                                     borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.20),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.20,
+                                        ),
                                         blurRadius: 8,
                                         offset: const Offset(2, 4),
                                       ),
@@ -471,7 +531,8 @@ class _BooksPageState extends State<BooksPage> {
                                             Image.network(
                                               img,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (_, __, ___) => _buildFallbackCover(title),
+                                              errorBuilder: (_, __, ___) =>
+                                                  _buildFallbackCover(title),
                                             )
                                           else
                                             _buildFallbackCover(title),
@@ -487,7 +548,9 @@ class _BooksPageState extends State<BooksPage> {
                                                   begin: Alignment.centerLeft,
                                                   end: Alignment.centerRight,
                                                   colors: [
-                                                    Colors.black.withValues(alpha: 0.38),
+                                                    Colors.black.withValues(
+                                                      alpha: 0.38,
+                                                    ),
                                                     Colors.transparent,
                                                   ],
                                                 ),
@@ -537,7 +600,10 @@ class _BooksPageState extends State<BooksPage> {
                               children: [
                                 // Harga Sewa (Badge Krim Klasik)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3.5),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 3.5,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFEDE2CF),
                                     borderRadius: BorderRadius.circular(6),
@@ -556,7 +622,11 @@ class _BooksPageState extends State<BooksPage> {
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.star_rounded, size: 16, color: Color(0xFFD97706)),
+                                    const Icon(
+                                      Icons.star_rounded,
+                                      size: 16,
+                                      color: Color(0xFFD97706),
+                                    ),
                                     const SizedBox(width: 2.5),
                                     Text(
                                       displayRating.toStringAsFixed(1),

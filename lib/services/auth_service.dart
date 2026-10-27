@@ -330,6 +330,14 @@ class AuthService {
       if (displayName == null || displayName.trim() == oldUsername)
         'display_name': newUsername,
     };
+    final localLedgerRows = await db.query(
+      'riwayat_transaksi',
+      columns: ['id'],
+      where: 'username = ?',
+      whereArgs: [oldUsername],
+      limit: 1,
+    );
+    final hasLocalLedgerRows = localLedgerRows.isNotEmpty;
     try {
       await db.transaction((txn) async {
         await txn.update(
@@ -339,7 +347,7 @@ class AuthService {
           whereArgs: [oldUsername],
         );
         await txn.update(
-          'ledger',
+          'riwayat_transaksi',
           {'username': newUsername},
           where: 'username = ?',
           whereArgs: [oldUsername],
@@ -375,15 +383,20 @@ class AuthService {
         filters: {'username': oldUsername},
       );
     }
-    final ledgerSync = await CloudService.update(
-      'ledger',
-      {'username': newUsername},
-      filters: {'username': oldUsername},
-    );
+    final ledgerSync = hasLocalLedgerRows
+        ? await CloudService.update(
+            'riwayat_transaksi',
+            {'username': newUsername},
+            filters: {'username': oldUsername},
+          )
+        : const CloudUpdateResult(
+            success: true,
+            message: 'Tidak ada riwayat transaksi untuk diperbarui.',
+          );
     final cloudSynced = usersSync.success && ledgerSync.success;
     final cloudSyncDetails = [
       if (!usersSync.success) 'users: ${usersSync.message}',
-      if (!ledgerSync.success) 'ledger: ${ledgerSync.message}',
+      if (!ledgerSync.success) 'riwayat transaksi: ${ledgerSync.message}',
     ].join('\n');
     return UsernameChangeResult(
       success: true,

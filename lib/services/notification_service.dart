@@ -1,8 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
+
 import 'auth_service.dart';
 
 class AppNotificationItem {
@@ -23,25 +25,27 @@ class AppNotificationItem {
   });
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'message': message,
-        'type': type,
-        'timestamp': timestamp.toIso8601String(),
-        'isRead': isRead,
-      };
+    'id': id,
+    'title': title,
+    'message': message,
+    'type': type,
+    'timestamp': timestamp.toIso8601String(),
+    'isRead': isRead,
+  };
 
-  factory AppNotificationItem.fromJson(Map<String, dynamic> json) =>
-      AppNotificationItem(
-        id: json['id'] as String? ??
-            '${DateTime.now().millisecondsSinceEpoch}_${json['title']?.hashCode}',
-        title: json['title'] as String? ?? 'Pemberitahuan',
-        message: json['message'] as String? ?? '',
-        type: json['type'] as String? ?? 'sewa',
-        timestamp: DateTime.tryParse(json['timestamp'] as String? ?? '') ??
-            DateTime.now(),
-        isRead: json['isRead'] as bool? ?? false,
-      );
+  factory AppNotificationItem.fromJson(
+    Map<String, dynamic> json,
+  ) => AppNotificationItem(
+    id:
+        json['id'] as String? ??
+        '${DateTime.now().millisecondsSinceEpoch}_${json['title']?.hashCode}',
+    title: json['title'] as String? ?? 'Pemberitahuan',
+    message: json['message'] as String? ?? '',
+    type: json['type'] as String? ?? 'sewa',
+    timestamp:
+        DateTime.tryParse(json['timestamp'] as String? ?? '') ?? DateTime.now(),
+    isRead: json['isRead'] as bool? ?? false,
+  );
 }
 
 class NotificationService {
@@ -60,7 +64,8 @@ class NotificationService {
     android: AndroidNotificationDetails(
       'rentbook_channel',
       'Pemberitahuan RentBook',
-      channelDescription: 'Notifikasi sewa buku, jatuh tempo, dan promo harian.',
+      channelDescription:
+          'Notifikasi sewa buku, jatuh tempo, dan promo harian.',
       importance: Importance.high,
       priority: Priority.high,
     ),
@@ -75,7 +80,8 @@ class NotificationService {
     );
     await _n
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin
+        >()
         ?.requestNotificationsPermission();
 
     // Inisialisasi jadwal harian jika aktif
@@ -148,8 +154,7 @@ class NotificationService {
         AppNotificationItem(
           id: 'init_promo_1',
           title: 'Voucher Sewa Aktif: DISKON10',
-          message:
-              'Dapatkan potongan harga sewa 10 persen untuk seluruh judul buku di katalog RentBook.',
+          message: 'Dapatkan potongan harga sewa 10 persen untuk seluruh judul buku di katalog RentBook.',
           type: 'promo',
           timestamp: DateTime.now().subtract(const Duration(hours: 2)),
           isRead: false,
@@ -157,8 +162,7 @@ class NotificationService {
         AppNotificationItem(
           id: 'init_promo_2',
           title: 'Rekomendasi Buku Klasik Minggu Ini',
-          message:
-              'Koleksi karya sastra klasik pilihan dan buku filosofi telah tersedia untuk dipinjam.',
+          message: 'Koleksi karya sastra klasik pilihan dan buku filosofi telah tersedia untuk dipinjam.',
           type: 'promo',
           timestamp: DateTime.now().subtract(const Duration(days: 1)),
           isRead: true,
@@ -243,9 +247,12 @@ class NotificationService {
 
   /// Notifikasi pembayaran sewa berhasil
   static Future<void> showPaymentSuccess(
-      String title, String amount, String method) async {
+    String title,
+    String amount,
+    String method,
+  ) async {
     final notifTitle = 'Pembayaran Berhasil ($method)';
-    final notifBody = 'Sewa "$title" sebesar $amount telah terkonfirmasi lunas.';
+    final notifBody = '$title sebesar $amount telah dikonfirmasi via $method.';
 
     try {
       await _n.show(
@@ -256,18 +263,14 @@ class NotificationService {
       );
     } catch (_) {}
 
-    await addNotification(
-      title: notifTitle,
-      message: notifBody,
-      type: 'sewa',
-    );
+    await addNotification(title: notifTitle, message: notifBody, type: 'sewa');
   }
 
   /// Notifikasi aktivasi VIP berhasil
   static Future<void> showVipSuccess(String method) async {
     const notifTitle = 'Keanggotaan VIP Aktif';
     final notifBody =
-        'Langganan RentBook VIP (30 Hari) via $method telah aktif. Nikmati akses eksklusif seluruh fitur.';
+        'Langganan RentBook VIP via $method telah aktif. Nikmati akses eksklusif seluruh fitur.';
 
     try {
       await _n.show(
@@ -278,11 +281,7 @@ class NotificationService {
       );
     } catch (_) {}
 
-    await addNotification(
-      title: notifTitle,
-      message: notifBody,
-      type: 'vip',
-    );
+    await addNotification(title: notifTitle, message: notifBody, type: 'vip');
   }
 
   /// Notifikasi peminjaman & jadwal pengingat jatuh tempo
@@ -291,19 +290,15 @@ class NotificationService {
     final notifBody = '"$title" berhasil disewa untuk $days hari ke depan.';
 
     try {
-      await _n.show(
-        1,
-        notifTitle,
-        notifBody,
-        _d,
-      );
+      await _n.show(1, notifTitle, notifBody, _d);
 
       // Jadwal reminder jatuh tempo
       await _n.zonedSchedule(
         title.hashCode,
         'Pengingat Batas Pengembalian',
         'Masa sewa untuk "$title" ($days hari) segera berakhir. Silakan kembalikan tepat waktu.',
-        tz.TZDateTime.now(tz.local).add(Duration(days: days > 1 ? days - 1 : 1)),
+        tz.TZDateTime.now(tz.local)
+            .add(Duration(days: days > 1 ? days - 1 : 1)),
         _d,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
@@ -311,10 +306,6 @@ class NotificationService {
       );
     } catch (_) {}
 
-    await addNotification(
-      title: notifTitle,
-      message: notifBody,
-      type: 'sewa',
-    );
+    await addNotification(title: notifTitle, message: notifBody, type: 'sewa');
   }
 }

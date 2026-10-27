@@ -23,6 +23,18 @@ class SupabaseAuthResult {
   });
 }
 
+class CloudSelectResult {
+  final bool success;
+  final List<Map<String, dynamic>> rows;
+  final String message;
+
+  const CloudSelectResult({
+    required this.success,
+    this.rows = const [],
+    this.message = '',
+  });
+}
+
 /// Akses database online (Supabase) lewat REST API.
 class CloudService {
   static Map<String, String> get _h => {
@@ -133,7 +145,7 @@ class CloudService {
   }) async {
     try {
       final response = await http
-          .patch(
+          .put(
             _authUri('user'),
             headers: {..._h, 'Authorization': 'Bearer $accessToken'},
             body: jsonEncode({'password': password}),
@@ -225,6 +237,78 @@ class CloudService {
       return const CloudUpdateResult(success: true, message: 'Berhasil');
     } catch (error) {
       return CloudUpdateResult(
+        success: false,
+        message: 'Request gagal: $error',
+      );
+    }
+  }
+
+  static Future<CloudUpdateResult> upsert(
+    String table,
+    Map<String, dynamic> values, {
+    required String conflictColumn,
+  }) async {
+    try {
+      final uri = Uri.parse('$supabaseUrl/rest/v1/$table')
+          .replace(queryParameters: {'on_conflict': conflictColumn});
+      final response = await http
+          .post(
+            uri,
+            headers: {
+              ..._h,
+              'Prefer': 'resolution=merge-duplicates,return=minimal',
+            },
+            body: jsonEncode(values),
+          )
+          .timeout(const Duration(seconds: 8));
+      if (response.statusCode >= 300) {
+        return CloudUpdateResult(
+          success: false,
+          message: _responseMessage(response.body, response.statusCode),
+        );
+      }
+      return const CloudUpdateResult(success: true, message: 'Berhasil');
+    } catch (error) {
+      return CloudUpdateResult(
+        success: false,
+        message: 'Request gagal: $error',
+      );
+    }
+  }
+
+  static Future<CloudSelectResult> selectWhere(
+    String table, {
+    required Map<String, String> filters,
+  }) async {
+    try {
+      final uri = Uri.parse('$supabaseUrl/rest/v1/$table').replace(
+        queryParameters: {
+          'select': '*',
+          ...filters.map((key, value) => MapEntry(key, 'eq.$value')),
+        },
+      );
+      final response = await http
+          .get(uri, headers: _h)
+          .timeout(const Duration(seconds: 8));
+      if (response.statusCode >= 300) {
+        return CloudSelectResult(
+          success: false,
+          message: _responseMessage(response.body, response.statusCode),
+        );
+      }
+      final decoded = jsonDecode(response.body);
+      if (decoded is! List) {
+        return const CloudSelectResult(
+          success: false,
+          message: 'Format data Supabase tidak sesuai.',
+        );
+      }
+      return CloudSelectResult(
+        success: true,
+        rows: decoded.cast<Map<String, dynamic>>(),
+      );
+    } catch (error) {
+      return CloudSelectResult(
         success: false,
         message: 'Request gagal: $error',
       );

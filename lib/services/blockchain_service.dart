@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:web3dart/web3dart.dart';
+
 import '../config.dart';
 import 'auth_service.dart';
 import 'db_helper.dart';
@@ -49,7 +51,7 @@ class BlockchainService {
     final currentUser = user ?? await AuthService.currentSession() ?? 'anonim';
     final db = await DbHelper.db;
     final last = await db.query(
-      'ledger',
+      'riwayat_transaksi',
       where: 'username = ?',
       whereArgs: [currentUser],
       orderBy: 'id DESC',
@@ -70,13 +72,14 @@ class BlockchainService {
       'username': currentUser,
     };
 
-    await db.insert('ledger', row);
-    final sync = await CloudService.insertDetailed('ledger', row);
+    await db.insert('riwayat_transaksi', row);
+    final sync = await CloudService.insertDetailed('riwayat_transaksi', row);
     if (!sync.success) {
       try {
         await NotificationService.addNotification(
           title: 'Transaksi belum tersinkron',
-          message: 'Transaksi tersimpan di perangkat, tetapi Supabase menolak pengiriman: ${sync.message}',
+          message:
+              'Transaksi tersimpan di perangkat, tetapi Supabase menolak pengiriman: ${sync.message}',
           type: 'sewa',
         );
       } catch (_) {}
@@ -88,19 +91,20 @@ class BlockchainService {
     final db = await DbHelper.db;
     if (currentUser != null && currentUser.isNotEmpty) {
       return db.query(
-        'ledger',
+        'riwayat_transaksi',
         where: 'username = ?',
         whereArgs: [currentUser],
         orderBy: 'id DESC',
       );
     }
-    return db.query('ledger', orderBy: 'id DESC');
+    return db.query('riwayat_transaksi', orderBy: 'id DESC');
   }
 
   static bool verifyRows(List<Map<String, Object?>> rows) {
     var prev = '0';
     for (final r in rows) {
-      if (r['prev_hash'] != prev || r['hash'] != _calc(r['data'], r['prev_hash'], r['ts'])) {
+      if (r['prev_hash'] != prev ||
+          r['hash'] != _calc(r['data'], r['prev_hash'], r['ts'])) {
         return false;
       }
       prev = r['hash'] as String;
@@ -114,13 +118,13 @@ class BlockchainService {
     List<Map<String, Object?>> rows;
     if (currentUser != null && currentUser.isNotEmpty) {
       rows = await db.query(
-        'ledger',
+        'riwayat_transaksi',
         where: 'username = ?',
         whereArgs: [currentUser],
         orderBy: 'id ASC',
       );
     } else {
-      rows = await db.query('ledger', orderBy: 'id ASC');
+      rows = await db.query('riwayat_transaksi', orderBy: 'id ASC');
     }
     return verifyRows(rows);
   }
