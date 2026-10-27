@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../config.dart';
 
 class CloudUpdateResult {
@@ -9,14 +11,151 @@ class CloudUpdateResult {
   const CloudUpdateResult({required this.success, required this.message});
 }
 
+class SupabaseAuthResult {
+  final bool success;
+  final String message;
+  final String? accessToken;
+
+  const SupabaseAuthResult({
+    required this.success,
+    required this.message,
+    this.accessToken,
+  });
+}
+
 /// Akses database online (Supabase) lewat REST API.
 class CloudService {
   static Map<String, String> get _h => {
-        'apikey': supabaseKey,
-        'Authorization': 'Bearer $supabaseKey',
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
-      };
+    'apikey': supabaseKey,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal',
+  };
+
+  static Uri _authUri(String path) => Uri.parse('$supabaseUrl/auth/v1/$path');
+
+  static Future<CloudUpdateResult> sendSignupOtp(String email) async {
+    try {
+      final response = await http
+          .post(
+            _authUri('otp'),
+            headers: _h,
+            body: jsonEncode({'email': email, 'create_user': true}),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode >= 300) {
+        return CloudUpdateResult(
+          success: false,
+          message: _responseMessage(response.body, response.statusCode),
+        );
+      }
+      return const CloudUpdateResult(
+        success: true,
+        message: 'Kode verifikasi dikirim ke email.',
+      );
+    } catch (error) {
+      return CloudUpdateResult(
+        success: false,
+        message: 'Tidak dapat mengirim kode: $error',
+      );
+    }
+  }
+
+  static Future<CloudUpdateResult> sendRecoveryOtp(String email) async {
+    try {
+      final response = await http
+          .post(
+            _authUri('recover'),
+            headers: _h,
+            body: jsonEncode({'email': email}),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode >= 300) {
+        return CloudUpdateResult(
+          success: false,
+          message: _responseMessage(response.body, response.statusCode),
+        );
+      }
+      return const CloudUpdateResult(
+        success: true,
+        message: 'Kode pemulihan dikirim ke email.',
+      );
+    } catch (error) {
+      return CloudUpdateResult(
+        success: false,
+        message: 'Tidak dapat mengirim kode: $error',
+      );
+    }
+  }
+
+  static Future<SupabaseAuthResult> verifyEmailOtp({
+    required String email,
+    required String token,
+    required String type,
+  }) async {
+    try {
+      final response = await http
+          .post(
+            _authUri('verify'),
+            headers: _h,
+            body: jsonEncode({'email': email, 'token': token, 'type': type}),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode >= 300) {
+        return SupabaseAuthResult(
+          success: false,
+          message: _responseMessage(response.body, response.statusCode),
+        );
+      }
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      final accessToken = payload['access_token'] as String?;
+      if (accessToken == null || accessToken.isEmpty) {
+        return const SupabaseAuthResult(
+          success: false,
+          message: 'Supabase tidak mengembalikan sesi verifikasi.',
+        );
+      }
+      return SupabaseAuthResult(
+        success: true,
+        message: 'Email berhasil diverifikasi.',
+        accessToken: accessToken,
+      );
+    } catch (error) {
+      return SupabaseAuthResult(
+        success: false,
+        message: 'Verifikasi gagal: $error',
+      );
+    }
+  }
+
+  static Future<CloudUpdateResult> setAuthPassword({
+    required String accessToken,
+    required String password,
+  }) async {
+    try {
+      final response = await http
+          .patch(
+            _authUri('user'),
+            headers: {..._h, 'Authorization': 'Bearer $accessToken'},
+            body: jsonEncode({'password': password}),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode >= 300) {
+        return CloudUpdateResult(
+          success: false,
+          message: _responseMessage(response.body, response.statusCode),
+        );
+      }
+      return const CloudUpdateResult(
+        success: true,
+        message: 'Password Supabase diperbarui.',
+      );
+    } catch (error) {
+      return CloudUpdateResult(
+        success: false,
+        message: 'Pembaruan password gagal: $error',
+      );
+    }
+  }
 
   static Future<bool> insert(String table, Map<String, dynamic> body) async {
     final result = await insertDetailed(table, body);
@@ -57,7 +196,9 @@ class CloudService {
   }) async {
     try {
       final uri = Uri.parse('$supabaseUrl/rest/v1/$table').replace(
-        queryParameters: filters.map((key, value) => MapEntry(key, 'eq.$value')),
+        queryParameters: filters.map(
+          (key, value) => MapEntry(key, 'eq.$value'),
+        ),
       );
       final r = await http
           .patch(
@@ -77,7 +218,8 @@ class CloudService {
       if (decoded is List && decoded.isEmpty) {
         return const CloudUpdateResult(
           success: false,
-          message: 'Tidak ada baris yang cocok atau izin update ditolak oleh RLS.',
+          message:
+              'Tidak ada baris yang cocok atau izin update ditolak oleh RLS.',
         );
       }
       return const CloudUpdateResult(success: true, message: 'Berhasil');

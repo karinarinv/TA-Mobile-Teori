@@ -93,40 +93,12 @@ class _ProfilePageState extends State<ProfilePage> {
     final currentUsername = _username;
     if (currentUsername == null) return;
 
-    final controller = TextEditingController(text: currentUsername);
     final requestedUsername = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Ganti Username'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 20,
-          textCapitalization: TextCapitalization.none,
-          decoration: const InputDecoration(
-            labelText: 'Username baru',
-            prefixText: '@',
-            helperText: '3-20 karakter: huruf, angka, underscore',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
-            onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
-            child: const Text('Simpan'),
-          ),
-        ],
-      ),
+      builder: (_) => _ChangeUsernameDialog(initialUsername: currentUsername),
     );
 
-    if (requestedUsername == null || !mounted) {
-      controller.dispose();
-      return;
-    }
+    if (requestedUsername == null || !mounted) return;
 
     try {
       final result = await AuthService.changeUsername(requestedUsername);
@@ -151,8 +123,6 @@ class _ProfilePageState extends State<ProfilePage> {
           const SnackBar(content: Text('Username gagal diperbarui.')),
         );
       }
-    } finally {
-      controller.dispose();
     }
   }
 
@@ -449,40 +419,48 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(height: 14),
 
                           // Nama Pengguna
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _username ?? 'Pengguna',
-                                style: GoogleFonts.playfairDisplay(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF302622),
+                          SizedBox(
+                            width: double.infinity,
+                            child: Center(
+                              child: Transform.translate(
+                                // Keep the username centered while placing the pencil beside it.
+                                offset: const Offset(17, 0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      _username ?? 'Pengguna',
+                                      style: GoogleFonts.playfairDisplay(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF302622),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      tooltip: _usernameChangeAvailableAt == null
+                                          ? 'Ganti username'
+                                          : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
+                                      onPressed: _usernameChangeAvailableAt == null
+                                          ? _changeUsername
+                                          : null,
+                                      visualDensity: VisualDensity.compact,
+                                      constraints: const BoxConstraints.tightFor(
+                                        width: 34,
+                                        height: 34,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      icon: Icon(
+                                        Icons.edit_rounded,
+                                        size: 18,
+                                        color: _usernameChangeAvailableAt == null
+                                            ? const Color(0xFF9A704F)
+                                            : Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              IconButton(
-                                tooltip: _usernameChangeAvailableAt == null
-                                    ? 'Ganti username'
-                                    : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
-                                onPressed: _usernameChangeAvailableAt == null
-                                    ? _changeUsername
-                                    : null,
-                                visualDensity: VisualDensity.compact,
-                                constraints: const BoxConstraints.tightFor(
-                                  width: 34,
-                                  height: 34,
-                                ),
-                                padding: EdgeInsets.zero,
-                                icon: Icon(
-                                  Icons.edit_rounded,
-                                  size: 18,
-                                  color: _usernameChangeAvailableAt == null
-                                      ? const Color(0xFF9A704F)
-                                      : Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                           const SizedBox(height: 6),
 
@@ -873,30 +851,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(color: const Color(0xFFEADBCE)),
                               ),
-                              child: const Icon(Icons.edit_note_rounded, color: Color(0xFF67343A), size: 19),
-                            ),
-                            title: Text(
-                              'Ganti Username Akun',
-                              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13.5, color: const Color(0xFF302622)),
-                            ),
-                            subtitle: Text(
-                              _usernameChangeAvailableAt == null
-                                  ? 'Perbarui username akun Anda'
-                                  : 'Tersedia kembali ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 11.5, color: const Color(0xFF6B564A)),
-                            ),
-                            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Color(0xFF9A704F)),
-                            onTap: _usernameChangeAvailableAt == null ? _changeUsername : null,
-                          ),
-                          const Divider(height: 1, indent: 16, endIndent: 16, color: Color(0xFFEADBCE)),
-                          ListTile(
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFAF7F2),
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFFEADBCE)),
-                              ),
                               child: const Icon(Icons.add_a_photo_outlined, color: Color(0xFF67343A), size: 19),
                             ),
                             title: Text(
@@ -960,4 +914,64 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
     );
   }
+}
+
+class _ChangeUsernameDialog extends StatefulWidget {
+  final String initialUsername;
+
+  const _ChangeUsernameDialog({required this.initialUsername});
+
+  @override
+  State<_ChangeUsernameDialog> createState() => _ChangeUsernameDialogState();
+}
+
+class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialUsername);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: const Text('Ganti Username'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Username dapat diganti kembali setelah 30 hari.'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              maxLength: 20,
+              textCapitalization: TextCapitalization.none,
+              decoration: const InputDecoration(
+                labelText: 'Username baru',
+                prefixText: '@',
+                helperText: '3-20 karakter: huruf, angka, underscore',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
+            onPressed: () => Navigator.pop(context, _controller.text.trim()),
+            child: const Text('Simpan'),
+          ),
+        ],
+      );
 }
