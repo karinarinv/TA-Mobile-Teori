@@ -103,12 +103,18 @@ class _MapPageState extends State<MapPage> {
       final facilities = rawFacilities is List
           ? rawFacilities.map((value) => value.toString()).toList()
           : const <String>[];
+      final address = row['address']?.toString() ?? '';
+      final hours = row['hours']?.toString() ?? '';
+      final phone = row['phone']?.toString() ?? '';
+      if (address.trim().isEmpty && hours.trim().isEmpty && phone.trim().isEmpty && facilities.isEmpty) {
+        continue;
+      }
       final item = LibraryItem(
           name: name,
           location: LatLng(latitude, longitude),
-          address: row['address']?.toString() ?? '',
-          hours: row['hours']?.toString() ?? '',
-          phone: row['phone']?.toString() ?? '',
+          address: address,
+          hours: hours,
+          phone: phone,
           rating: (row['rating'] as num?)?.toDouble() ?? 0,
           facilities: facilities,
         );
@@ -268,11 +274,74 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  bool _isLibraryOpen(String hoursStr) {
+    if (hoursStr.trim().isEmpty) return false;
+    final now = DateTime.now();
+    final weekday = now.weekday; // 1 = Senin, ..., 7 = Minggu
+    final currentMinutes = now.hour * 60 + now.minute;
+
+    final segments = hoursStr.split('|');
+    for (final seg in segments) {
+      final s = seg.toLowerCase().trim();
+      List<int> days = [];
+      if (s.contains('setiap hari')) {
+        days = [1, 2, 3, 4, 5, 6, 7];
+      } else if (s.contains('senin - sabtu')) {
+        days = [1, 2, 3, 4, 5, 6];
+      } else if (s.contains('senin - jumat')) {
+        days = [1, 2, 3, 4, 5];
+      } else if (s.contains('senin - kamis')) {
+        days = [1, 2, 3, 4];
+      } else if (s.contains('selasa - minggu')) {
+        days = [2, 3, 4, 5, 6, 7];
+      } else if (s.contains('jumat')) {
+        days = [5];
+      } else if (s.contains('sabtu')) {
+        days = [6];
+      } else if (s.contains('minggu')) {
+        days = [7];
+      }
+
+      if (days.contains(weekday)) {
+        const dayNames = {
+          1: 'senin',
+          2: 'selasa',
+          3: 'rabu',
+          4: 'kamis',
+          5: 'jumat',
+          6: 'sabtu',
+          7: 'minggu',
+        };
+        final currentDayName = dayNames[weekday] ?? '';
+        if (s.contains('$currentDayName tutup') ||
+            s.contains('$currentDayName libur')) {
+          return false;
+        }
+
+        final match = RegExp(
+          r'(\d{1,2})[.:](\d{2})\s*-\s*(\d{1,2})[.:](\d{2})',
+        ).firstMatch(s);
+        if (match != null) {
+          final openH = int.tryParse(match.group(1) ?? '') ?? 0;
+          final openM = int.tryParse(match.group(2) ?? '') ?? 0;
+          final closeH = int.tryParse(match.group(3) ?? '') ?? 0;
+          final closeM = int.tryParse(match.group(4) ?? '') ?? 0;
+          final openMinutes = openH * 60 + openM;
+          final closeMinutes = closeH * 60 + closeM;
+
+          return currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+        }
+      }
+    }
+    return false;
+  }
+
   void _showLibraryDetail(LibraryItem lib) {
     final dist = _getDistanceInKm(lib.location);
     final distStr = _me != null
         ? '${dist.toStringAsFixed(1)} km dari lokasi Anda'
         : 'Jarak sedang dihitung...';
+    final isOpen = _isLibraryOpen(lib.hours);
 
     showModalBottomSheet(
       context: context,
@@ -345,19 +414,29 @@ class _MapPageState extends State<MapPage> {
                           const SizedBox(width: 10),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
+                              horizontal: 7,
+                              vertical: 2.5,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.green.shade50,
-                              borderRadius: BorderRadius.circular(4),
+                              color: isOpen
+                                  ? Colors.green.shade50
+                                  : Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(
+                                color: isOpen
+                                    ? Colors.green.shade200
+                                    : Colors.red.shade200,
+                                width: 0.8,
+                              ),
                             ),
                             child: Text(
-                              'Buka Sekarang',
+                              isOpen ? 'Buka Sekarang' : 'Tutup',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green.shade800,
+                                color: isOpen
+                                    ? Colors.green.shade800
+                                    : Colors.red.shade800,
                               ),
                             ),
                           ),
@@ -575,75 +654,77 @@ class _MapPageState extends State<MapPage> {
                         if (_me != null)
                           Marker(
                             point: _me!,
-                            width: 50,
-                            height: 50,
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF67343A),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2.5,
-                                    ),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 6,
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Icon(
-                                    Icons.person_pin,
+                            width: 44,
+                            height: 44,
+                            alignment: Alignment.center,
+                            child: Center(
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF67343A),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
                                     color: Colors.white,
-                                    size: 24,
+                                    width: 2.5,
                                   ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 6,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                                child: const Icon(
+                                  Icons.person_pin,
+                                  color: Colors.white,
+                                  size: 24,
+                                ),
+                              ),
                             ),
                           ),
                         // Titik-titik Perpustakaan
                         for (final lib in sortedLibs)
                           Marker(
                             point: lib.location,
-                            width: 60,
-                            height: 60,
+                            width: 44,
+                            height: 44,
+                            alignment: Alignment.center,
                             child: GestureDetector(
                               onTap: () {
                                 setState(() => _selectedLib = lib);
                                 _showLibraryDetail(lib);
                               },
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: _navigatingLib?.name == lib.name
-                                          ? Colors.green.shade700
-                                          : _selectedLib?.name == lib.name
-                                          ? Colors.deepOrange
-                                          : const Color(0xFF67343A),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 2,
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black38,
-                                          blurRadius: 6,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.local_library,
+                              child: Center(
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: _navigatingLib?.name == lib.name
+                                        ? Colors.green.shade700
+                                        : _selectedLib?.name == lib.name
+                                        ? Colors.deepOrange
+                                        : const Color(0xFF67343A),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
                                       color: Colors.white,
-                                      size: 22,
+                                      width: 2.2,
                                     ),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black38,
+                                        blurRadius: 6,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                  child: const Icon(
+                                    Icons.local_library,
+                                    color: Colors.white,
+                                    size: 22,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -844,6 +925,7 @@ class _MapPageState extends State<MapPage> {
                         final isSelected = _selectedLib?.name == lib.name;
                         final isNavigating = _navigatingLib?.name == lib.name;
                         final dist = _getDistanceInKm(lib.location);
+                        final isLibOpen = _isLibraryOpen(lib.hours);
 
                         return Container(
                           width: 285,
@@ -945,6 +1027,54 @@ class _MapPageState extends State<MapPage> {
                                                           FontWeight.bold,
                                                       color:
                                                           Colors.grey.shade700,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 6,
+                                                          vertical: 1.5,
+                                                        ),
+                                                    decoration: BoxDecoration(
+                                                      color: isLibOpen
+                                                          ? Colors
+                                                              .green
+                                                              .shade50
+                                                          : Colors
+                                                              .red
+                                                              .shade50,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            4,
+                                                          ),
+                                                      border: Border.all(
+                                                        color: isLibOpen
+                                                            ? Colors
+                                                                .green
+                                                                .shade200
+                                                            : Colors
+                                                                .red
+                                                                .shade200,
+                                                        width: 0.7,
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      isLibOpen
+                                                          ? 'Buka'
+                                                          : 'Tutup',
+                                                      style: TextStyle(
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: isLibOpen
+                                                            ? Colors
+                                                                .green
+                                                                .shade800
+                                                            : Colors
+                                                                .red
+                                                                .shade800,
+                                                      ),
                                                     ),
                                                   ),
                                                 ],

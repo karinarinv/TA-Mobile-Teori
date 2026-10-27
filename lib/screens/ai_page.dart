@@ -183,7 +183,7 @@ class _AiPageState extends State<AiPage> {
                               color: const Color(0xFFF7EDED),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.smart_toy, size: 54, color: Color(0xFF67343A)),
+                            child: const Icon(Icons.auto_stories_rounded, size: 54, color: Color(0xFF67343A)),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -232,7 +232,7 @@ class _AiPageState extends State<AiPage> {
                               CircleAvatar(
                                 radius: 16,
                                 backgroundColor: const Color(0xFFEADBCE),
-                                child: const Icon(Icons.smart_toy, size: 18, color: Color(0xFF67343A)),
+                                child: const Icon(Icons.auto_stories_rounded, size: 18, color: Color(0xFF67343A)),
                               ),
                               const SizedBox(width: 8),
                             ],

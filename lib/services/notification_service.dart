@@ -73,6 +73,9 @@ class NotificationService {
 
   static Future<void> init() async {
     tzdata.initializeTimeZones();
+    try {
+      tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
+    } catch (_) {}
     await _n.initialize(
       const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
@@ -119,7 +122,7 @@ class NotificationService {
         now.year,
         now.month,
         now.day,
-        9, // Pukul 09.00 pagi
+        9, // Pukul 09.00 pagi WIB
         0,
       );
 
@@ -133,12 +136,38 @@ class NotificationService {
         'Gunakan voucher DISKON10 untuk potongan sewa 10 persen bagi seluruh koleksi sastra dan fiksi.',
         scheduledDate,
         _d,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time,
       );
-    } catch (_) {}
+    } catch (_) {
+      try {
+        final now = tz.TZDateTime.now(tz.local);
+        var scheduledDate = tz.TZDateTime(
+          tz.local,
+          now.year,
+          now.month,
+          now.day,
+          9,
+          0,
+        );
+        if (scheduledDate.isBefore(now)) {
+          scheduledDate = scheduledDate.add(const Duration(days: 1));
+        }
+        await _n.zonedSchedule(
+          8888,
+          'Promo Sewa Pilihan Hari Ini',
+          'Gunakan voucher DISKON10 untuk potongan sewa 10 persen bagi seluruh koleksi sastra dan fiksi.',
+          scheduledDate,
+          _d,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          uiLocalNotificationDateInterpretation:
+              UILocalNotificationDateInterpretation.absoluteTime,
+          matchDateTimeComponents: DateTimeComponents.time,
+        );
+      } catch (_) {}
+    }
   }
 
   // ============================================================
@@ -149,27 +178,7 @@ class NotificationService {
     final key = await _getStorageKey();
     final raw = prefs.getString(key);
     if (raw == null || raw.isEmpty) {
-      // Seed default sample notifications (promos & welcome)
-      final initial = [
-        AppNotificationItem(
-          id: 'init_promo_1',
-          title: 'Voucher Sewa Aktif: DISKON10',
-          message: 'Dapatkan potongan harga sewa 10 persen untuk seluruh judul buku di katalog RentBook.',
-          type: 'promo',
-          timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-          isRead: false,
-        ),
-        AppNotificationItem(
-          id: 'init_promo_2',
-          title: 'Rekomendasi Buku Klasik Minggu Ini',
-          message: 'Koleksi karya sastra klasik pilihan dan buku filosofi telah tersedia untuk dipinjam.',
-          type: 'promo',
-          timestamp: DateTime.now().subtract(const Duration(days: 1)),
-          isRead: true,
-        ),
-      ];
-      await _saveList(initial);
-      return initial;
+      return [];
     }
 
     try {

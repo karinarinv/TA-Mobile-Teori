@@ -615,51 +615,59 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
+                            Wrap(
+                              alignment: WrapAlignment.spaceBetween,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 8,
+                              runSpacing: 10,
                               children: [
-                                Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEDE2CF)
-                                        .withValues(alpha: 0.15),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: const Color(0xFFD4AF37)
-                                          .withValues(alpha: 0.6),
-                                      width: 1.2,
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFEDE2CF)
+                                            .withValues(alpha: 0.15),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: const Color(0xFFD4AF37)
+                                              .withValues(alpha: 0.6),
+                                          width: 1.2,
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.workspace_premium_rounded,
+                                        color: Color(0xFFD4AF37),
+                                        size: 22,
+                                      ),
                                     ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.workspace_premium_rounded,
-                                    color: Color(0xFFD4AF37),
-                                    size: 22,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Keanggotaan VIP Club',
-                                        style: GoogleFonts.playfairDisplay(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: const Color(0xFFEDE2CF),
-                                          letterSpacing: 0.3,
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Keanggotaan VIP Club',
+                                          style: GoogleFonts.playfairDisplay(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: const Color(0xFFEDE2CF),
+                                            letterSpacing: 0.3,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        'Akses eksklusif fitur premium',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 11,
-                                          color: const Color(0xFFD4BE9D),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Akses eksklusif fitur premium',
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 11,
+                                            color: const Color(0xFFD4BE9D),
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                                 // Badge VIP Aktif Eksklusif (Sesuai Color Palette)
                                 Container(
@@ -694,7 +702,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       const SizedBox(width: 4),
                                       Text(
-                                        'VIP AKTIF • $_vipPlanName',
+                                        _vipPlanName.isNotEmpty
+                                            ? 'VIP AKTIF • $_vipPlanName'
+                                            : 'VIP AKTIF',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.w800,

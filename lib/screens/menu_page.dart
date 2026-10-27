@@ -721,7 +721,7 @@ class _MenuPageState extends State<MenuPage> {
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
-                                Icons.auto_awesome_rounded,
+                                Icons.auto_stories_rounded,
                                 color: Color(0xFF67343A),
                                 size: 22,
                               ),
