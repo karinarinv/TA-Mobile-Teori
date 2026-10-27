@@ -449,13 +449,40 @@ class _ProfilePageState extends State<ProfilePage> {
                           const SizedBox(height: 14),
 
                           // Nama Pengguna
-                          Text(
-                            _username ?? 'Pengguna',
-                            style: GoogleFonts.playfairDisplay(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF302622),
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _username ?? 'Pengguna',
+                                style: GoogleFonts.playfairDisplay(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFF302622),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                tooltip: _usernameChangeAvailableAt == null
+                                    ? 'Ganti username'
+                                    : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
+                                onPressed: _usernameChangeAvailableAt == null
+                                    ? _changeUsername
+                                    : null,
+                                visualDensity: VisualDensity.compact,
+                                constraints: const BoxConstraints.tightFor(
+                                  width: 34,
+                                  height: 34,
+                                ),
+                                padding: EdgeInsets.zero,
+                                icon: Icon(
+                                  Icons.edit_rounded,
+                                  size: 18,
+                                  color: _usernameChangeAvailableAt == null
+                                      ? const Color(0xFF9A704F)
+                                      : Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 6),
 
@@ -509,39 +536,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 8),
 
-                          // Tombol Ganti Username
-                          InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: _usernameChangeAvailableAt == null ? _changeUsername : null,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.alternate_email_rounded,
-                                    size: 14,
-                                    color: _usernameChangeAvailableAt == null
-                                        ? const Color(0xFF9A704F)
-                                        : Colors.grey.shade500,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _usernameChangeAvailableAt == null
-                                        ? 'Ganti username (sekali tiap 30 hari)'
-                                        : 'Bisa diganti lagi ${DateFormat('dd MMM yyyy', 'id_ID').format(_usernameChangeAvailableAt!)}',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w500,
-                                      color: _usernameChangeAvailableAt == null
-                                          ? const Color(0xFF9A704F)
-                                          : Colors.grey.shade500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),

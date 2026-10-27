@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
+import '../services/cloud_service.dart';
 import '../constants/app_colors.dart';
 
 class FeedbackPage extends StatefulWidget {
@@ -42,6 +43,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
     final savedRating = prefs.getInt('feedback_rating_$username') ?? 5;
     final savedDate = prefs.getString('feedback_date_$username') ?? '';
 
+    if (!mounted) return;
     setState(() {
       _isLoading = false;
       if (savedKesan != null && savedKesan.isNotEmpty) {
@@ -85,6 +87,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
     await prefs.setInt('feedback_rating_$username', _rating);
     await prefs.setString('feedback_date_$username', dateStr);
 
+    final cloudResult = await CloudService.insertDetailed('user_feedback', {
+      'username': username,
+      'kesan': kesan,
+      'saran': saran,
+      'rating': _rating,
+      'created_at': DateTime.now().toUtc().toIso8601String(),
+    });
+
+    if (!mounted) return;
     setState(() {
       _hasSavedData = true;
       _isEditing = false;
@@ -100,13 +111,17 @@ class _FeedbackPageState extends State<FeedbackPage> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Kesan & saran Anda berhasil disimpan!',
+                  cloudResult.success
+                      ? 'Kesan & saran berhasil disimpan ke Supabase!'
+                      : 'Tersimpan di perangkat. Gagal mengirim ke Supabase: ${cloudResult.message}',
                   style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
                 ),
               ),
             ],
           ),
-          backgroundColor: Colors.green.shade700,
+          backgroundColor: cloudResult.success
+              ? Colors.green.shade700
+              : Colors.orange.shade800,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
