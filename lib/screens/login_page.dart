@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../services/auth_service.dart';
-import '../services/cloud_service.dart';
 import 'home_shell.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,7 +12,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _u = TextEditingController();
-  final _email = TextEditingController();
   final _p = TextEditingController();
   bool _isRegister = false;
   bool _obscure = true;
@@ -31,7 +29,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     _u.dispose();
-    _email.dispose();
     _p.dispose();
     super.dispose();
   }
@@ -66,7 +63,6 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _submit() async {
     final username = _u.text.trim();
-    final email = _email.text.trim().toLowerCase();
     final password = _p.text;
 
     if (username.isEmpty || password.isEmpty) {
@@ -79,66 +75,22 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (_isRegister && !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
-      _msg(
-        'Masukkan alamat email yang valid untuk verifikasi akun.',
-        isError: true,
-      );
-      return;
-    }
-
     setState(() => _loading = true);
 
     try {
       if (_isRegister) {
-        final conflict = await AuthService.registrationConflict(
-          username,
-          email,
-        );
+        final conflict = await AuthService.registrationConflict(username);
         if (conflict != null) {
           _msg(conflict, isError: true);
           return;
         }
-        final sent = await CloudService.sendSignupOtp(email);
-        if (!sent.success) {
-          _msg(
-            'Kode verifikasi tidak terkirim: ${sent.message}',
-            isError: true,
-          );
-          return;
-        }
-        if (!mounted) return;
-        final code = await showDialog<String>(
-          context: context,
-          builder: (_) => const _EmailOtpDialog(
-            title: 'Verifikasi Email',
-            description: 'Masukkan kode yang dikirim ke email untuk menyelesaikan pendaftaran.',
-          ),
-        );
-        if (code == null || !mounted) return;
-        final verification = await CloudService.verifyEmailOtp(
-          email: email,
-          token: code,
-          type: 'signup',
-        );
-        if (!verification.success || verification.accessToken == null) {
-          _msg(
-            'Verifikasi email gagal: ${verification.message}',
-            isError: true,
-          );
-          return;
-        }
-        final result = await AuthService.register(username, email, password);
+        final result = await AuthService.register(username, password);
         if (result.localSuccess) {
-          final authPassword = await CloudService.setAuthPassword(
-            accessToken: verification.accessToken!,
-            password: password,
-          );
           _msg(
-            result.cloudSynced && authPassword.success
+            result.cloudSynced
                 ? 'Registrasi berhasil! Silakan masuk ke akun Anda.'
-                : 'Akun tersimpan di perangkat, tetapi sinkronisasi Supabase belum lengkap. Database: ${result.cloudMessage} ${authPassword.success ? '' : authPassword.message}',
-            isError: !result.cloudSynced || !authPassword.success,
+                : 'Akun tersimpan di perangkat, tetapi sinkronisasi Supabase gagal: ${result.cloudMessage}',
+            isError: !result.cloudSynced,
           );
           setState(() {
             _isRegister = false;
@@ -155,41 +107,6 @@ class _LoginPageState extends State<LoginPage> {
           _msg('Username atau password salah', isError: true);
         }
       }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _forgotPassword() async {
-    final username = await showDialog<String>(
-      context: context,
-      builder: (_) => const _SingleInputDialog(
-        title: 'Lupa Password',
-        label: 'Username akun',
-      ),
-    );
-    if (username == null || !mounted) return;
-
-    setState(() => _loading = true);
-    try {
-      final request = await AuthService.requestPasswordReset(username);
-      if (!request.success) {
-        _msg(request.message, isError: true);
-        return;
-      }
-      if (!mounted) return;
-      _msg(request.message);
-      final reset = await showDialog<_PasswordResetInput>(
-        context: context,
-        builder: (_) => const _PasswordResetDialog(),
-      );
-      if (reset == null || !mounted) return;
-      final result = await AuthService.resetPassword(
-        username: username,
-        token: reset.code,
-        newPassword: reset.password,
-      );
-      _msg(result.message, isError: !result.success);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -429,53 +346,6 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 14),
 
-                          if (_isRegister) ...[
-                            TextField(
-                              controller: _email,
-                              keyboardType: TextInputType.emailAddress,
-                              autofillHints: const [AutofillHints.email],
-                              style: GoogleFonts.poppins(
-                                color: _cWalnut,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                              cursorColor: _cOxblood,
-                              decoration: InputDecoration(
-                                hintText: 'Email untuk pemulihan akun',
-                                hintStyle: GoogleFonts.poppins(
-                                  color: _cWalnut.withValues(alpha: 0.6),
-                                  fontSize: 13.5,
-                                ),
-                                prefixIcon: const Icon(
-                                  Icons.email_outlined,
-                                  color: _cWalnut,
-                                  size: 21,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 13,
-                                ),
-                                filled: true,
-                                fillColor: _cAgedPaper.withValues(alpha: 0.35),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: const BorderSide(
-                                    color: _cTobacco,
-                                    width: 1.1,
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: const BorderSide(
-                                    color: _cOxblood,
-                                    width: 1.8,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                          ],
-
                           // Field Password
                           TextField(
                             controller: _p,
@@ -530,26 +400,6 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                          if (!_isRegister)
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                onPressed: _loading ? null : _forgotPassword,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: _cOxblood,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 4,
-                                  ),
-                                ),
-                                child: Text(
-                                  'Lupa password?',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
                           const SizedBox(height: 18),
 
                           SizedBox(
@@ -670,193 +520,4 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-}
-
-class _SingleInputDialog extends StatefulWidget {
-  final String title;
-  final String label;
-
-  const _SingleInputDialog({required this.title, required this.label});
-
-  @override
-  State<_SingleInputDialog> createState() => _SingleInputDialogState();
-}
-
-class _SingleInputDialogState extends State<_SingleInputDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.title),
-    content: TextField(
-      controller: _controller,
-      autofocus: true,
-      decoration: InputDecoration(labelText: widget.label),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Batal'),
-      ),
-      FilledButton(
-        onPressed: () {
-          final value = _controller.text.trim();
-          if (value.isNotEmpty) Navigator.pop(context, value);
-        },
-        child: const Text('Lanjut'),
-      ),
-    ],
-  );
-}
-
-class _EmailOtpDialog extends StatefulWidget {
-  final String title;
-  final String description;
-
-  const _EmailOtpDialog({required this.title, required this.description});
-
-  @override
-  State<_EmailOtpDialog> createState() => _EmailOtpDialogState();
-}
-
-class _EmailOtpDialogState extends State<_EmailOtpDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.title),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.description),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _controller,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          maxLength: 8,
-          decoration: const InputDecoration(labelText: 'Kode OTP'),
-        ),
-      ],
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Batal'),
-      ),
-      FilledButton(
-        onPressed: () {
-          final code = _controller.text.trim();
-          if (code.isNotEmpty) Navigator.pop(context, code);
-        },
-        child: const Text('Verifikasi'),
-      ),
-    ],
-  );
-}
-
-class _PasswordResetInput {
-  final String code;
-  final String password;
-
-  const _PasswordResetInput(this.code, this.password);
-}
-
-class _PasswordResetDialog extends StatefulWidget {
-  const _PasswordResetDialog();
-
-  @override
-  State<_PasswordResetDialog> createState() => _PasswordResetDialogState();
-}
-
-class _PasswordResetDialogState extends State<_PasswordResetDialog> {
-  final _formKey = GlobalKey<FormState>();
-  final _codeController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _confirmController = TextEditingController();
-
-  @override
-  void dispose() {
-    _codeController.dispose();
-    _passwordController.dispose();
-    _confirmController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Atur Password Baru'),
-    content: Form(
-      key: _formKey,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextFormField(
-              controller: _codeController,
-              autofocus: true,
-              keyboardType: TextInputType.number,
-              maxLength: 8,
-              decoration: const InputDecoration(
-                labelText: 'Kode OTP dari email',
-              ),
-              validator: (value) => value == null || value.trim().isEmpty
-                  ? 'Masukkan kode OTP.'
-                  : null,
-            ),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(labelText: 'Password baru'),
-              validator: (value) => value == null || value.length < 6
-                  ? 'Password minimal 6 karakter.'
-                  : null,
-            ),
-            TextFormField(
-              controller: _confirmController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Ulangi password baru',
-              ),
-              validator: (value) => value != _passwordController.text
-                  ? 'Password belum sama.'
-                  : null,
-            ),
-          ],
-        ),
-      ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Batal'),
-      ),
-      FilledButton(
-        onPressed: () {
-          if (!_formKey.currentState!.validate()) return;
-          Navigator.pop(
-            context,
-            _PasswordResetInput(
-              _codeController.text.trim(),
-              _passwordController.text,
-            ),
-          );
-        },
-        child: const Text('Simpan'),
-      ),
-    ],
-  );
 }

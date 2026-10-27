@@ -36,13 +36,6 @@ class RegistrationResult {
   });
 }
 
-class PasswordResetResult {
-  final bool success;
-  final String message;
-
-  const PasswordResetResult({required this.success, required this.message});
-}
-
 class AuthService {
   static const usernameChangeCooldown = Duration(days: 30);
 
@@ -59,18 +52,13 @@ class AuthService {
     return base64Encode(List<int>.generate(16, (_) => r.nextInt(256)));
   }
 
-  static Future<RegistrationResult> register(
-    String user,
-    String email,
-    String pass,
-  ) async {
+  static Future<RegistrationResult> register(String user, String pass) async {
     final db = await DbHelper.db;
     final salt = _newSalt();
     try {
       final row = {
         'username': user,
         'display_name': user,
-        'email': email.trim().toLowerCase(),
         'salt': salt,
         'hash': _hash(pass, salt),
       };
@@ -89,7 +77,7 @@ class AuthService {
     }
   }
 
-  static Future<String?> registrationConflict(String user, String email) async {
+  static Future<String?> registrationConflict(String user) async {
     final db = await DbHelper.db;
     final usernameRows = await db.query(
       'users',
@@ -101,14 +89,6 @@ class AuthService {
     if (usernameRows.isNotEmpty) {
       return 'Username sudah dipakai, gunakan username lain.';
     }
-    final emailRows = await db.query(
-      'users',
-      columns: ['id'],
-      where: 'LOWER(email) = LOWER(?)',
-      whereArgs: [email.trim()],
-      limit: 1,
-    );
-    if (emailRows.isNotEmpty) return 'Email sudah terhubung ke akun lain.';
     return null;
   }
 
@@ -133,129 +113,6 @@ class AuthService {
 
   static Future<String?> currentSession() async =>
       (await SharedPreferences.getInstance()).getString('session_user');
-
-  static Future<PasswordResetResult> requestPasswordReset(
-    String username,
-  ) async {
-    final db = await DbHelper.db;
-    final rows = await db.query(
-      'users',
-      columns: ['email'],
-      where: 'LOWER(username) = LOWER(?)',
-      whereArgs: [username.trim()],
-      limit: 1,
-    );
-    if (rows.isEmpty) {
-      return const PasswordResetResult(
-        success: false,
-        message: 'Username tidak ditemukan di perangkat ini.',
-      );
-    }
-    final email = (rows.first['email'] as String? ?? '').trim();
-    if (email.isEmpty) {
-      return const PasswordResetResult(
-        success: false,
-        message: 'Akun ini belum memiliki email pemulihan. Masuk dan hubungi admin untuk memperbarui data akun.',
-      );
-    }
-    final result = await CloudService.sendRecoveryOtp(email);
-    return PasswordResetResult(
-      success: result.success,
-      message: result.success
-          ? 'Kode pemulihan dikirim ke ${_maskEmail(email)}.'
-          : result.message,
-    );
-  }
-
-  static Future<PasswordResetResult> resetPassword({
-    required String username,
-    required String token,
-    required String newPassword,
-  }) async {
-    final db = await DbHelper.db;
-    final rows = await db.query(
-      'users',
-      columns: ['email'],
-      where: 'LOWER(username) = LOWER(?)',
-      whereArgs: [username.trim()],
-      limit: 1,
-    );
-    if (rows.isEmpty) {
-      return const PasswordResetResult(
-        success: false,
-        message: 'Username tidak ditemukan di perangkat ini.',
-      );
-    }
-    final email = (rows.first['email'] as String? ?? '').trim().toLowerCase();
-    if (email.isEmpty) {
-      return const PasswordResetResult(
-        success: false,
-        message: 'Email pemulihan belum terdaftar pada akun ini.',
-      );
-    }
-
-    final verified = await CloudService.verifyEmailOtp(
-      email: email,
-      token: token.trim(),
-      type: 'recovery',
-    );
-    if (!verified.success || verified.accessToken == null) {
-      return PasswordResetResult(success: false, message: verified.message);
-    }
-
-    final authUpdate = await CloudService.setAuthPassword(
-      accessToken: verified.accessToken!,
-      password: newPassword,
-    );
-    if (!authUpdate.success) {
-      return PasswordResetResult(success: false, message: authUpdate.message);
-    }
-
-    final salt = _newSalt();
-    final values = {'salt': salt, 'hash': _hash(newPassword, salt)};
-    try {
-      final changed = await db.update(
-        'users',
-        values,
-        where: 'LOWER(username) = LOWER(?)',
-        whereArgs: [username.trim()],
-      );
-      if (changed == 0) {
-        return const PasswordResetResult(
-          success: false,
-          message:
-              'Akun lokal tidak berhasil diperbarui setelah OTP terverifikasi.',
-        );
-      }
-    } catch (_) {
-      return const PasswordResetResult(
-        success: false,
-        message: 'Password cloud berubah, tetapi database perangkat gagal diperbarui.',
-      );
-    }
-
-    final cloudUpdate = await CloudService.update(
-      'users',
-      values,
-      filters: {'username': username.trim()},
-    );
-    return PasswordResetResult(
-      success: true,
-      message: cloudUpdate.success
-          ? 'Password berhasil diubah.'
-          : 'Password perangkat berhasil diubah, tetapi database profil cloud gagal disinkronkan: ${cloudUpdate.message}',
-    );
-  }
-
-  static String _maskEmail(String email) {
-    final parts = email.split('@');
-    if (parts.length != 2) return email;
-    final name = parts.first;
-    final visible = name.length <= 2
-        ? name.substring(0, 1)
-        : name.substring(0, 2);
-    return '$visible***@${parts.last}';
-  }
 
   static Future<UsernameChangeResult> changeUsername(
     String requestedUsername,
