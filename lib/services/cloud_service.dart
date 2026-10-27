@@ -235,8 +235,13 @@ class CloudService {
     try {
       final decoded = jsonDecode(body);
       if (decoded is Map<String, dynamic>) {
-        final message = decoded['message']?.toString();
-        final details = decoded['details']?.toString();
+        final message =
+            (decoded['message'] ??
+                    decoded['msg'] ??
+                    decoded['error_description'] ??
+                    decoded['error'])
+                ?.toString();
+        final details = (decoded['details'] ?? decoded['hint'])?.toString();
         if (message != null && message.isNotEmpty) {
           return details == null || details.isEmpty
               ? 'HTTP $statusCode: $message'
@@ -244,6 +249,13 @@ class CloudService {
         }
       }
     } catch (_) {}
+    final responseText = body.trim();
+    if (responseText.isNotEmpty) {
+      final summary = responseText.length > 400
+          ? '${responseText.substring(0, 400)}…'
+          : responseText;
+      return 'HTTP $statusCode: $summary';
+    }
     return 'Supabase merespons HTTP $statusCode.';
   }
 
