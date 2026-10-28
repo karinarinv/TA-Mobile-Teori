@@ -109,6 +109,7 @@ class AuthService {
     final p = await SharedPreferences.getInstance();
     await p.setString('session_user', user);
     await p.setString('last_user', user); // untuk login biometrik
+    await p.setInt('session_last_active_ms', DateTime.now().millisecondsSinceEpoch);
   }
 
   static Future<String?> currentSession() async =>
@@ -306,8 +307,11 @@ class AuthService {
     }
   }
 
-  static Future<void> logout() async =>
-      (await SharedPreferences.getInstance()).remove('session_user');
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('session_user');
+    await prefs.remove('session_last_active_ms');
+  }
 
   static Future<bool> loginBiometric() async {
     final p = await SharedPreferences.getInstance();

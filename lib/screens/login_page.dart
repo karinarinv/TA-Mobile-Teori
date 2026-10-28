@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../services/auth_service.dart';
+import '../services/session_service.dart';
 import 'home_shell.dart';
 
 class LoginPage extends StatefulWidget {
@@ -55,6 +56,8 @@ class _LoginPageState extends State<LoginPage> {
 
   void _goHome() {
     if (!mounted) return;
+    SessionService.recordActivity();
+    SessionService.persistActivity();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const HomeShell()),
