@@ -100,11 +100,12 @@ class _ProfilePageState extends State<ProfilePage> {
     final currentUsername = _username;
     if (currentUsername == null) return;
 
-    final requestedUsername = await showDialog<String>(
-      context: context,
-      builder: (_) => _ChangeUsernameDialog(
+    final requestedUsername = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) => _ChangeUsernamePage(
         initialUsername: currentUsername,
         availableAt: _usernameChangeAvailableAt,
+        ),
       ),
     );
 
@@ -1094,20 +1095,20 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class _ChangeUsernameDialog extends StatefulWidget {
+class _ChangeUsernamePage extends StatefulWidget {
   final String initialUsername;
   final DateTime? availableAt;
 
-  const _ChangeUsernameDialog({
+  const _ChangeUsernamePage({
     required this.initialUsername,
     required this.availableAt,
   });
 
   @override
-  State<_ChangeUsernameDialog> createState() => _ChangeUsernameDialogState();
+  State<_ChangeUsernamePage> createState() => _ChangeUsernamePageState();
 }
 
-class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
+class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
   late final TextEditingController _controller;
 
   @override
@@ -1123,65 +1124,62 @@ class _ChangeUsernameDialogState extends State<_ChangeUsernameDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Ganti Username'),
-    content: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.availableAt != null) ...[
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0EFED),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE0DEDA)),
-            ),
-            child: Text(
-              'Anda bisa mengganti username lagi pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.',
-              style: TextStyle(color: Colors.grey.shade700),
-            ),
+  Widget build(BuildContext context) {
+    final locked = widget.availableAt != null;
+    const accent = Color(0xFFB52F50);
+    return Scaffold(
+      backgroundColor: const Color(0xFF090909),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF090909),
+        foregroundColor: Colors.white,
+        title: const Text('Ubah nama', style: TextStyle(fontWeight: FontWeight.w600)),
+        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal', style: TextStyle(color: Colors.white70))),
+        leadingWidth: 72,
+        actions: [
+          TextButton(
+            onPressed: locked ? null : () => Navigator.pop(context, _controller.text.trim()),
+            child: Text('Simpan', style: TextStyle(color: locked ? Colors.white30 : accent, fontWeight: FontWeight.bold)),
           ),
-          const SizedBox(height: 12),
-        ] else Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFAF7F2),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFEADBCE)),
-          ),
-          child: const Text(
-            'Username hanya bisa diganti sekali setiap 30 hari. Setelah disimpan, kamu bisa menggantinya lagi 30 hari kemudian.',
-          ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _controller,
-          autofocus: widget.availableAt == null,
-          readOnly: widget.availableAt != null,
-          maxLength: 20,
-          textCapitalization: TextCapitalization.none,
-          decoration: const InputDecoration(
-            labelText: 'Username baru',
-            prefixText: '@',
-            helperText: '3-20 karakter: huruf, angka, underscore',
-          ),
-          enabled: widget.availableAt == null,
-        ),
-      ],
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: Text(widget.availableAt == null ? 'Batal' : 'Tutup'),
+          const SizedBox(width: 8),
+        ],
       ),
-      if (widget.availableAt == null) FilledButton(
-        style: FilledButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
-        onPressed: () => Navigator.pop(context, _controller.text.trim()),
-        child: const Text('Simpan'),
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Nama pengguna', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 14),
+            Text(
+              locked
+                  ? 'Nama pengguna hanya dapat diubah setiap 30 hari. Kamu bisa mengubahnya lagi pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.'
+                  : 'Pilih nama pengguna yang mudah dikenali. Nama pengguna hanya dapat diubah setiap 30 hari.',
+              style: const TextStyle(color: Colors.white70, fontSize: 16, height: 1.45),
+            ),
+            const SizedBox(height: 28),
+            TextField(
+              controller: _controller,
+              autofocus: !locked,
+              readOnly: locked,
+              enabled: !locked,
+              maxLength: 20,
+              textCapitalization: TextCapitalization.none,
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+              decoration: InputDecoration(
+                prefixText: '@', prefixStyle: const TextStyle(color: Colors.white70, fontSize: 18),
+                counterStyle: const TextStyle(color: Colors.white54),
+                filled: true, fillColor: const Color(0xFF242424),
+                hintText: 'nama_pengguna', hintStyle: const TextStyle(color: Colors.white38),
+                helperText: '3–20 karakter: huruf, angka, atau garis bawah',
+                helperStyle: const TextStyle(color: Colors.white54),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: accent)),
+              ),
+            ),
+          ]),
+        ),
       ),
-    ],
-  );
+    );
+  }
 }

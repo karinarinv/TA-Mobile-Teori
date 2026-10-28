@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import '../config.dart';
+import '../widgets/owl_book_icon.dart';
 
 class AiPage extends StatefulWidget {
   const AiPage({super.key});
@@ -183,7 +184,7 @@ class _AiPageState extends State<AiPage> {
                               color: const Color(0xFFF7EDED),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.smart_toy, size: 54, color: Color(0xFF67343A)),
+                            child: const OwlBookIcon(size: 64),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -232,7 +233,7 @@ class _AiPageState extends State<AiPage> {
                               CircleAvatar(
                                 radius: 16,
                                 backgroundColor: const Color(0xFFEADBCE),
-                                child: const Icon(Icons.smart_toy, size: 18, color: Color(0xFF67343A)),
+                                child: const OwlBookIcon(size: 30),
                               ),
                               const SizedBox(width: 8),
                             ],
