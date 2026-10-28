@@ -1136,19 +1136,23 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
   @override
   Widget build(BuildContext context) {
     final locked = widget.availableAt != null;
-    const accent = Color(0xFFB52F50);
+    const background = Color(0xFFEDE2CF);
+    const fieldBackground = Color(0xFFD4BE9D);
+    const walnut = Color(0xFF302622);
+    const oxblood = Color(0xFF67343A);
     return Scaffold(
-      backgroundColor: const Color(0xFF090909),
+      backgroundColor: background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF090909),
-        foregroundColor: Colors.white,
-        title: const Text('Ubah nama', style: TextStyle(fontWeight: FontWeight.w600)),
-        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal', style: TextStyle(color: Colors.white70))),
+        backgroundColor: background,
+        foregroundColor: walnut,
+        elevation: 0,
+        title: const Text('Ubah nama', style: TextStyle(color: walnut, fontSize: 18, fontWeight: FontWeight.w600)),
+        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal', style: TextStyle(color: walnut, fontSize: 14))),
         leadingWidth: 72,
         actions: [
           TextButton(
             onPressed: locked ? null : () => Navigator.pop(context, _controller.text.trim()),
-            child: Text('Simpan', style: TextStyle(color: locked ? Colors.white30 : accent, fontWeight: FontWeight.bold)),
+            child: Text('Simpan', style: TextStyle(color: locked ? walnut.withValues(alpha: 0.4) : oxblood, fontSize: 14, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 8),
         ],
@@ -1158,13 +1162,13 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Nama pengguna', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 14),
+            const Text('Nama pengguna', style: TextStyle(color: walnut, fontSize: 23, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
             Text(
               locked
                   ? 'Nama pengguna hanya dapat diubah setiap 30 hari. Kamu bisa mengubahnya lagi pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.'
                   : 'Pilih nama pengguna yang mudah dikenali. Nama pengguna hanya dapat diubah setiap 30 hari.',
-              style: const TextStyle(color: Colors.white70, fontSize: 16, height: 1.45),
+              style: const TextStyle(color: walnut, fontSize: 14, height: 1.45),
             ),
             const SizedBox(height: 28),
             TextField(
@@ -1174,17 +1178,17 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
               enabled: !locked,
               maxLength: 20,
               textCapitalization: TextCapitalization.none,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
+              style: const TextStyle(color: walnut, fontSize: 16),
               decoration: InputDecoration(
-                prefixText: '@', prefixStyle: const TextStyle(color: Colors.white70, fontSize: 18),
-                counterStyle: const TextStyle(color: Colors.white54),
-                filled: true, fillColor: const Color(0xFF242424),
-                hintText: 'nama_pengguna', hintStyle: const TextStyle(color: Colors.white38),
+                prefixText: '@', prefixStyle: const TextStyle(color: walnut, fontSize: 16),
+                counterStyle: TextStyle(color: walnut.withValues(alpha: 0.65)),
+                filled: true, fillColor: fieldBackground,
+                hintText: 'nama_pengguna', hintStyle: TextStyle(color: walnut.withValues(alpha: 0.55)),
                 helperText: '3–20 karakter: huruf, angka, atau garis bawah',
-                helperStyle: const TextStyle(color: Colors.white54),
+                helperStyle: TextStyle(color: walnut.withValues(alpha: 0.75), fontSize: 12),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: accent)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: oxblood, width: 1.5)),
               ),
             ),
           ]),
