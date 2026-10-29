@@ -23,6 +23,7 @@ class _MazeBookItem {
   }) : isCollected = false;
 }
 
+/// Labirin interaktif dengan kontrol pemain, koleksi buku, dan pengejar Wikwok.
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
 
@@ -82,6 +83,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   static const int _cols = 11;
   static const int _rows = 15;
 
+  // Peta tile per level; kode tile diterjemahkan menjadi dinding, jalan, start, atau tujuan.
   static const List<List<String>> _levelMaps = [
     // Level 1: "Lorong Fiksi & Komik" - Jalur S-Curve Lebar
     [
@@ -173,6 +175,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     super.initState();
     _initLevelBooks();
 
+    // Denyut dekorasi 1,2 detik dan gerakan item 0,9 detik berulang bolak-balik.
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -188,6 +191,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 80),
     );
 
+    // Progress jumpscare berjalan tepat 2 detik.
     _jumpscareProgressController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2), // Jumpscare tepat 2 detik
@@ -211,6 +215,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    // Batalkan timer/audio dan lepaskan controller saat keluar dari game.
     _stopLevelTimers();
     _jumpscareTimer?.cancel();
     _collectedBannerTimer?.cancel();
@@ -239,6 +244,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _resetToLevelStart() {
+    // Bersihkan timer dan kembalikan pemain/pengejar ke posisi awal level.
     _stopLevelTimers();
     _jumpscareTimer?.cancel();
     _collectedBannerTimer?.cancel();
@@ -268,6 +274,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _startLevel3ChaserCountdown() {
+    // Wikwok mulai mengejar setelah hitung mundur 5 detik di level 3.
     if (_currentLevel != 2 || _hasStartedMoving) return;
     _hasStartedMoving = true;
 
@@ -301,6 +308,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     });
 
     _chaserTimer?.cancel();
+    // Perbarui posisi Wikwok tiap 360 ms agar bergerak mengejar pemain.
     _chaserTimer = Timer.periodic(const Duration(milliseconds: 360), (timer) {
       if (!mounted || !_isChaserActive || _isGameOver || _isJumpscareActive || _isDefeatActive) {
         timer.cancel();
@@ -359,6 +367,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   // Jumpscare Wikwok 2 Detik Sesuai Codingan Asli
   void _triggerWikwokJumpscare() {
+    // Aktifkan animasi/audio jumpscare; durasi animasinya 2 detik.
     _stopLevelTimers();
     GameAudioService.stopChase();
     GameAudioService.stopBgm();

@@ -10,6 +10,7 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'book_detail_page.dart';
 import 'saved_books_page.dart';
 
+/// Katalog buku: pencarian API, filter genre, dan navigasi ke detail buku.
 class BooksPage extends StatefulWidget {
   const BooksPage({super.key});
 
@@ -40,10 +41,12 @@ class _BooksPageState extends State<BooksPage> {
   @override
   void initState() {
     super.initState();
+    // Tampilkan daftar awal setelah frame pertama siap.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _search();
     });
 
+    // Goyangan kuat (lebih dari 16) mengganti kata pencarian, dengan jeda 3 detik.
     _sub = userAccelerometerEventStream().listen((e) {
       final g = sqrt(e.x * e.x + e.y * e.y + e.z * e.z);
       if (g > 16 &&
@@ -74,6 +77,7 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   int _calcPrice(String title) {
+    // Harga demo dibuat konsisten dari judul, bukan berasal dari API katalog.
     final hash = title.hashCode.abs();
     return ((hash % 10) + 3) * 1000;
   }
@@ -108,6 +112,7 @@ class _BooksPageState extends State<BooksPage> {
         'printType': 'books',
       });
 
+      // Sumber utama katalog; bila kosong/gagal, _searchOpenLibrary menjadi cadangan.
       final r = await http.get(uri).timeout(const Duration(seconds: 8));
 
       if (!mounted) return;
@@ -187,6 +192,7 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   Future<void> _searchOpenLibrary(String q) async {
+    // Sumber katalog cadangan dengan batas waktu request 10 detik.
     try {
       final uri = Uri.https('openlibrary.org', '/search.json', {
         'q': q,

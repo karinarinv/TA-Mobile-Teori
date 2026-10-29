@@ -12,10 +12,14 @@ import 'screens/splash_screen.dart';
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
+  // Siapkan Flutter sebelum memanggil plugin atau membaca penyimpanan.
   WidgetsFlutterBinding.ensureInitialized();
+  // Daftarkan format tanggal Bahasa Indonesia yang dipakai di aplikasi.
   await initializeDateFormatting('id_ID', null);
+  // Siapkan notifikasi lokal sebelum halaman aplikasi ditampilkan.
   await NotificationService.init();
 
+  // Hapus sesi yang sudah melewati batas tidak aktif; selain itu catat aktivitas.
   final expired = await SessionService.isSessionExpired();
   if (expired) {
     await AuthService.logout();
@@ -23,6 +27,7 @@ void main() async {
     SessionService.recordActivity();
   }
 
+  // Status login menentukan destination yang nanti diberikan ke SplashScreen.
   final user = await AuthService.currentSession();
   runApp(MyApp(startLoggedIn: user != null));
 }
@@ -135,6 +140,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
             ),
             useMaterial3: true,
           ),
+          // SplashScreen mengatur animasi; pilihan halaman tujuan dibuat di sini.
           home: SplashScreen(
             destination:
                 widget.startLoggedIn ? const HomeShell() : const LoginPage(),

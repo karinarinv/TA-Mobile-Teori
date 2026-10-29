@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'db_helper.dart';
 import 'cloud_service.dart';
 
+/// Ringkasan hasil ganti username, termasuk status sinkronisasi cloud.
 class UsernameChangeResult {
   final bool success;
   final String message;
@@ -24,6 +25,7 @@ class UsernameChangeResult {
   });
 }
 
+/// Memisahkan keberhasilan simpan lokal dari keberhasilan kirim ke Supabase.
 class RegistrationResult {
   final bool localSuccess;
   final bool cloudSynced;
@@ -36,9 +38,12 @@ class RegistrationResult {
   });
 }
 
+/// Mengatur daftar akun, login lokal, sesi, ganti username, dan biometrik.
 class AuthService {
+  // Username baru bisa dipakai setelah jeda 30 hari sejak perubahan terakhir.
   static const usernameChangeCooldown = Duration(days: 30);
 
+  // Hash berulang membuat tebakan password lebih mahal; salt disimpan per akun.
   static String _hash(String pass, String salt) {
     List<int> h = utf8.encode(salt + pass);
     for (var i = 0; i < 1000; i++) {
@@ -47,11 +52,13 @@ class AuthService {
     return base64Encode(h);
   }
 
+  // Buat salt acak 16 byte agar hash setiap pengguna berbeda.
   static String _newSalt() {
     final r = Random.secure();
     return base64Encode(List<int>.generate(16, (_) => r.nextInt(256)));
   }
 
+  // Simpan akun di SQLite terlebih dahulu, lalu coba sinkronkan ke Supabase.
   static Future<RegistrationResult> register(String user, String pass) async {
     final db = await DbHelper.db;
     final salt = _newSalt();
@@ -77,6 +84,7 @@ class AuthService {
     }
   }
 
+  // Periksa bentrok username tanpa membedakan huruf besar/kecil.
   static Future<String?> registrationConflict(String user) async {
     final db = await DbHelper.db;
     final usernameRows = await db.query(
@@ -92,6 +100,7 @@ class AuthService {
     return null;
   }
 
+  // Login membandingkan hash lokal; sesi baru disimpan jika password cocok.
   static Future<bool> login(String user, String pass) async {
     final db = await DbHelper.db;
     final rows = await db.query(
@@ -105,6 +114,7 @@ class AuthService {
     return ok;
   }
 
+  // SharedPreferences menyimpan pengguna aktif dan waktu aktivitas sesi.
   static Future<void> _setSession(String user) async {
     final p = await SharedPreferences.getInstance();
     await p.setString('session_user', user);
@@ -115,6 +125,7 @@ class AuthService {
   static Future<String?> currentSession() async =>
       (await SharedPreferences.getInstance()).getString('session_user');
 
+  // Ganti nama lokal, pindahkan data per pengguna, lalu sinkronkan ke cloud.
   static Future<UsernameChangeResult> changeUsername(
     String requestedUsername,
   ) async {
@@ -264,6 +275,7 @@ class AuthService {
     );
   }
 
+  // Pindahkan preferensi yang memakai username sebagai bagian dari nama kunci.
   static Future<void> _moveUserPreferences(
     String oldUsername,
     String newUsername,
@@ -307,12 +319,14 @@ class AuthService {
     }
   }
 
+  // Hapus sesi aktif; identitas login biometrik terakhir tetap tersimpan.
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('session_user');
     await prefs.remove('session_last_active_ms');
   }
 
+  // Minta sistem operasi memverifikasi wajah/sidik jari sebelum membuka sesi.
   static Future<bool> loginBiometric() async {
     final p = await SharedPreferences.getInstance();
     final last = p.getString('last_user');

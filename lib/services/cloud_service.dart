@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import '../config.dart';
 
 class CloudUpdateResult {
+  // Hasil operasi tulis beserta pesan yang bisa ditampilkan saat gagal.
   final bool success;
   final String message;
 
@@ -12,6 +13,7 @@ class CloudUpdateResult {
 }
 
 class CloudSelectResult {
+  // Hasil operasi baca: daftar baris hanya terisi jika respons berhasil.
   final bool success;
   final List<Map<String, dynamic>> rows;
   final String message;
@@ -31,11 +33,13 @@ class CloudService {
     'Prefer': 'return=minimal',
   };
 
+  // POST ke tabel Supabase; kegagalan jaringan dilaporkan tanpa menghentikan app.
   static Future<bool> insert(String table, Map<String, dynamic> body) async {
     final result = await insertDetailed(table, body);
     return result.success;
   }
 
+  // Tambah satu baris; semua request dibatasi 8 detik agar halaman tidak menunggu.
   static Future<CloudUpdateResult> insertDetailed(
     String table,
     Map<String, dynamic> body,
@@ -63,6 +67,7 @@ class CloudService {
     }
   }
 
+  // PATCH hanya baris yang cocok dengan filter, misalnya username yang sama.
   static Future<CloudUpdateResult> update(
     String table,
     Map<String, dynamic> values, {
@@ -105,6 +110,7 @@ class CloudService {
     }
   }
 
+  // POST dengan resolusi duplikat untuk memasukkan atau memperbarui baris.
   static Future<CloudUpdateResult> upsert(
     String table,
     Map<String, dynamic> values, {
@@ -138,6 +144,7 @@ class CloudService {
     }
   }
 
+  // Ambil baris yang cocok dengan filter eq.<nilai> dari tabel yang diminta.
   static Future<CloudSelectResult> selectWhere(
     String table, {
     required Map<String, String> filters,
@@ -177,6 +184,7 @@ class CloudService {
     }
   }
 
+  // Ubah respons REST menjadi pesan singkat, termasuk detail error bila ada.
   static String _responseMessage(String body, int statusCode) {
     try {
       final decoded = jsonDecode(body);
@@ -205,6 +213,7 @@ class CloudService {
     return 'Supabase merespons HTTP $statusCode.';
   }
 
+  // Ambil seluruh baris tabel (select *); dipakai pada kebutuhan sederhana.
   static Future<List> select(String table) async {
     try {
       final r = await http

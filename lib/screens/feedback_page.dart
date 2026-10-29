@@ -6,6 +6,7 @@ import '../services/auth_service.dart';
 import '../services/cloud_service.dart';
 import '../constants/app_colors.dart';
 
+/// Form rating, kesan, dan saran; data lokal tetap disimpan saat cloud gagal.
 class FeedbackPage extends StatefulWidget {
   const FeedbackPage({super.key});
 
@@ -36,6 +37,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Future<void> _loadFeedback() async {
+    // Pulihkan isian akun ini dari SharedPreferences saat halaman dibuka.
     final username = await AuthService.currentSession() ?? 'guest';
     final prefs = await SharedPreferences.getInstance();
     final savedKesan = prefs.getString('feedback_kesan_$username');
@@ -83,6 +85,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
     final username = await AuthService.currentSession() ?? 'guest';
     final dateStr = DateFormat('dd MMMM yyyy, HH:mm', 'id_ID').format(DateTime.now());
+    // Simpan lokal lebih dulu, lalu coba kirim salinan ke tabel Supabase.
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('feedback_kesan_$username', kesan);
     await prefs.setString('feedback_saran_$username', saran);

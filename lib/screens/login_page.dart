@@ -5,6 +5,7 @@ import '../services/auth_service.dart';
 import '../services/session_service.dart';
 import 'home_shell.dart';
 
+/// Menangani formulir registrasi, login lokal, dan pilihan login biometrik.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
   @override
@@ -42,6 +43,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _msg(String s, {bool isError = false}) {
+    // SnackBar pesan error tampil 6 detik; pesan biasa tampil 2 detik.
     if (!mounted) return;
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -64,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _goHome() {
+    // Ganti halaman login dengan kerangka navigasi setelah autentikasi berhasil.
     if (!mounted) return;
     SessionService.recordActivity();
     SessionService.persistActivity();
@@ -74,6 +77,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _submit() async {
+    // Validasi input, lalu jalankan cabang registrasi atau login.
     final username = _u.text.trim();
     final password = _p.text;
 
@@ -125,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _bio() async {
+    // Delegasikan pemeriksaan sidik jari/wajah ke AuthService perangkat.
     setState(() => _loading = true);
     try {
       if (await AuthService.loginBiometric()) {

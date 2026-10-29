@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../config.dart';
 import '../widgets/owl_book_icon.dart';
 
+/// Chat kurator buku; pesan dikirim ke Gemini dan jawabannya ditampilkan di sini.
 class AiPage extends StatefulWidget {
   const AiPage({super.key});
 
@@ -34,6 +35,7 @@ class _AiPageState extends State<AiPage> {
   }
 
   void _scrollToBottom() {
+    // Tunggu layout selesai agar posisi scroll sudah mencakup pesan terbaru.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -46,6 +48,7 @@ class _AiPageState extends State<AiPage> {
   }
 
   Future<void> _send([String? customText]) async {
+    // Ambil teks dari tombol prompt atau kolom input, lalu cegah request kosong/ganda.
     final q = (customText ?? _c.text).trim();
     if (q.isEmpty || _busy) return;
     _c.clear();
@@ -56,6 +59,7 @@ class _AiPageState extends State<AiPage> {
     });
     _scrollToBottom();
 
+    // Susun instruksi kurator dan seluruh percakapan sebagai konteks untuk Gemini.
     final contents = <Map<String, dynamic>>[];
 
     // System instruction awal
@@ -82,6 +86,7 @@ class _AiPageState extends State<AiPage> {
     }
 
     String ans = '';
+    // Coba model cadangan jika model utama gagal; tiap request dibatasi 25 detik.
     final modelsToTry = [
       geminiModel,
       'gemini-flash-lite-latest',

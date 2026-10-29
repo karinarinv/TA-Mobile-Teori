@@ -8,6 +8,7 @@ import '../config.dart';
 import '../constants/app_colors.dart';
 import '../services/blockchain_service.dart';
 
+/// Menampilkan catatan transaksi lokal, memeriksa rantai hash, dan membuka explorer.
 class BlockchainPage extends StatefulWidget {
   const BlockchainPage({super.key});
   @override
@@ -22,6 +23,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
   final TextEditingController _searchCtrl = TextEditingController();
 
   Future<void> _openEtherscan([String? txHash]) async {
+    // Buka transaksi Sepolia jika punya txHash; jika tidak, buka alamat wallet.
     final String url = (txHash != null && txHash.isNotEmpty)
         ? 'https://sepolia.etherscan.io/tx/$txHash'
         : 'https://sepolia.etherscan.io/address/$sepoliaWalletAddress';
@@ -50,11 +52,13 @@ class _BlockchainPageState extends State<BlockchainPage> {
   }
 
   Future<void> _load() async {
+    // Ambil riwayat yang sudah disimpan BlockchainService di database lokal.
     final r = await BlockchainService.all();
     if (mounted) setState(() => _rows = r);
   }
 
   Future<void> _verify() async {
+    // Periksa urutan prev_hash dan hitung ulang hash untuk semua catatan.
     final ok = await BlockchainService.verify();
     setState(() {
       _ok = ok;
@@ -65,6 +69,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
   }
 
   void _simulate() {
+    // Ubah salinan data di memori untuk demo deteksi manipulasi; database asli tidak diubah.
     if (_rows.isEmpty) return;
     final copy = _rows.reversed
         .map((e) => Map<String, Object?>.from(e))
@@ -78,6 +83,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
   }
 
   void _copyHash(String hash, int blockId) {
+    // Salin hash ke clipboard lalu tampilkan notifikasi selama 2 detik.
     Clipboard.setData(ClipboardData(text: hash));
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -95,6 +101,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
   }
 
   int _calculateTotalExpense() {
+    // Jumlahkan nilai setelah teks 'Biaya:' dari catatan sewa yang tersimpan.
     int total = 0;
     for (final r in _rows) {
       final rawData = (r['data'] as String?) ?? '';

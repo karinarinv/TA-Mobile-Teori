@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../constants/app_colors.dart';
 import '../services/notification_service.dart';
 
+/// Menampilkan notifikasi lokal dan kontrol untuk promo harian.
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});
 
@@ -24,6 +25,7 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _load() async {
+    // Baca daftar notifikasi dan status promo dari NotificationService.
     final list = await NotificationService.getNotifications();
     final promoStatus = await NotificationService.isDailyPromoEnabled();
     if (mounted) {
@@ -36,6 +38,7 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _togglePromo(bool value) async {
+    // Simpan pilihan pengguna dan jadwalkan/batalkan promo pada layanan lokal.
     await NotificationService.setDailyPromoEnabled(value);
     setState(() => _promoEnabled = value);
     if (!mounted) return;
@@ -63,12 +66,14 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _markItemRead(AppNotificationItem item) async {
+    // Abaikan notifikasi yang sudah dibaca; selain itu simpan status baca.
     if (item.isRead) return;
     await NotificationService.markAsRead(item.id);
     await _load();
   }
 
   String _formatTime(DateTime dt) {
+    // Ubah waktu ke label relatif, seperti 'Baru saja', 'Hari ini', atau tanggal.
     final now = DateTime.now();
     final diff = now.difference(dt);
 

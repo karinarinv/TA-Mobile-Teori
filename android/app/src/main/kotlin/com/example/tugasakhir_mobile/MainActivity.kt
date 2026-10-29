@@ -15,6 +15,7 @@ import kotlin.concurrent.thread
 import kotlin.math.sin
 
 class MainActivity : FlutterFragmentActivity() {
+    // Harus sama dengan MethodChannel pada lib/services/game_audio_service.dart.
     private val CHANNEL = "com.rentbook.audio"
 
     @Volatile
@@ -41,6 +42,7 @@ class MainActivity : FlutterFragmentActivity() {
         super.configureFlutterEngine(flutterEngine)
         vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
 
+        // Terjemahkan perintah audio dari Flutter menjadi pemanggilan fungsi Android.
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
                 "playBgm" -> {

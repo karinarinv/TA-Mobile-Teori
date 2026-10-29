@@ -6,6 +6,7 @@ import 'menu_page.dart';
 import 'profile_page.dart';
 import 'feedback_page.dart';
 
+/// Kerangka navigasi utama yang menampung Beranda, Profil, dan Kesan & Saran.
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
   @override
@@ -23,6 +24,7 @@ class _HomeShellState extends State<HomeShell> {
   }
 
   Future<void> _checkPendingCamera() async {
+    // Pulihkan halaman pemindai jika aplikasi sempat dijeda saat membuka kamera.
     try {
       final prefs = await SharedPreferences.getInstance();
       if (prefs.getBool('ai_vision_camera_pending') == true) {
@@ -99,6 +101,7 @@ class _HomeShellState extends State<HomeShell> {
         ),
       );
 
+  // Bentuk ikon tab aktif/nonaktif dengan animasi ukuran 250 milidetik.
   Widget _buildNavIcon(IconData icon, int index) {
     final isSelected = _i == index;
     return AnimatedContainer(

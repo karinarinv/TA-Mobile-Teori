@@ -29,6 +29,7 @@ class LibraryItem {
   });
 }
 
+/// Peta cabang perpustakaan: data Supabase, posisi GPS, dan rute jalan OSRM.
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
 
@@ -62,6 +63,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _loadCloud() async {
+    // Ambil baris tabel libraries, validasi koordinat, lalu gabungkan duplikat cabang.
     if (mounted) {
       setState(() {
         _loadingLibraries = true;
@@ -154,6 +156,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _locate() async {
+    // Minta izin lokasi bila perlu, lalu baca koordinat GPS perangkat.
     setState(() => _loadingLocation = true);
     try {
       var p = await Geolocator.checkPermission();
@@ -193,6 +196,7 @@ class _MapPageState extends State<MapPage> {
 
   // Menghasilkan dan memunculkan rute navigasi nyata dari GPS ke perpustakaan
   Future<void> _fetchAndShowRoute(LibraryItem lib) async {
+    // Buat rute jalan dari posisi pengguna ke cabang; request OSRM dibatasi 8 detik.
     if (_me == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

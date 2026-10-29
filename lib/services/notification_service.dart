@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'auth_service.dart';
 
+/// Data satu pemberitahuan; dapat disimpan dan dibaca kembali sebagai JSON.
 class AppNotificationItem {
   final String id;
   final String title;
@@ -48,7 +49,9 @@ class AppNotificationItem {
   );
 }
 
+/// Menyiapkan notifikasi Android dan menyimpan riwayat per akun di perangkat.
 class NotificationService {
+  // ID promo tetap dipakai agar jadwal harian yang sama dapat diganti/dibatalkan.
   static final _n = FlutterLocalNotificationsPlugin();
   static Future<String> _getStorageKey() async {
     final user = await AuthService.currentSession();
@@ -71,6 +74,7 @@ class NotificationService {
     ),
   );
 
+  // Atur zona waktu WIB, minta izin sistem, lalu pulihkan jadwal promo aktif.
   static Future<void> init() async {
     tzdata.initializeTimeZones();
     try {
@@ -114,6 +118,7 @@ class NotificationService {
   // ============================================================
   // PENJADWALAN NOTIFIKASI PROMO HARIAN (PUKUL 09.00)
   // ============================================================
+  // Jadwalkan promo pukul 09.00 WIB setiap hari; fallback memakai jadwal tak presisi.
   static Future<void> scheduleDailyPromoNotifications() async {
     try {
       final now = tz.TZDateTime.now(tz.local);
@@ -294,6 +299,7 @@ class NotificationService {
   }
 
   /// Notifikasi peminjaman & jadwal pengingat jatuh tempo
+  // Tampilkan konfirmasi sewa sekarang dan pengingat menjelang batas pengembalian.
   static Future<void> scheduleReturn(String title, {int days = 3}) async {
     final notifTitle = 'Peminjaman Berhasil';
     final notifBody = '"$title" berhasil disewa untuk $days hari ke depan.';

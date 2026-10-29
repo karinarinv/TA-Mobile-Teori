@@ -11,11 +11,14 @@ import 'db_helper.dart';
 import 'cloud_service.dart';
 import 'notification_service.dart';
 
+/// Membuat rantai hash riwayat sewa lokal dan mencoba menyalinnya ke layanan.
 class BlockchainService {
+  // Hash mengikat isi, hash sebelumnya, dan waktu agar perubahan terdeteksi.
   static String _calc(Object? data, Object? prev, Object? ts) =>
       sha256.convert(utf8.encode('$data|$prev|$ts')).toString();
 
   /// Mengirim bukti pencatatan sewa ke jaringan Ethereum Sepolia (Etherscan)
+  // Kirim transaksi data ke Sepolia; batas tunggu jaringan adalah 15 detik.
   static Future<String?> recordToSepolia(String data) async {
     final pk = sepoliaPrivateKey.trim();
     if (pk.isEmpty) {
@@ -47,6 +50,7 @@ class BlockchainService {
     }
   }
 
+  // Bentuk rantai per akun, simpan lokal dahulu, lalu kirim salinan ke cloud.
   static Future<void> addTransaction(String data, [String? user]) async {
     final currentUser = user ?? await AuthService.currentSession() ?? 'anonim';
     final db = await DbHelper.db;
@@ -86,6 +90,7 @@ class BlockchainService {
     }
   }
 
+  // Baca riwayat akun aktif dengan transaksi terbaru lebih dulu.
   static Future<List<Map<String, Object?>>> all([String? user]) async {
     final currentUser = user ?? await AuthService.currentSession();
     final db = await DbHelper.db;
@@ -100,6 +105,7 @@ class BlockchainService {
     return db.query('riwayat_transaksi', orderBy: 'id DESC');
   }
 
+  // Hitung ulang tiap hash dan tautan sebelumnya untuk mendeteksi perubahan.
   static bool verifyRows(List<Map<String, Object?>> rows) {
     var prev = '0';
     for (final r in rows) {
@@ -112,6 +118,7 @@ class BlockchainService {
     return true;
   }
 
+  // Ambil data lokal berurutan lama-ke-baru sebelum memeriksa rantainya.
   static Future<bool> verify([String? user]) async {
     final currentUser = user ?? await AuthService.currentSession();
     final db = await DbHelper.db;

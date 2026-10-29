@@ -11,6 +11,7 @@ class TiltCover extends StatefulWidget {
 }
 
 class _TiltCoverState extends State<TiltCover> {
+  // Rotasi dibatasi +/- 0.5 radian dan diredam agar gerak terasa halus.
   double _x = 0, _y = 0;
   StreamSubscription? _sub;
 
@@ -28,6 +29,7 @@ class _TiltCoverState extends State<TiltCover> {
 
   @override
   void dispose() {
+    // Hentikan langganan sensor ketika widget dilepas dari layar.
     _sub?.cancel();
     super.dispose();
   }

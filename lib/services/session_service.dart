@@ -5,7 +5,9 @@ import 'auth_service.dart';
 import '../screens/login_page.dart';
 import '../main.dart';
 
+/// Memantau aktivitas dan mengakhiri sesi setelah 15 menit tidak aktif.
 class SessionService {
+  // Pemeriksaan berjalan tiap 10 detik; aktivitas disimpan berkala tiap 20 detik.
   static const Duration timeoutDuration = Duration(minutes: 15);
   static const String _keyLastActive = 'session_last_active_ms';
 

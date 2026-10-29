@@ -16,6 +16,7 @@ import 'saved_books_page.dart';
 import 'blockchain_page.dart';
 import 'login_page.dart';
 
+/// Ringkasan akun: profil lokal, bookmark, riwayat sewa, dan membership.
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
   @override
@@ -39,6 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _load() async {
+    // Gabungkan data akun SQLite, bookmark lokal, transaksi, dan status VIP.
     final username = await AuthService.currentSession();
     String? photo;
     DateTime? usernameChangeAvailableAt;
@@ -85,6 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    // Pilih foto profil dan simpan path file pada baris akun SQLite.
     final f = await ImagePicker().pickImage(source: source, imageQuality: 70);
     if (f == null || _username == null) return;
     await (await DbHelper.db).update(
@@ -97,6 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _changeUsername() async {
+    // Buka formulir nama; AuthService menerapkan validasi dan jeda 30 hari.
     final currentUsername = _username;
     if (currentUsername == null) return;
 
@@ -138,6 +142,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showImagePickerSheet() {
+    // Tampilkan pilihan kamera atau galeri untuk foto profil.
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -209,6 +214,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _logout() async {
+    // Minta konfirmasi; jika setuju, hapus sesi dan kembali ke login.
     final yes = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(

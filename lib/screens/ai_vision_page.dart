@@ -9,6 +9,7 @@ import '../config.dart';
 import '../constants/app_colors.dart';
 import 'books_page.dart';
 
+/// Memilih foto sampul, meminta Gemini mengenali buku, lalu menampilkan hasilnya.
 class AiVisionPage extends StatefulWidget {
   const AiVisionPage({super.key});
 
@@ -45,6 +46,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    // Gambar dibatasi 1024 px dan kualitas 85 agar request lebih ringan.
     final prefs = await SharedPreferences.getInstance();
     if (source == ImageSource.camera) {
       await prefs.setBool('ai_vision_camera_pending', true);
@@ -81,6 +83,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
   }
 
   Future<void> _analyzeImageWithGemini(File imageFile) async {
+    // Kirim gambar sebagai Base64 bersama instruksi analisis ke Gemini Vision.
     setState(() => _analyzing = true);
 
     try {
@@ -127,6 +130,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
 
       String? responseText;
 
+      // Setiap model dicoba dengan batas waktu 25 detik; lanjut jika gagal.
       for (final model in modelsToTry) {
         try {
           final res = await http.post(
@@ -151,6 +155,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
 
       if (responseText != null) {
         // Bersihkan jika ada format ```json
+        // Hilangkan pembungkus Markdown sebelum mengubah jawaban menjadi JSON.
         String cleanJson = responseText.replaceAll('```json', '').replaceAll('```', '').trim();
         final parsed = jsonDecode(cleanJson) as Map<String, dynamic>;
         

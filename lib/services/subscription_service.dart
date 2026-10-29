@@ -14,6 +14,7 @@ import 'notification_service.dart';
 import 'cloud_service.dart';
 
 enum _VipPlan {
+  // Paket VIP menentukan nama plan, masa berlaku, dan harga pada UI.
   monthly('1 Bulan', 30, 29000, 29000),
   yearly('1 Tahun', 365, 348000, 348000);
 
@@ -31,6 +32,7 @@ enum _VipPlan {
 }
 
 class SubscriptionService {
+  // Mengelola status VIP lokal/cloud dan alur pembelian dalam aplikasi.
   /// True only when the account has no recorded annual VIP purchase yet.
   static Future<bool> canUseAnnualPromo() async {
     final username = await AuthService.currentSession();
@@ -257,6 +259,7 @@ class SubscriptionService {
     return prefs.getString('vip_plan_user_$username') ?? '-';
   }
 
+  // Gunakan cache perangkat saat koneksi Supabase belum tersedia.
   static Future<bool> _isCachedVip(
     String username,
     SharedPreferences prefs,
@@ -271,6 +274,7 @@ class SubscriptionService {
   }
 
   /// Cek akses fitur: jika VIP -> langsung buka; jika bukan -> munculkan dialog Paywall VIP
+  // Periksa hak akses; bila belum VIP, tampilkan pilihan paket berlangganan.
   static Future<void> checkAccess(
     BuildContext context, {
     required String featureName,
@@ -310,6 +314,7 @@ class SubscriptionService {
 }
 
 class _SubscriptionPaywallSheet extends StatefulWidget {
+  // Lembar pilihan paket dan metode pembayaran VIP.
   final String featureName;
   final VoidCallback? onSubscribed;
 
@@ -720,6 +725,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
 /// MODAL QRIS VIP DENGAN AUTO-KONFIRMASI 5 DETIK SETELAH DI-SCAN
 /// =========================================================================
 class _VipQrisPaymentModal extends StatefulWidget {
+  // QR yang ditampilkan adalah bagian antarmuka demo; aktivasi tidak diverifikasi provider.
   final _VipPlan plan;
   final int priceIdr;
   final int originalPriceIdr;
@@ -1003,6 +1009,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
 /// MODAL VIRTUAL ACCOUNT VIP
 /// =========================================================================
 class _VipVaPaymentModal extends StatefulWidget {
+  // Alur VA demo; nomor dan konfirmasi pembayaran belum berasal dari bank.
   final _VipPlan plan;
   final int priceIdr;
   final int originalPriceIdr;
@@ -1052,6 +1059,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
 
   Future<void> _completePayment() async {
     setState(() => _isProcessing = true);
+    // Simulasi jeda konfirmasi 700 ms sebelum status VIP diaktifkan.
     await Future.delayed(const Duration(milliseconds: 700));
 
     try {

@@ -11,6 +11,7 @@ import '../services/subscription_service.dart';
 import '../screens/blockchain_page.dart';
 import '../main.dart';
 
+/// Form durasi, voucher, dan pilihan pembayaran saat pengguna menyewa buku.
 class RentalBottomSheet extends StatefulWidget {
   final Map<String, dynamic> book;
 
@@ -31,6 +32,7 @@ class RentalBottomSheet extends StatefulWidget {
 }
 
 class _RentalBottomSheetState extends State<RentalBottomSheet> {
+  // Sewa dimulai 7 hari; pilihan metode dibawa ke modal pembayaran terkait.
   int _duration = 7;
   String _paymentMethod = 'QRIS (GoPay/OVO/Dana)';
   bool _isProcessing = false;
@@ -725,6 +727,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     );
   }
 
+  // Validasi pilihan, hitung tagihan, lalu catat transaksi dan pengingat sewa.
   Future<void> _confirmRent(
     String title,
     String authors,
@@ -958,6 +961,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
 // ================================================================
 // WIDGET MODAL QRIS DENGAN KODE QR NYATA & NOTIFIKASI SUKSES
 // ================================================================
+/// Modal QR untuk alur demo pembayaran sewa.
 class _QrisPaymentModal extends StatefulWidget {
   final String title;
   final String authors;
@@ -986,6 +990,7 @@ class _QrisPaymentModal extends StatefulWidget {
 class _QrisPaymentModalState extends State<_QrisPaymentModal> {
   bool _isProcessing = false;
 
+  // Menunggu simulasi 600 ms sebelum transaksi dicatat; tidak memverifikasi provider.
   Future<void> _processPayment() async {
     if (_isProcessing) return;
     final navigator = Navigator.of(context);
@@ -1215,6 +1220,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
 // ================================================================
 // WIDGET MODAL VIRTUAL ACCOUNT DENGAN PILIHAN BANK & SALIN NOMOR
 // ================================================================
+/// Modal nomor Virtual Account untuk alur demo pembayaran sewa.
 class _VaPaymentModal extends StatefulWidget {
   final String title;
   final String authors;
@@ -1271,6 +1277,7 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
     );
   }
 
+  // Menunggu simulasi 900 ms sebelum transaksi dicatat; belum terhubung ke bank.
   Future<void> _processPayment() async {
     setState(() => _isProcessing = true);
     await Future.delayed(const Duration(milliseconds: 900));

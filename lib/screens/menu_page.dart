@@ -25,6 +25,7 @@ import 'map_page.dart';
 import 'notification_page.dart';
 import 'profile_page.dart';
 
+/// Beranda: profil singkat, notifikasi, banner, buku rekomendasi, dan pintasan fitur.
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
 
@@ -177,6 +178,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   void _startBannerAutoSlide() {
+    // Geser ke banner berikutnya setiap 4 detik; perpindahannya berlangsung 450 ms.
     _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (_bannerController.hasClients) {
         final next = (_currentBannerIndex + 1) % 4;
@@ -190,6 +192,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> _loadUser() async {
+    // Muat username/foto lokal dan status VIP untuk bagian header beranda.
     final u = await AuthService.currentSession();
     String? photo;
     if (u != null && u.isNotEmpty) {
@@ -215,6 +218,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> _loadNotificationsCount() async {
+    // Perbarui angka badge dari jumlah notifikasi yang belum dibaca.
     final c = await NotificationService.getUnreadCount();
     if (mounted) {
       setState(() => _unreadNotifications = c);
@@ -222,6 +226,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> _loadLastRentedGenre() async {
+    // Genre sewa terakhir dipakai untuk mengurutkan rekomendasi buku.
     final user = await AuthService.currentSession() ?? 'guest';
     final prefs = await SharedPreferences.getInstance();
     final genre = prefs.getString('last_rented_genre_$user');
@@ -234,6 +239,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   void _updateRecommendedBooks() {
+    // Dahulukan buku dengan genre sama, lalu tambahkan genre lainnya.
     if (_lastRentedGenre != null && _lastRentedGenre!.isNotEmpty) {
       final matching = _masterBooks.where((b) {
         final cat = (b['category'] as String? ?? '').toLowerCase();

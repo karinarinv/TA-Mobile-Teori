@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 
+/// Jembatan dari Flutter ke pemutar suara native melalui MethodChannel.
 class GameAudioService {
+  // Nama channel ini harus sama dengan handler pada kode platform Android/iOS.
   static const _channel = MethodChannel('com.rentbook.audio');
 
   static Future<void> playBgm() async {

@@ -15,6 +15,7 @@ class OwlBookIcon extends StatelessWidget {
 }
 
 class _OwlBookPainter extends CustomPainter {
+  // Gambar dibuat dengan Path dan lingkaran agar tidak memerlukan file gambar.
   @override
   void paint(Canvas canvas, Size size) {
     final scale = size.width / 100;

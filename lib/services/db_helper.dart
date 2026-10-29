@@ -1,10 +1,13 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+/// Membuka SQLite lokal dan memperbarui struktur tabel antarversi aplikasi.
 class DbHelper {
+  // Database dibuat sekali, lalu instance yang sama dipakai ulang.
   static Database? _db;
   static Future<Database> get db async => _db ??= await openDatabase(
     join(await getDatabasesPath(), 'rentbook.db'),
+    // Naikkan versi saat struktur berubah agar onUpgrade menjalankan migrasi.
     version: 7,
     onCreate: (d, v) async {
       await d.execute(
@@ -14,6 +17,7 @@ class DbHelper {
         'CREATE TABLE riwayat_transaksi(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT, prev_hash TEXT, hash TEXT, ts TEXT, tx_hash TEXT, username TEXT)',
       );
     },
+    // Migrasi berurutan menjaga data pengguna lama saat aplikasi diperbarui.
     onUpgrade: (d, oldVersion, newVersion) async {
       if (oldVersion < 3) {
         await d.execute('ALTER TABLE users ADD COLUMN display_name TEXT');
@@ -38,6 +42,7 @@ class DbHelper {
         await d.execute('ALTER TABLE users_without_email RENAME TO users');
       }
     },
+    // Tambah kolom lama secara aman; error berarti kolom itu sudah tersedia.
     onOpen: (d) async {
       try {
         await d.execute(

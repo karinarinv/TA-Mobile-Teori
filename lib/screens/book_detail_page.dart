@@ -9,6 +9,7 @@ import '../widgets/rental_bottom_sheet.dart';
 import '../services/bookmark_service.dart';
 import 'saved_books_page.dart';
 
+/// Menampilkan detail buku terpilih dan menyediakan bookmark serta alur sewa.
 class BookDetailPage extends StatefulWidget {
   final Map<String, dynamic> book;
 
@@ -30,6 +31,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _loadOpenLibraryDescription() async {
+    // Ambil sinopsis cadangan hanya jika katalog utama tidak menyediakannya.
     final currentDescription = widget.book['description']?.toString().trim() ?? '';
     final workKey = widget.book['openLibraryKey']?.toString();
     if (currentDescription.isNotEmpty || workKey == null || workKey.isEmpty) {
@@ -38,6 +40,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
     try {
       final uri = Uri.https('openlibrary.org', '$workKey.json');
+      // Request sinopsis dibatasi 6 detik agar halaman detail tidak menunggu lama.
       final response = await http.get(uri).timeout(const Duration(seconds: 6));
       if (response.statusCode != 200) return;
 
@@ -61,6 +64,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _toggleBookmark() async {
+    // Bookmark tersimpan lokal; Snackbar menawarkan pintasan ke daftar tersimpan.
     final title = widget.book['title']?.toString() ?? 'Buku';
     final nowSaved = await BookmarkService.toggleBookmark(widget.book);
     if (!mounted) return;

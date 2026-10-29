@@ -5,6 +5,7 @@ import '../widgets/rental_bottom_sheet.dart';
 import 'book_detail_page.dart';
 import 'books_page.dart';
 
+/// Menampilkan bookmark lokal serta aksi hapus, urungkan, lihat detail, dan sewa.
 class SavedBooksPage extends StatefulWidget {
   const SavedBooksPage({super.key});
 
@@ -23,6 +24,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
   }
 
   Future<void> _loadBookmarks() async {
+    // Muat ulang daftar agar perubahan bookmark langsung terlihat.
     setState(() => _loading = true);
     final list = await BookmarkService.getBookmarks();
     if (mounted) {
@@ -34,6 +36,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
   }
 
   Future<void> _remove(Map<String, dynamic> book) async {
+    // Hapus bookmark dan tampilkan opsi urungkan selama Snackbar 1,8 detik.
     final title = (book['title'] as String?) ?? '';
     await BookmarkService.removeBookmark(title);
     await _loadBookmarks();

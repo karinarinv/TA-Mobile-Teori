@@ -2,12 +2,15 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_service.dart';
 
+/// Menyimpan daftar buku favorit terpisah untuk setiap akun perangkat.
 class BookmarkService {
+  // Kunci penyimpanan memakai username agar bookmark akun tidak tercampur.
   static Future<String> _getKey() async {
     final user = await AuthService.currentSession();
     return 'bookmarks_${user ?? "guest"}';
   }
 
+  // Baca JSON dari SharedPreferences dan abaikan entri yang rusak.
   static Future<List<Map<String, dynamic>>> getBookmarks() async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getKey();
@@ -30,6 +33,7 @@ class BookmarkService {
   }
 
   /// Toggle simpan: return true jika berhasil disimpan, false jika dihapus
+  // Tambah buku ke urutan teratas atau hapus jika judulnya sudah tersimpan.
   static Future<bool> toggleBookmark(Map<String, dynamic> book) async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getKey();

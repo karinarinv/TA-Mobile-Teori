@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
+/// Halaman dua tab: kurs mata uang dari API dan jam dari zona waktu UTC.
 class ConverterPage extends StatefulWidget {
   const ConverterPage({super.key});
   @override
@@ -45,7 +46,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
-    // Live clock timer 
+    // Perbarui jam setiap 1 detik agar tampilan jam dunia bergerak realtime.
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (mounted) {
         setState(() => _now = DateTime.now());
@@ -64,11 +65,12 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
   }
 
   Future<void> _fetchRates() async {
+    // Ambil kurs dari Frankfurter; nilai awal di _rates dipakai saat offline.
     setState(() => _loadingRates = true);
     try {
       final r = await http
           .get(Uri.parse('https://api.frankfurter.app/latest?from=IDR&to=USD,EUR,JPY,GBP,AUD'))
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 5)); // Batasi waktu tunggu API.
 
       if (r.statusCode == 200) {
         final data = jsonDecode(r.body)['rates'] as Map<String, dynamic>;
@@ -97,6 +99,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
   }
 
   bool _bst(DateTime u) {
+    // Tentukan periode British Summer Time dari hari Minggu terakhir Mar-Okt.
     DateTime lastSun(int m) {
       var d = DateTime.utc(u.year, m + 1, 0, 1);
       while (d.weekday != DateTime.sunday) {
@@ -135,6 +138,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final amount = double.tryParse(_amt.text.replaceAll('.', '')) ?? 0;
+    // Hitung zona waktu dari satu waktu UTC, lalu tambahkan offset tiap wilayah.
     final utc = _now.toUtc();
     final fTime = DateFormat('HH:mm:ss');
 

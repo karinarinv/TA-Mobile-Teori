@@ -7,6 +7,7 @@ import '../services/game_audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
+  // Halaman yang dibuka setelah animasi selesai; nilainya dipilih di main.dart.
   final Widget destination;
 
   const SplashScreen({super.key, required this.destination});
@@ -24,10 +25,15 @@ class _SplashScreenState extends State<SplashScreen>
   // WARNA: warna elemen.
   static const _logoColor = Color(0xFFEDE2CF);
 
+  // Mengendalikan seluruh animasi splash dari awal sampai selesai.
   late final AnimationController _controller;
+  // Progress buka sampul, nilainya 0.0 sampai 1.0.
   late final Animation<double> _open;
+  // Skala buku: mulai kecil, mendekat, lalu zoom untuk transisi.
   late final Animation<double> _zoom;
+  // Progress animasi lembar halaman dibalik.
   late final Animation<double> _pageTurn;
+  // Opacity lapisan putih untuk menyamarkan perpindahan halaman.
   late final Animation<double> _whiteFade;
   Timer? _pageSound;
 
@@ -36,27 +42,33 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
+      // Durasi total animasi splash adalah 2,8 detik.
       duration: const Duration(milliseconds: 2800),
     );
     _open = CurvedAnimation(
       parent: _controller,
+      // Sampul membuka dari sekitar detik 0,64 sampai detik 1,46.
       curve: const Interval(.23, .52, curve: Curves.easeInOutCubic),
     );
     _zoom = TweenSequence<double>([
+      // Weight adalah porsi relatif tiap tahap zoom, bukan satuan waktu.
       TweenSequenceItem(
         tween: Tween(begin: .9, end: .9),
         weight: 23,
       ),
+      // Tahap 1: zoom perlahan dari 0,9 ke 1,02.
       TweenSequenceItem(
         tween: Tween(begin: .9, end: 1.02)
             .chain(CurveTween(curve: Curves.easeOutCubic)),
         weight: 12,
       ),
+      // Tahap 2: zoom sedikit dari 1,02 ke 1,06.
       TweenSequenceItem(
         tween: Tween(begin: 1.02, end: 1.06)
             .chain(CurveTween(curve: Curves.easeInOut)),
         weight: 50,
       ),
+      // Tahap 3: zoom cepat ke 2,45 untuk transisi keluar.
       TweenSequenceItem(
         tween: Tween(begin: 1.06, end: 2.45)
             .chain(CurveTween(curve: Curves.easeInCubic)),
@@ -65,15 +77,19 @@ class _SplashScreenState extends State<SplashScreen>
     ]).animate(_controller);
     _pageTurn = CurvedAnimation(
       parent: _controller,
+      // Halaman dibalik dari sekitar detik 1,37 sampai detik 2,24.
       curve: const Interval(.49, .8, curve: Curves.easeInOutCubic),
     );
     _whiteFade = CurvedAnimation(
       parent: _controller,
+      // Lapisan putih muncul dari sekitar detik 2,35 sampai 2,8.
       curve: const Interval(.84, 1, curve: Curves.easeIn),
     );
+    // Efek suara membalik halaman diputar 0,7 detik setelah splash mulai.
     _pageSound = Timer(const Duration(milliseconds: 700), () {
       if (mounted) unawaited(GameAudioService.playPageTurn());
     });
+    // Setelah controller mencapai akhir, lanjut ke halaman tujuan.
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) _openApp();
     });
@@ -83,20 +99,24 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _checkPendingAndStart() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Jika aplikasi kembali dari kamera AI Vision, jangan tampilkan splash lagi.
       if (prefs.getBool('ai_vision_camera_pending') == true) {
         if (mounted) _openApp();
         return;
       }
     } catch (_) {}
+    // Mulai animasi hanya jika widget masih berada di layar.
     if (mounted) {
       _controller.forward();
     }
   }
 
   void _openApp() {
+    // Ganti splash dengan tujuan supaya tombol Back tidak kembali ke splash.
     Navigator.of(context).pushReplacement(
       PageRouteBuilder<void>(
         pageBuilder: (_, __, ___) => widget.destination,
+        // Halaman tujuan muncul dengan transisi fade selama 0,28 detik.
         transitionDuration: const Duration(milliseconds: 280),
         transitionsBuilder: (_, animation, __, child) =>
             FadeTransition(opacity: animation, child: child),
@@ -105,6 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Widget _bookCover() {
+    // Sampul 2D dengan logo, ornamen, gradasi, dan bayangan.
     return Container(
       width: 204,
       height: 282,
@@ -156,6 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
+    // Hentikan timer dan animasi agar tidak berjalan setelah halaman ditutup.
     _pageSound?.cancel();
     _controller.dispose();
     super.dispose();
@@ -168,9 +190,11 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: _background,
       body: SafeArea(
         child: AnimatedBuilder(
+            // Bangun ulang tampilan ketika nilai animasi berubah.
             animation: _controller,
             builder: (context, _) {
               final open = _open.value;
+              // Sampul mulai memudar setelah progress buka melewati 0,72.
               final coverFade = (1 - ((open - .72) / .28).clamp(0.0, 1.0))
                   .toDouble();
 
@@ -189,6 +213,7 @@ class _SplashScreenState extends State<SplashScreen>
                             Positioned.fill(
                               child: CustomPaint(
                                 painter: _OpenBookPainter(
+                                  // Kirim progress buka dan balik halaman ke painter.
                                   progress: open,
                                   turnProgress: _pageTurn.value,
                                 ),
@@ -199,6 +224,7 @@ class _SplashScreenState extends State<SplashScreen>
                               child: Transform(
                                 alignment: Alignment.center,
                                 transform: Matrix4.identity()
+                                  // Angka ini memberi perspektif; rotateY memutar sampul pada sumbu Y.
                                   ..setEntry(3, 2, .0017)
                                   ..rotateY(-1.43 * open),
                                 child: _bookCover(),
@@ -227,6 +253,7 @@ class _SplashScreenState extends State<SplashScreen>
 }
 
 class _BookCoverOrnamentPainter extends CustomPainter {
+  // Menggambar garis hias emas pada sampul buku.
   @override
   void paint(Canvas canvas, Size size) {
     final gold = Paint()
@@ -292,6 +319,7 @@ class _BookCoverOrnamentPainter extends CustomPainter {
 }
 
 class _OpenBookPainter extends CustomPainter {
+  // Nilai animasi dari SplashScreen; painter tidak memiliki controller sendiri.
   final double progress;
   final double turnProgress;
 
@@ -299,6 +327,7 @@ class _OpenBookPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Belum gambar halaman sebelum animasi buka dimulai.
     if (progress <= 0) return;
 
     final centerX = size.width / 2;
@@ -334,7 +363,7 @@ class _OpenBookPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 
-    // Flip a stack of pages in sequence so the opening reads as a quick page riffle.
+    // Delapan lembar memakai progress berbeda agar terlihat seperti halaman dibalik berurutan.
     const pageCount = 8;
     for (var page = 0; page < pageCount; page++) {
       final turn = (turnProgress * pageCount - page)
@@ -402,6 +431,7 @@ class _OpenBookPainter extends CustomPainter {
     canvas.drawLine(Offset(centerX - 3, top + 8), Offset(centerX - 3, bottom - 8), pageEdge);
   }
 
+  // Gambar ulang hanya ketika progress buka atau balik halaman berubah.
   @override
   bool shouldRepaint(covariant _OpenBookPainter oldDelegate) =>
       oldDelegate.progress != progress || oldDelegate.turnProgress != turnProgress;
