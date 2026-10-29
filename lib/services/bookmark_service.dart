@@ -6,6 +6,7 @@ import 'auth_service.dart';
 class BookmarkService {
   // Kunci penyimpanan memakai username agar bookmark akun tidak tercampur.
   static Future<String> _getKey() async {
+    // Pengguna yang belum login memakai namespace guest tersendiri.
     final user = await AuthService.currentSession();
     return 'bookmarks_${user ?? "guest"}';
   }
@@ -14,6 +15,7 @@ class BookmarkService {
   static Future<List<Map<String, dynamic>>> getBookmarks() async {
     final prefs = await SharedPreferences.getInstance();
     final key = await _getKey();
+    // Setiap buku disimpan sebagai JSON dalam daftar string SharedPreferences.
     final raw = prefs.getStringList(key) ?? [];
     return raw
         .map((e) {
@@ -40,6 +42,7 @@ class BookmarkService {
     final list = await getBookmarks();
     final title = (book['title'] as String?) ?? '';
 
+    // Judul dibandingkan tanpa membedakan kapitalisasi agar tidak tersimpan ganda.
     final index = list.indexWhere((b) => (b['title'] as String?)?.toLowerCase() == title.toLowerCase());
     bool nowBookmarked;
 
@@ -52,6 +55,7 @@ class BookmarkService {
     }
 
     final raw = list.map((e) => jsonEncode(e)).toList();
+    // Simpan ulang seluruh daftar setelah item ditambah atau dihapus.
     await prefs.setStringList(key, raw);
     return nowBookmarked;
   }

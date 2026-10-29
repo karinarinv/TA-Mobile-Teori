@@ -14,6 +14,7 @@ class SavedBooksPage extends StatefulWidget {
 }
 
 class _SavedBooksPageState extends State<SavedBooksPage> {
+  // Daftar favorit akun; nilainya diambil ulang setelah tambah/hapus.
   List<Map<String, dynamic>> _savedBooks = [];
   bool _loading = true;
 
@@ -36,6 +37,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
   }
 
   Future<void> _remove(Map<String, dynamic> book) async {
+    // Hapus bookmark, lalu tampilkan opsi undo untuk memasukkannya kembali.
     // Hapus bookmark dan tampilkan opsi urungkan selama Snackbar 1,8 detik.
     final title = (book['title'] as String?) ?? '';
     await BookmarkService.removeBookmark(title);

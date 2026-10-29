@@ -38,13 +38,16 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  // MapController menggerakkan kamera peta, misalnya saat memilih lokasi/rute.
   final MapController _mapController = MapController();
+  // Koordinat pengguna didapat dari GPS setelah izin lokasi diberikan.
   LatLng? _me;
   bool _loadingLocation = true;
   LibraryItem? _selectedLib;
 
   // State untuk Rute Navigasi
   List<LatLng> _routePoints = [];
+  // State rute dipakai untuk menggambar garis dan menampilkan jarak/waktu.
   bool _isRouting = false;
   LibraryItem? _navigatingLib;
   String _routeDistance = '';
@@ -71,6 +74,7 @@ class _MapPageState extends State<MapPage> {
       });
     }
     final result = await CloudService.selectWhere('libraries', filters: {});
+    // Hentikan pembaruan UI jika halaman ditutup selagi request berjalan.
     if (!mounted) return;
 
     if (!result.success) {
@@ -86,6 +90,7 @@ class _MapPageState extends State<MapPage> {
     // where only some fields were filled. Merge those rows before displaying.
     final librariesByKey = <String, LibraryItem>{};
     for (final row in result.rows) {
+      // Tolak koordinat yang kosong, bukan angka, atau di luar rentang bumi.
       final latitude = double.tryParse('${row['lat']}');
       final longitude = double.tryParse('${row['lng']}');
       final name = row['name']?.toString().trim() ?? '';
@@ -121,6 +126,7 @@ class _MapPageState extends State<MapPage> {
           facilities: facilities,
         );
       final key = '${name.toLowerCase()}|${latitude.toStringAsFixed(5)}|${longitude.toStringAsFixed(5)}';
+      // Baris cabang yang punya nama dan koordinat sama digabung menjadi satu marker.
       final existing = librariesByKey[key];
       if (existing == null) {
         librariesByKey[key] = item;

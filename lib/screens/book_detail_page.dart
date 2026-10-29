@@ -20,7 +20,9 @@ class BookDetailPage extends StatefulWidget {
 }
 
 class _BookDetailPageState extends State<BookDetailPage> {
+  // Status favorit dibaca dari BookmarkService saat halaman detail dibuka.
   bool _isBookmarked = false;
+  // Deskripsi tambahan yang diminta dari Open Library jika katalog belum punya.
   String? _openLibraryDescription;
 
   @override
@@ -58,6 +60,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   Future<void> _checkBookmark() async {
+    // Cocokkan judul dengan daftar favorit akun yang sedang login.
     final title = widget.book['title']?.toString() ?? '';
     final b = await BookmarkService.isBookmarked(title);
     if (mounted) setState(() => _isBookmarked = b);
@@ -67,6 +70,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     // Bookmark tersimpan lokal; Snackbar menawarkan pintasan ke daftar tersimpan.
     final title = widget.book['title']?.toString() ?? 'Buku';
     final nowSaved = await BookmarkService.toggleBookmark(widget.book);
+    // Perbarui ikon favorit mengikuti hasil simpan atau hapus.
     if (!mounted) return;
     setState(() => _isBookmarked = nowSaved);
 

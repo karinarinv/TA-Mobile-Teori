@@ -19,12 +19,17 @@ class BooksPage extends StatefulWidget {
 }
 
 class _BooksPageState extends State<BooksPage> {
+  // Input pencarian dan daftar hasil yang dirender oleh ListView katalog.
   final _q = TextEditingController();
   List _books = [];
+  // Dipakai untuk spinner dan mencegah pemicu shake saat pencarian berlangsung.
   bool _loading = false;
+  // Pesan untuk keadaan hasil kosong atau error request.
   String _status = '';
   StreamSubscription? _sub;
+  // Waktu shake terakhir untuk mencegah pencarian berulang terlalu cepat.
   DateTime _lastShake = DateTime.now();
+  // Genre aktif mengatur kategori yang ditampilkan/dicari.
   String _selectedGenre = 'Semua';
   final List<String> _genres = const [
     'Semua',
@@ -48,6 +53,7 @@ class _BooksPageState extends State<BooksPage> {
 
     // Goyangan kuat (lebih dari 16) mengganti kata pencarian, dengan jeda 3 detik.
     _sub = userAccelerometerEventStream().listen((e) {
+      // Besar vektor percepatan mengukur seberapa kuat ponsel digoyangkan.
       final g = sqrt(e.x * e.x + e.y * e.y + e.z * e.z);
       if (g > 16 &&
           DateTime.now().difference(_lastShake).inSeconds > 3 &&
@@ -95,6 +101,7 @@ class _BooksPageState extends State<BooksPage> {
   }
 
   Future<void> _search() async {
+    // Tutup keyboard sebelum mengubah tampilan hasil.
     FocusManager.instance.primaryFocus?.unfocus();
 
     final queryText = _q.text.trim();
@@ -107,6 +114,7 @@ class _BooksPageState extends State<BooksPage> {
 
     try {
       final uri = Uri.https('www.googleapis.com', '/books/v1/volumes', {
+        // Google Books diminta mengembalikan maksimal 30 hasil bertipe buku.
         'q': q,
         'maxResults': '30',
         'printType': 'books',
@@ -118,6 +126,7 @@ class _BooksPageState extends State<BooksPage> {
       if (!mounted) return;
 
       if (r.statusCode == 200) {
+        // Ubah JSON API menjadi daftar item yang hanya berisi field UI perlukan.
         final data = jsonDecode(r.body) as Map<String, dynamic>;
         final items = (data['items'] as List?) ?? [];
         if (items.isEmpty) {

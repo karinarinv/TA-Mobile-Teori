@@ -18,9 +18,13 @@ class AiVisionPage extends StatefulWidget {
 }
 
 class _AiVisionPageState extends State<AiVisionPage> {
+  // ImagePicker mengembalikan foto dari kamera/galeri sebagai file perangkat.
   final ImagePicker _picker = ImagePicker();
+  // Foto terpilih ditampilkan di preview dan dikirim ke model vision.
   File? _selectedImage;
+  // Mengunci tombol dan menampilkan loading selama request AI berjalan.
   bool _analyzing = false;
+  // Hasil JSON Gemini yang dipakai untuk membangun kartu detail hasil scan.
   Map<String, dynamic>? _analysisResult;
 
   @override
@@ -32,10 +36,13 @@ class _AiVisionPageState extends State<AiVisionPage> {
   Future<void> _retrieveLostData() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      // Bersihkan penanda sebelum memeriksa hasil kamera yang mungkin mematikan Activity.
       await prefs.remove('ai_vision_camera_pending');
       final response = await _picker.retrieveLostData();
+      // Tidak semua pembukaan halaman berasal dari kamera yang kehilangan hasil.
       if (response.isEmpty) return;
       if (response.file != null) {
+        // Pulihkan file, kosongkan hasil lama, lalu jalankan analisis lagi.
         setState(() {
           _selectedImage = File(response.file!.path);
           _analysisResult = null;
@@ -48,12 +55,14 @@ class _AiVisionPageState extends State<AiVisionPage> {
   Future<void> _pickImage(ImageSource source) async {
     // Gambar dibatasi 1024 px dan kualitas 85 agar request lebih ringan.
     final prefs = await SharedPreferences.getInstance();
+    // Penanda membantu memulihkan foto jika Android menghentikan aplikasi saat kamera terbuka.
     if (source == ImageSource.camera) {
       await prefs.setBool('ai_vision_camera_pending', true);
     }
     try {
       final picked = await _picker.pickImage(
         source: source,
+        // Ukuran dan kompresi ini mengurangi besar file Base64 yang dikirim ke API.
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
@@ -63,6 +72,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
 
       if (picked == null) return;
 
+      // Foto baru membatalkan tampilan hasil scan sebelumnya.
       setState(() {
         _selectedImage = File(picked.path);
         _analysisResult = null;
@@ -87,6 +97,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
     setState(() => _analyzing = true);
 
     try {
+      // Gemini menerima gambar sebagai string Base64 di inlineData.
       final bytes = await imageFile.readAsBytes();
       final base64Image = base64Encode(bytes);
 
@@ -101,6 +112,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
           'PENTING: Kembalikan HANYA format JSON valid tanpa tanda markdown (tanpa ```json).';
 
       final body = {
+        // contents.parts berisi gambar dan instruksi JSON untuk model.
         'contents': [
           {
             'parts': [
@@ -122,6 +134,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
       };
 
       final modelsToTry = [
+        // Jika model utama tidak tersedia, coba nama model alternatif berurutan.
         geminiModel,
         'gemini-3.5-flash',
         'gemini-3.1-flash-lite',
@@ -133,6 +146,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
       // Setiap model dicoba dengan batas waktu 25 detik; lanjut jika gagal.
       for (final model in modelsToTry) {
         try {
+          // Request dibatasi 25 detik; timeout membuat percobaan pindah ke model berikutnya.
           final res = await http.post(
             Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$geminiKey'),
             headers: {'Content-Type': 'application/json'},
@@ -140,6 +154,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
           ).timeout(const Duration(seconds: 25));
 
           if (res.statusCode == 200) {
+            // Ambil teks jawaban dari kandidat pertama yang dikembalikan Gemini.
             final data = jsonDecode(res.body);
             final candidates = data['candidates'] as List?;
             if (candidates != null && candidates.isNotEmpty) {
@@ -157,6 +172,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
         // Bersihkan jika ada format ```json
         // Hilangkan pembungkus Markdown sebelum mengubah jawaban menjadi JSON.
         String cleanJson = responseText.replaceAll('```json', '').replaceAll('```', '').trim();
+        // Konversi teks model ke map agar judul, penulis, dan ringkasan bisa ditampilkan.
         final parsed = jsonDecode(cleanJson) as Map<String, dynamic>;
         
         final rawIsBook = parsed['is_book'];
@@ -166,6 +182,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
             (rawIsBook != false && !title.contains('bukan buku') && !genre.contains('bukan buku'));
         parsed['is_book'] = isBook;
 
+        // Simpan hasil dan matikan indikator loading setelah JSON berhasil dibaca.
         setState(() {
           _analysisResult = parsed;
           _analyzing = false;
@@ -180,6 +197,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
   }
 
   void _fallbackAnalysis() {
+    // Isi contoh ini menjaga halaman tetap menampilkan hasil jika semua request gagal.
     setState(() {
       _analysisResult = {
         'is_book': true,
@@ -195,6 +213,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
 
   @override
   void dispose() {
+    // Bersihkan flag kamera saat halaman ditutup agar tidak terbaca sebagai pemulihan tertunda.
     SharedPreferences.getInstance().then((p) => p.remove('ai_vision_camera_pending'));
     super.dispose();
   }

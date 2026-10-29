@@ -24,6 +24,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  // Ringkasan akun yang dimuat untuk menampilkan profil dan status keanggotaan.
   String? _username, _photo;
   DateTime? _usernameChangeAvailableAt;
   int _savedCount = 0;
@@ -40,6 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _load() async {
+    // Baca identitas, jumlah bookmark/sewa, dan status VIP dari penyimpanan.
     // Gabungkan data akun SQLite, bookmark lokal, transaksi, dan status VIP.
     final username = await AuthService.currentSession();
     String? photo;
@@ -87,6 +89,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    // Ambil gambar dari sumber yang dipilih dan simpan sebagai foto profil lokal.
     // Pilih foto profil dan simpan path file pada baris akun SQLite.
     final f = await ImagePicker().pickImage(source: source, imageQuality: 70);
     if (f == null || _username == null) return;
@@ -100,6 +103,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _changeUsername() async {
+    // Minta username baru; service memvalidasi format dan masa tunggu 30 hari.
     // Buka formulir nama; AuthService menerapkan validasi dan jeda 30 hari.
     final currentUsername = _username;
     if (currentUsername == null) return;
@@ -214,6 +218,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _logout() async {
+    // Keluar menghapus sesi aktif lalu mengganti halaman ke form login.
     // Minta konfirmasi; jika setuju, hapus sesi dan kembali ke login.
     final yes = await showDialog<bool>(
       context: context,

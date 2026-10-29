@@ -15,6 +15,7 @@ class FeedbackPage extends StatefulWidget {
 }
 
 class _FeedbackPageState extends State<FeedbackPage> {
+  // Controller mempertahankan teks kesan dan saran selama form diedit.
   final TextEditingController _kesanController = TextEditingController();
   final TextEditingController _saranController = TextEditingController();
   int _rating = 5;
@@ -63,6 +64,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
   }
 
   Future<void> _saveFeedback() async {
+    // Simpan ke perangkat lebih dulu dan coba sinkronkan salinannya ke Supabase.
     final kesan = _kesanController.text.trim();
     final saran = _saranController.text.trim();
 
