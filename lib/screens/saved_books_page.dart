@@ -44,14 +44,17 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
       SnackBar(
         duration: const Duration(milliseconds: 1800),
         behavior: SnackBarBehavior.floating,
+        // WARNA: latar notifikasi.
         backgroundColor: const Color(0xFF302622),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Text(
           '"$title" dihapus dari daftar tersimpan.',
+          // WARNA: teks '"$title" dihapus dari daftar tersimpan.'.
           style: const TextStyle(color: Color(0xFFEDE2CF)),
         ),
         action: SnackBarAction(
           label: 'Urungkan',
+          // WARNA: teks '"$title" dihapus dari daftar tersimpan.'.
           textColor: const Color(0xFFD4BE9D),
           onPressed: () async {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -87,9 +90,11 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
+                            // WARNA: latar kartu/komponen.
                             color: const Color(0xFFEDE2CF),
                             shape: BoxShape.circle,
                           ),
+                          // WARNA: latar kartu/komponen.
                           child: Icon(Icons.bookmark_border, size: 64, color: const Color(0xFF9A704F)),
                         ),
                         const SizedBox(height: 20),
@@ -100,13 +105,16 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         const SizedBox(height: 8),
                         Text(
                           'Simpan buku favorit Anda dari halaman detail buku untuk mengaksesnya dengan cepat di sini.',
+                          // WARNA: teks 'Belum Ada Buku Tersimpan'.
                           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
                         FilledButton.icon(
                           style: FilledButton.styleFrom(
+                            // WARNA: latar tombol.
                             backgroundColor: const Color(0xFF67343A),
+                            // WARNA: teks/ikon tombol 'Jelajahi Katalog Buku'.
                             foregroundColor: const Color(0xFFEDE2CF),
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -165,12 +173,16 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                           img,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) => Container(
+                                            // WARNA: warna komponen.
                                             color: Colors.grey[200],
+                                            // WARNA: warna komponen.
                                             child: const Icon(Icons.book, color: Colors.grey),
                                           ),
                                         )
                                       : Container(
+                                          // WARNA: ikon book.
                                           color: Colors.grey[200],
+                                          // WARNA: ikon book.
                                           child: const Icon(Icons.book, color: Colors.grey),
                                         ),
                                 ),
@@ -191,6 +203,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                       authors,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
+                                      // WARNA: judul buku.
                                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                     ),
                                     const SizedBox(height: 6),
@@ -199,6 +212,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
+                                            // WARNA: latar kartu/komponen.
                                             color: const Color(0xFFEDE2CF),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
@@ -207,17 +221,20 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
+                                              // WARNA: teks 'Rp ${_formatNumber(pricePerDay)}/hari'.
                                               color: const Color(0xFF5A2A38),
                                             ),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
+                                        // WARNA: teks 'Rp ${_formatNumber(pricePerDay)}/hari'.
                                         Icon(Icons.star, size: 13, color: Colors.amber.shade800),
                                         const SizedBox(width: 2),
                                         Text(
                                           rating,
                                           style: TextStyle(
                                             fontSize: 11,
+                                            // WARNA: rating buku.
                                             color: Colors.grey.shade700,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -231,12 +248,14 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                               Column(
                                 children: [
                                   IconButton(
+                                    // WARNA: warna komponen.
                                     icon: const Icon(Icons.bookmark_remove_outlined, color: Colors.redAccent),
                                     tooltip: 'Hapus dari Tersimpan',
                                     onPressed: () => _remove(item),
                                   ),
                                   FilledButton(
                                     style: FilledButton.styleFrom(
+                                      // WARNA: latar tombol.
                                       backgroundColor: const Color(0xFF67343A),
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                       visualDensity: VisualDensity.compact,

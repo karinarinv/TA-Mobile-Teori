@@ -125,6 +125,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
         style: GoogleFonts.poppins(
           fontWeight: FontWeight.bold,
           fontSize: 15,
+          // WARNA: teks 'text'.
           color: AppColors.walnut,
         ),
       );
@@ -158,6 +159,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 15,
+            // WARNA: teks 'titlePart'.
             color: AppColors.walnut,
           ),
         ),
@@ -170,8 +172,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: Colors.green.shade50,
                   borderRadius: BorderRadius.circular(6),
+                  // WARNA: latar kartu/komponen.
                   border: Border.all(color: Colors.green.shade200),
                 ),
                 child: Row(
@@ -180,6 +184,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     const Icon(
                       Icons.payments_outlined,
                       size: 14,
+                      // WARNA: garis tepi kartu/komponen.
                       color: Colors.green,
                     ),
                     const SizedBox(width: 4),
@@ -188,6 +193,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
+                        // WARNA: teks 'price'.
                         color: Colors.green,
                       ),
                     ),
@@ -198,6 +204,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: AppColors.parchment,
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -207,6 +214,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     const Icon(
                       Icons.timer_outlined,
                       size: 14,
+                      // WARNA: ikon timer_outlined.
                       color: AppColors.oxblood,
                     ),
                     const SizedBox(width: 4),
@@ -215,6 +223,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
+                        // WARNA: teks 'duration'.
                         color: AppColors.oxblood,
                       ),
                     ),
@@ -225,6 +234,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: Colors.orange.shade50,
                   borderRadius: BorderRadius.circular(6),
                 ),
@@ -234,6 +244,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     const Icon(
                       Icons.calendar_today,
                       size: 13,
+                      // WARNA: ikon calendar_today.
                       color: Colors.deepOrange,
                     ),
                     const SizedBox(width: 4),
@@ -242,6 +253,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
+                        // WARNA: teks 'Batas: $due'.
                         color: Colors.deepOrange,
                       ),
                     ),
@@ -252,14 +264,17 @@ class _BlockchainPageState extends State<BlockchainPage> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: AppColors.background,
                   borderRadius: BorderRadius.circular(6),
+                  // WARNA: latar kartu/komponen.
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Text(
                   method,
                   style: const TextStyle(
                     fontSize: 12,
+                    // WARNA: teks 'method'.
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -280,9 +295,11 @@ class _BlockchainPageState extends State<BlockchainPage> {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 0.8,
+      // WARNA: warna komponen.
       color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
+        // WARNA: warna komponen.
         side: const BorderSide(color: AppColors.border, width: 0.8),
       ),
       child: Padding(
@@ -300,6 +317,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
+                    // WARNA: latar kartu/komponen.
                     color: AppColors.parchment,
                     borderRadius: BorderRadius.circular(6),
                   ),
@@ -308,18 +326,21 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
+                      // WARNA: teks 'Blok #$blockId'.
                       color: AppColors.oxblood,
                     ),
                   ),
                 ),
                 Row(
                   children: [
+                    // WARNA: teks 'Blok #$blockId'.
                     const Icon(Icons.link, size: 14, color: Colors.green),
                     const SizedBox(width: 4),
                     Text(
                       'Tersambung (SHA-256)',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 11,
+                        // WARNA: teks 'Tersambung (SHA-256)'.
                         color: Colors.green.shade700,
                         fontWeight: FontWeight.w600,
                       ),
@@ -328,6 +349,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 ),
               ],
             ),
+            // WARNA: warna komponen.
             const Divider(height: 16, color: AppColors.border),
 
             // Info Buku & Sewa
@@ -339,8 +361,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: AppColors.background,
                 borderRadius: BorderRadius.circular(8),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Column(
@@ -353,6 +377,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         'Waktu: ${_s(r['ts'])}',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
+                          // WARNA: teks 'Waktu: ${_s(r['.
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -363,6 +388,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                             const Icon(
                               Icons.copy,
                               size: 12,
+                              // WARNA: ikon copy.
                               color: AppColors.oxblood,
                             ),
                             const SizedBox(width: 3),
@@ -370,6 +396,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                               'Salin Hash',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
+                                // WARNA: teks 'Salin Hash'.
                                 color: AppColors.oxblood,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -384,6 +411,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     'Prev: ${_s(r['prev_hash'])}',
                     style: TextStyle(
                       fontSize: 11,
+                      // WARNA: teks 'Prev: ${_s(r['.
                       color: Colors.grey[600],
                       fontFamily: 'monospace',
                     ),
@@ -394,6 +422,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'monospace',
+                      // WARNA: teks 'Prev: ${_s(r['.
                       color: AppColors.textPrimary,
                     ),
                   ),
@@ -406,9 +435,11 @@ class _BlockchainPageState extends State<BlockchainPage> {
               width: double.infinity,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: hasTx
                       ? AppColors.oxblood
                       : AppColors.tobacco,
+                  // WARNA: teks/ikon tombol.
                   foregroundColor: AppColors.parchment,
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   shape: RoundedRectangleBorder(
@@ -446,6 +477,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
     final totalExpense = _calculateTotalExpense();
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      // WARNA: latar halaman.
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
@@ -453,12 +485,16 @@ class _BlockchainPageState extends State<BlockchainPage> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         elevation: 0,
+        // WARNA: latar AppBar.
         backgroundColor: AppColors.oxblood,
+        // WARNA: teks/ikon tombol.
         foregroundColor: AppColors.parchment,
+        // WARNA: teks 'Riwayat Blockchain'.
         iconTheme: const IconThemeData(color: AppColors.parchment),
         actions: [
           IconButton(
             tooltip: 'Segarkan',
+            // WARNA: teks pada komponen ini.
             icon: const Icon(Icons.refresh, color: AppColors.parchment),
             onPressed: _load,
           ),
@@ -472,6 +508,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.all(16),
+              // WARNA: warna komponen.
               color: AppColors.background,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -482,8 +519,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
+                            // WARNA: latar kartu/komponen.
                             color: AppColors.parchment,
                             borderRadius: BorderRadius.circular(12),
+                            // WARNA: latar kartu/komponen.
                             border: Border.all(color: AppColors.border),
                           ),
                           child: Column(
@@ -493,6 +532,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                 'Total Blok',
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
+                                  // WARNA: teks 'Total Blok'.
                                   color: AppColors.oxblood,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -503,6 +543,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                 style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  // WARNA: teks 'Total Blok'.
                                   color: AppColors.oxblood,
                                 ),
                               ),
@@ -515,8 +556,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
+                            // WARNA: latar kartu/komponen.
                             color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(12),
+                            // WARNA: latar kartu/komponen.
                             border: Border.all(color: Colors.green.shade200),
                           ),
                           child: Column(
@@ -526,6 +569,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                 'Total Biaya Sewa',
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
+                                  // WARNA: teks 'Total Biaya Sewa'.
                                   color: Colors.green.shade800,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -536,6 +580,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
+                                  // WARNA: teks 'Total Biaya Sewa'.
                                   color: Colors.green.shade900,
                                 ),
                                 maxLines: 1,
@@ -553,17 +598,20 @@ class _BlockchainPageState extends State<BlockchainPage> {
                     controller: _searchCtrl,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 13,
+                      // WARNA: teks judul/isi pada bagian ini.
                       color: AppColors.textPrimary,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Cari judul buku atau metode bayar...',
                       hintStyle: GoogleFonts.plusJakartaSans(
                         fontSize: 12.5,
+                        // WARNA: teks judul/isi pada bagian ini.
                         color: Colors.grey.shade500,
                       ),
                       prefixIcon: const Icon(
                         Icons.search,
                         size: 20,
+                        // WARNA: teks judul/isi pada bagian ini.
                         color: AppColors.oxblood,
                       ),
                       suffixIcon: _filter.isNotEmpty
@@ -580,22 +628,27 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         vertical: 10,
                         horizontal: 18,
                       ),
+                      // WARNA: garis tepi komponen.
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(28),
+                        // WARNA: warna komponen.
                         borderSide: const BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(28),
+                        // WARNA: garis tepi kartu/komponen.
                         borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(28),
                         borderSide: const BorderSide(
+                          // WARNA: garis tepi kartu/komponen.
                           color: AppColors.oxblood,
                           width: 1.6,
                         ),
                       ),
                       filled: true,
+                      // WARNA: garis tepi kartu/komponen.
                       fillColor: Colors.white,
                     ),
                     onChanged: (v) => setState(() => _filter = v.trim()),
@@ -607,7 +660,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       Expanded(
                         child: FilledButton.icon(
                           style: FilledButton.styleFrom(
+                            // WARNA: latar tombol.
                             backgroundColor: AppColors.oxblood,
+                            // WARNA: teks/ikon tombol 'Verifikasi Rantai'.
                             foregroundColor: AppColors.parchment,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -621,7 +676,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       const SizedBox(width: 8),
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
+                          // WARNA: teks/ikon tombol 'Simulasi Rusak'.
                           foregroundColor: AppColors.walnut,
+                          // WARNA: ikon verified.
                           side: const BorderSide(color: AppColors.border),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
@@ -645,9 +702,12 @@ class _BlockchainPageState extends State<BlockchainPage> {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: _ok ? Colors.green.shade50 : Colors.red.shade50,
                   borderRadius: BorderRadius.circular(10),
+                  // WARNA: garis tepi komponen.
                   border: Border.all(
+                    // WARNA: garis tepi kartu/komponen.
                     color: _ok ? Colors.green.shade300 : Colors.red.shade300,
                   ),
                 ),
@@ -656,6 +716,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                   children: [
                     Icon(
                       _ok ? Icons.check_circle : Icons.warning_amber_rounded,
+                      // WARNA: garis tepi kartu/komponen.
                       color: _ok ? Colors.green : Colors.red,
                       size: 20,
                     ),
@@ -665,6 +726,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                         _msg!,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
+                          // WARNA: teks '_msg'.
                           color: _ok
                               ? Colors.green.shade900
                               : Colors.red.shade900,
@@ -682,8 +744,10 @@ class _BlockchainPageState extends State<BlockchainPage> {
               margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Row(
@@ -691,11 +755,13 @@ class _BlockchainPageState extends State<BlockchainPage> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
+                      // WARNA: latar kartu/komponen.
                       color: AppColors.oxblood.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.language_rounded,
+                      // WARNA: latar kartu/komponen.
                       color: AppColors.oxblood,
                       size: 20,
                     ),
@@ -710,6 +776,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
+                            // WARNA: teks 'Ethereum Sepolia Explorer'.
                             color: AppColors.walnut,
                           ),
                         ),
@@ -717,6 +784,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                           'Akun: ${_s(sepoliaWalletAddress)}',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
+                            // WARNA: teks 'Ethereum Sepolia Explorer'.
                             color: AppColors.textSecondary,
                           ),
                         ),
@@ -726,7 +794,9 @@ class _BlockchainPageState extends State<BlockchainPage> {
                   OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
                       visualDensity: VisualDensity.compact,
+                      // WARNA: teks/ikon tombol 'Etherscan'.
                       foregroundColor: AppColors.oxblood,
+                      // WARNA: ikon pada komponen ini.
                       side: const BorderSide(color: AppColors.oxblood),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -761,6 +831,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                       Icon(
                         Icons.inventory_2_outlined,
                         size: 44,
+                        // WARNA: ikon inventory_2_outlined.
                         color: Colors.grey.shade400,
                       ),
                       const SizedBox(height: 10),
@@ -770,6 +841,7 @@ class _BlockchainPageState extends State<BlockchainPage> {
                             : 'Tidak ditemukan transaksi yang cocok dengan "$_filter"',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.plusJakartaSans(
+                          // WARNA: teks '_filter.isEmpty'.
                           color: Colors.grey.shade600,
                           fontSize: 13,
                         ),

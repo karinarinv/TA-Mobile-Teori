@@ -20,11 +20,17 @@ class _OwlBookPainter extends CustomPainter {
     final scale = size.width / 100;
     canvas.save();
     canvas.scale(scale, scale);
+    // WARNA: gambar ilustrasi burung hantu.
     final brown = Paint()..color = const Color(0xFF8A5148);
+    // WARNA: gambar ilustrasi burung hantu.
     final lightBrown = Paint()..color = const Color(0xFFB87462);
+    // WARNA: gambar ilustrasi burung hantu.
     final cream = Paint()..color = const Color(0xFFFFE9C9);
+    // WARNA: gambar ilustrasi burung hantu.
     final white = Paint()..color = const Color(0xFFFFFCF5);
+    // WARNA: gambar ilustrasi burung hantu.
     final dark = Paint()..color = const Color(0xFF34272A);
+    // WARNA: gambar ilustrasi burung hantu.
     final pink = Paint()..color = const Color(0xFFCE6672);
 
     // Telinga dan badan burung hantu.
@@ -47,6 +53,7 @@ class _OwlBookPainter extends CustomPainter {
     final bookRight = Path()..moveTo(51, 73)..quadraticBezierTo(67, 64, 83, 69)..lineTo(83, 88)..quadraticBezierTo(66, 83, 51, 91)..close();
     canvas.drawPath(bookLeft, white);
     canvas.drawPath(bookRight, cream);
+    // WARNA: gambar ilustrasi burung hantu.
     final linePaint = Paint()..color = const Color(0xFFD6BFA4)..strokeWidth = 1.6..strokeCap = StrokeCap.round;
     for (var y = 77.0; y <= 85; y += 5) {
       canvas.drawLine(Offset(25, y), Offset(43, y + 2), linePaint);
@@ -56,6 +63,7 @@ class _OwlBookPainter extends CustomPainter {
       const Offset(50, 73),
       const Offset(50, 91),
       Paint()
+        // WARNA: gambar ilustrasi burung hantu.
         ..color = lightBrown.color
         ..strokeWidth = 2,
     );

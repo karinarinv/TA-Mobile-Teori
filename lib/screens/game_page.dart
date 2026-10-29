@@ -488,6 +488,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           title: Row(
             children: [
+              // WARNA: warna elemen permainan.
               const Icon(Icons.check_circle_rounded, color: Colors.green, size: 28),
               const SizedBox(width: 10),
               Expanded(
@@ -512,14 +513,17 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
+                  // WARNA: latar elemen permainan.
                   color: Colors.amber.shade50,
                   borderRadius: BorderRadius.circular(10),
+                  // WARNA: latar elemen permainan.
                   border: Border.all(color: Colors.amber.shade300),
                 ),
                 child: Row(
                   children: [
                     Icon(
                       _currentLevel == 1 ? Icons.warning_amber_rounded : Icons.door_front_door_outlined,
+                      // WARNA: garis tepi kartu/komponen.
                       color: _currentLevel == 1 ? Colors.red.shade800 : Colors.amber.shade800,
                     ),
                     const SizedBox(width: 8),
@@ -531,6 +535,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
+                          // WARNA: teks '_currentLevel'.
                           color: _currentLevel == 1 ? Colors.red.shade900 : Colors.amber.shade900,
                         ),
                       ),
@@ -543,7 +548,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
           actions: [
             FilledButton.icon(
               style: FilledButton.styleFrom(
+                // WARNA: latar tombol.
                 backgroundColor: const Color(0xFFD97706),
+                // WARNA: teks/ikon tombol 'Buka Pintu Berikutnya'.
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
@@ -712,13 +719,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             child: Icon(
               Icons.menu_book_rounded,
               size: cellW * 0.62,
+              // WARNA: ikon menu_book_rounded.
               color: const Color(0xFFF59E0B),
               shadows: const [
                 Shadow(
+                  // WARNA: bayangan ikon/teks.
                   color: Color(0xFFB45309),
                   blurRadius: 6,
                 ),
                 Shadow(
+                  // WARNA: bayangan ikon/teks.
                   color: Colors.black,
                   blurRadius: 2,
                   offset: Offset(0, 1),
@@ -739,11 +749,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       SnackBar(
         content: const Row(
           children: [
+            // WARNA: warna elemen permainan.
             Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
             SizedBox(width: 8),
             Expanded(child: Text('Kode voucher "DISKON10" disalin! Gunakan saat sewa buku.')),
           ],
         ),
+        // WARNA: latar notifikasi.
         backgroundColor: Colors.green.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -767,6 +779,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         return Transform.translate(
           offset: Offset(shakeX, 0),
           child: Container(
+            // WARNA: warna elemen permainan.
             color: const Color(0xFF090B04),
             width: double.infinity,
             height: double.infinity,
@@ -775,8 +788,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 Positioned.fill(
                   child: CustomPaint(
                     painter: _CrtScanlinesPainter(
+                      // WARNA: warna elemen permainan.
                       strobeColor: (_shakeController.value > 0.5)
+                          // WARNA: latar layar jumpscare.
                           ? const Color(0x334D5E1F)
+                          // WARNA: latar layar jumpscare.
                           : const Color(0x11000000),
                     ),
                   ),
@@ -808,11 +824,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
+                          // WARNA: latar elemen permainan.
                           color: const Color(0xFF384517).withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(8),
+                          // WARNA: latar elemen permainan.
                           border: Border.all(color: const Color(0xFF84A333), width: 2),
                           boxShadow: [
                             BoxShadow(
+                              // WARNA: bayangan elemen permainan.
                               color: const Color(0xFF5E7522).withValues(alpha: 0.6),
                               blurRadius: 16,
                             ),
@@ -822,6 +841,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            // WARNA: warna elemen permainan.
                             const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
                             const SizedBox(width: 8),
                             Flexible(
@@ -830,6 +850,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                 child: Text(
                                   'HANTU PENJAGA MENYERANG ($_jumpscareRemainingSeconds detik)',
                                   style: const TextStyle(
+                                    // WARNA: teks 'HANTU PENJAGA MENYERANG ($_jumpscareRemainingSeconds detik)'.
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
@@ -849,7 +870,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           height: 5,
                           child: LinearProgressIndicator(
                             value: _jumpscareProgressController.value,
+                            // WARNA: latar bar indikator waktu.
                             backgroundColor: Colors.black,
+                            // WARNA: warna elemen permainan.
                             valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF84A333)),
                           ),
                         ),
@@ -863,7 +886,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   right: 20,
                   child: TextButton.icon(
                     style: TextButton.styleFrom(
+                      // WARNA: teks/ikon tombol 'Lewati >>'.
                       foregroundColor: Colors.grey.shade400,
+                      // WARNA: latar tombol.
                       backgroundColor: Colors.black54,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     ),
@@ -886,9 +911,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
       context: context,
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
+        // WARNA: latar dialog.
         backgroundColor: const Color(0xFFFAF7F2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
+          // WARNA: warna elemen permainan.
           side: const BorderSide(color: Color(0xFF67343A), width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -911,6 +938,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
+                    // WARNA: teks 'PANDUAN LABIRIN'.
                     color: Color(0xFF67343A),
                   ),
                 ),
@@ -922,6 +950,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 ),
               ],
             ),
+            // WARNA: warna elemen permainan.
             const Divider(color: Color(0xFFEADBCE), height: 20),
 
             // Item 1: Karakter Penjelajah
@@ -933,8 +962,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   height: 40,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
+                    // WARNA: latar elemen permainan.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(8),
+                    // WARNA: latar elemen permainan.
                     border: Border.all(color: const Color(0xFF67343A), width: 1.2),
                   ),
                   child: CustomPaint(painter: _CutePixelAdventurerPainter()),
@@ -946,10 +977,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     children: [
                       Text(
                         'Petualang Pustaka',
+                        // WARNA: teks 'Petualang Pustaka'.
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF302622)),
                       ),
                       Text(
                         'Kamu mencari Buku Emas legendaris di arsip tua.',
+                        // WARNA: teks 'Petualang Pustaka'.
                         style: TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                       ),
                     ],
@@ -968,8 +1001,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   height: 40,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
+                    // WARNA: latar elemen permainan.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(8),
+                    // WARNA: latar elemen permainan.
                     border: Border.all(color: const Color(0xFF67343A), width: 1.2),
                   ),
                   child: CustomPaint(painter: _CutePixelBookPainter()),
@@ -981,10 +1016,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     children: [
                       Text(
                         'Koleksi Buku & Rak Emas',
+                        // WARNA: teks 'Koleksi Buku & Rak Emas'.
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF302622)),
                       ),
                       Text(
                         'Sentuh rak buku emas di tiap lantai untuk naik level!',
+                        // WARNA: teks 'Koleksi Buku & Rak Emas'.
                         style: TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                       ),
                     ],
@@ -1003,8 +1040,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   height: 40,
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
+                    // WARNA: latar elemen permainan.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(8),
+                    // WARNA: latar elemen permainan.
                     border: Border.all(color: const Color(0xFF67343A), width: 1.2),
                   ),
                   child: CustomPaint(painter: _CutePixelWikwokPainter()),
@@ -1016,10 +1055,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     children: [
                       Text(
                         'Awas Wikwok di Lantai 3!',
+                        // WARNA: teks 'Awas Wikwok di Lantai 3!'.
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF67343A)),
                       ),
                       Text(
                         'Setelah 5 detik, Wikwok bangun mengejar. Lari secepatnya!',
+                        // WARNA: teks 'Awas Wikwok di Lantai 3!'.
                         style: TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                       ),
                     ],
@@ -1034,17 +1075,21 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
+                // WARNA: latar elemen permainan.
                 color: const Color(0xFFEDE2CF).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(8),
+                // WARNA: latar elemen permainan.
                 border: Border.all(color: const Color(0xFFEADBCE)),
               ),
               child: const Row(
                 children: [
+                  // WARNA: garis tepi kartu/komponen.
                   Icon(Icons.gamepad_rounded, size: 18, color: Color(0xFF67343A)),
                   SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Kontrol: Gunakan tombol D-Pad virtual di bawah layar untuk melangkah.',
+                      // WARNA: ikon gamepad_rounded.
                       style: TextStyle(fontSize: 11, color: Color(0xFF302622)),
                     ),
                   ),
@@ -1057,7 +1102,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         actions: [
           FilledButton.icon(
             style: FilledButton.styleFrom(
+              // WARNA: latar tombol.
               backgroundColor: const Color(0xFF67343A),
+              // WARNA: teks/ikon tombol 'Mulai Petualangan'.
               foregroundColor: const Color(0xFFEDE2CF),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1076,6 +1123,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   // Halaman Kalah (Sesuai Color Palette Aplikasi & Retro Game)
   Widget _buildPixelResultBanner({required bool won}) {
+    // WARNA: teks 'Mulai Petualangan'.
     final ink = const Color(0xFF27171C);
     return Container(
       height: 188,
@@ -1085,12 +1133,15 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          // WARNA: gradasi banner hasil permainan.
           colors: won
               ? const [Color(0xFF67343A), Color(0xFF3D252D)]
               : const [Color(0xFF29232B), Color(0xFF4B3035)],
         ),
         borderRadius: BorderRadius.circular(22),
+        // WARNA: latar elemen permainan.
         border: Border.all(color: const Color(0xFFD4BE9D), width: 2),
+        // WARNA: garis tepi kartu/komponen.
         boxShadow: [BoxShadow(color: ink.withValues(alpha: .22), blurRadius: 16, offset: const Offset(0, 7))],
       ),
       child: Stack(
@@ -1101,13 +1152,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             top: 18,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
+              // WARNA: bayangan elemen permainan.
               decoration: BoxDecoration(color: const Color(0xFFEDE2CF), border: Border.all(color: const Color(0xFFB9854D), width: 2), borderRadius: BorderRadius.circular(6)),
+              // WARNA: garis tepi kartu/komponen.
               child: Text(won ? '★  LEVEL CLEAR  ★' : '!  GAME OVER  !', style: const TextStyle(fontFamily: 'monospace', fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.1, color: Color(0xFF67343A))),
             ),
           ),
           Positioned(
             left: 24,
             bottom: 17,
+            // WARNA: teks judul/isi pada bagian ini.
             child: Text(won ? 'RAK EMAS DITEMUKAN!' : 'WIKWOK MENANGKAPMU!', style: const TextStyle(fontFamily: 'monospace', fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: .5, color: Color(0xFFEDE2CF))),
           ),
           Positioned(
@@ -1118,10 +1172,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             child: CustomPaint(painter: won ? _CutePixelHappyAdventurerPainter() : _WikwokPixelPainter()),
           ),
           if (won) ...[
+            // WARNA: teks 'won'.
             const Positioned(right: 27, top: 20, child: Icon(Icons.star_rounded, color: Color(0xFFF2C66D), size: 24)),
+            // WARNA: ikon star_rounded.
             const Positioned(right: 149, top: 73, child: Icon(Icons.auto_awesome_rounded, color: Color(0xFFEDE2CF), size: 17)),
           ] else ...[
+            // WARNA: ikon auto_awesome_rounded.
             const Positioned(right: 34, top: 20, child: Icon(Icons.bolt_rounded, color: Color(0xFFE6A66A), size: 24)),
+            // WARNA: ikon bolt_rounded.
             const Positioned(right: 151, top: 79, child: Icon(Icons.question_mark_rounded, color: Color(0xFFEDE2CF), size: 18)),
           ],
         ],
@@ -1145,6 +1203,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
+                // WARNA: teks 'KAMU TERTANGKAP'.
                 color: Color(0xFF67343A),
               ),
             ),
@@ -1155,6 +1214,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
+                // WARNA: teks 'KAMU TERTANGKAP'.
                 color: Color(0xFF302622),
               ),
               textAlign: TextAlign.center,
@@ -1164,8 +1224,10 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
+                // WARNA: latar elemen permainan.
                 color: const Color(0xFFEDE2CF).withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(14),
+                // WARNA: latar elemen permainan.
                 border: Border.all(color: const Color(0xFFEADBCE)),
               ),
               child: Column(
@@ -1173,11 +1235,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 children: [
                   const Row(
                     children: [
+                      // WARNA: garis tepi kartu/komponen.
                       Icon(Icons.lightbulb_outline_rounded, color: Color(0xFF67343A), size: 20),
                       SizedBox(width: 8),
                       Text(
                         'Strategi Menghadapi Wikwok',
                         style: TextStyle(
+                          // WARNA: teks 'Strategi Menghadapi Wikwok'.
                           color: Color(0xFF67343A),
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -1192,16 +1256,19 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     '3. Jangan berhenti atau berbalik arah menuju jalur buntu.',
                     style: TextStyle(
                       fontSize: 12,
+                      // WARNA: teks '1. Kamu memiliki waktu 5 detik sebelum Wikwok bangun mengejar.\n'.
                       color: Color(0xFF302622),
                       height: 1.45,
                     ),
                   ),
+                  // WARNA: teks '1. Kamu memiliki waktu 5 detik sebelum Wikwok bangun mengejar.\n'.
                   const Divider(color: Color(0xFFEADBCE), height: 18),
                   Row(
                     children: [
                       Expanded(
                         child: Text(
                           'Lorong: ${_levelNames[2]}',
+                          // WARNA: teks 'Lorong: ${_levelNames[2]}'.
                           style: const TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -1210,6 +1277,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       const SizedBox(width: 8),
                       Text(
                         'Tabrakan: $_wallHits kali',
+                        // WARNA: teks 'Lorong: ${_levelNames[2]}'.
                         style: const TextStyle(fontSize: 11, color: Color(0xFF6E5648)),
                         maxLines: 1,
                       ),
@@ -1225,7 +1293,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: const Color(0xFF67343A),
+                  // WARNA: teks/ikon tombol 'Coba Lagi Dari Lantai Ini'.
                   foregroundColor: const Color(0xFFEDE2CF),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -1244,7 +1314,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               height: 44,
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
+                  // WARNA: teks/ikon tombol 'Ulangi Dari Lantai 1'.
                   foregroundColor: const Color(0xFF67343A),
+                  // WARNA: ikon pada komponen ini.
                   side: const BorderSide(color: Color(0xFF67343A)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -1263,6 +1335,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             const SizedBox(height: 8),
 
             TextButton.icon(
+              // WARNA: teks/ikon tombol 'Kembali ke Katalog Buku'.
               style: TextButton.styleFrom(foregroundColor: const Color(0xFF67343A)),
               onPressed: () {
                 Navigator.pushReplacement(
@@ -1295,6 +1368,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
+                // WARNA: teks 'SELAMAT, MISI SELESAI!'.
                 color: Color(0xFF67343A),
               ),
             ),
@@ -1304,6 +1378,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
+                // WARNA: teks 'SELAMAT, MISI SELESAI!'.
                 color: Color(0xFF302622),
               ),
               textAlign: TextAlign.center,
@@ -1313,6 +1388,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 'Lolos dari kejaran Wikwok dan menuntaskan 3 lorong labirin perpustakaan RentBook.',
+                // WARNA: teks pada komponen ini.
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
                 textAlign: TextAlign.center,
               ),
@@ -1322,9 +1398,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             if (_isVoucherUsed)
               Card(
                 elevation: 1.5,
+                // WARNA: teks judul/isi pada bagian ini.
                 color: const Color(0xFFFAF7F2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
+                  // WARNA: warna elemen permainan.
                   side: const BorderSide(color: Color(0xFFEADBCE)),
                 ),
                 child: const Padding(
@@ -1334,6 +1412,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // WARNA: garis tepi kartu/komponen.
                           Icon(Icons.workspace_premium_rounded, color: Color(0xFFB45309), size: 24),
                           SizedBox(width: 8),
                           Text(
@@ -1341,6 +1420,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
+                              // WARNA: teks 'Penakluk Labirin Emas'.
                               color: Color(0xFF67343A),
                             ),
                           ),
@@ -1350,6 +1430,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       Text(
                         'Selamat! Anda telah berhasil menuntaskan seluruh tantangan labirin buku dan menyelamatkan seluruh arsip kuno perpustakaan RentBook.',
                         textAlign: TextAlign.center,
+                        // WARNA: teks pada komponen ini.
                         style: TextStyle(fontSize: 13, color: Color(0xFF302622), height: 1.45),
                       ),
                     ],
@@ -1359,9 +1440,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             else
               Card(
                 elevation: 1.5,
+                // WARNA: teks judul/isi pada bagian ini.
                 color: const Color(0xFFFAF7F2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
+                  // WARNA: warna elemen permainan.
                   side: const BorderSide(color: Color(0xFFEADBCE)),
                 ),
                 child: Padding(
@@ -1371,6 +1454,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+                          // WARNA: garis tepi kartu/komponen.
                           Icon(Icons.card_giftcard_rounded, color: Color(0xFF67343A), size: 22),
                           SizedBox(width: 8),
                           Text(
@@ -1378,6 +1462,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
+                              // WARNA: teks 'Hadiah Voucher Sewa Buku'.
                               color: Color(0xFF67343A),
                             ),
                           ),
@@ -1387,9 +1472,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         decoration: BoxDecoration(
+                          // WARNA: latar elemen permainan.
                           color: const Color(0xFFEDE2CF),
                           borderRadius: BorderRadius.circular(10),
+                          // WARNA: garis tepi kartu hasil labirin.
                           border: Border.all(
+                            // WARNA: garis tepi kartu/komponen.
                             color: const Color(0xFF67343A).withValues(alpha: 0.3),
                             style: BorderStyle.solid,
                           ),
@@ -1403,6 +1491,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 3,
+                                // WARNA: teks 'DISKON10'.
                                 color: Color(0xFF67343A),
                                 fontFamily: 'monospace',
                               ),
@@ -1413,6 +1502,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       const SizedBox(height: 10),
                       Text(
                         'Potongan 10% untuk sewa buku apa pun di katalog RentBook.',
+                        // WARNA: teks 'Potongan 10% untuk sewa buku apa pun di katalog RentBook.'.
                         style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
                         textAlign: TextAlign.center,
                       ),
@@ -1420,13 +1510,17 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          // WARNA: teks 'Potongan 10% untuk sewa buku apa pun di katalog RentBook.'.
                           side: const BorderSide(color: Color(0xFF67343A)),
+                          // WARNA: teks/ikon tombol 'Salin Kode Voucher'.
                           foregroundColor: const Color(0xFF67343A),
                         ),
                         onPressed: _copyVoucher,
+                        // WARNA: garis tepi kartu/komponen.
                         icon: const Icon(Icons.copy_rounded, size: 16, color: Color(0xFF67343A)),
                         label: const Text(
                           'Salin Kode Voucher',
+                          // WARNA: ikon copy_rounded.
                           style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
                         ),
                       ),
@@ -1441,7 +1535,9 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: const Color(0xFF67343A),
+                  // WARNA: teks/ikon tombol 'Gunakan di Katalog Buku'.
                   foregroundColor: const Color(0xFFEDE2CF),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -1457,6 +1553,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             ),
             const SizedBox(height: 10),
             TextButton.icon(
+              // WARNA: teks/ikon tombol 'Mainkan Labirin Lagi'.
               style: TextButton.styleFrom(foregroundColor: const Color(0xFF67343A)),
               onPressed: () {
                 setState(() {
@@ -1480,6 +1577,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (_isJumpscareActive) {
       return Scaffold(
+        // WARNA: latar halaman.
         backgroundColor: Colors.black,
         body: SafeArea(
           child: _buildWikwokJumpscareView(),
@@ -1489,11 +1587,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     if (_isDefeatActive) {
       return Scaffold(
+        // WARNA: latar halaman.
         backgroundColor: const Color(0xFFFAF7F2),
         appBar: AppBar(
           title: Text('Misi Gagal',style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
           elevation: 0,
+          // WARNA: latar AppBar.
           backgroundColor: const Color(0xFF67343A),
+          // WARNA: teks/ikon tombol.
           foregroundColor: const Color(0xFFEDE2CF),
           automaticallyImplyLeading: false,
         ),
@@ -1505,11 +1606,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     if (_isGameOver) {
       return Scaffold(
+        // WARNA: latar halaman.
         backgroundColor: const Color(0xFFFAF7F2),
         appBar: AppBar(
           title: Text('Kemenangan Labirin Buku', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
           elevation: 0,
+          // WARNA: latar AppBar.
           backgroundColor: const Color(0xFF67343A),
+          // WARNA: teks/ikon tombol.
           foregroundColor: const Color(0xFFEDE2CF),
         ),
         body: _buildVictoryView(),
@@ -1517,12 +1621,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     }
 
     final Color pageBgColor = _currentLevel == 0
+        // WARNA: teks 'Misi Gagal'.
         ? const Color(0xFF26170E) // Level 1: Perpustakaan kayu terang
         : _currentLevel == 1
+            // WARNA: teks 'Misi Gagal'.
             ? const Color(0xFF0C1424) // Level 2: Perpustakaan temaram malam
+            // WARNA: teks 'Kemenangan Labirin Buku'.
             : const Color(0xFF0E0303); // Level 3: Arsip horor gelap & anxious
 
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: pageBgColor,
       body: SafeArea(
         child: Column(
@@ -1530,6 +1638,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             // Header Minimalis Layar Penuh (Fokus Game Penuh, Bebas AppBar)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              // WARNA: warna elemen permainan.
               color: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
               child: Row(
                 children: [
@@ -1540,10 +1649,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
+                        // WARNA: latar elemen permainan.
                         color: Colors.black.withValues(alpha: 0.35),
                         shape: BoxShape.circle,
+                        // WARNA: latar elemen permainan.
                         border: Border.all(color: Colors.white24),
                       ),
+                      // WARNA: garis tepi kartu/komponen.
                       child: const Icon(Icons.close_rounded, size: 18, color: Colors.white70),
                     ),
                   ),
@@ -1551,11 +1663,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                     decoration: BoxDecoration(
+                      // WARNA: latar elemen permainan.
                       color: _currentLevel == 2
                           ? const Color(0xFF384517).withValues(alpha: 0.6)
                           : Colors.amber.shade900.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(8),
+                      // WARNA: garis tepi kartu hasil labirin.
                       border: Border.all(
+                        // WARNA: garis tepi kartu/komponen.
                         color: _currentLevel == 2 ? const Color(0xFF84A333) : Colors.amber.shade400,
                         width: 1.2,
                       ),
@@ -1563,6 +1678,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     child: Text(
                       'Lvl ${_currentLevel + 1}/3',
                       style: TextStyle(
+                        // WARNA: teks 'Lvl ${_currentLevel + 1}/3'.
                         color: _currentLevel == 2 ? const Color(0xFFA3C742) : const Color(0xFFFBBF24),
                         fontWeight: FontWeight.bold,
                         fontSize: 11,
@@ -1576,6 +1692,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           ? 'Hantu bangun: $_countdown dtk'
                           : '${_levelNames[_currentLevel]} (${_allLevelBooks[_currentLevel].where((b) => b.isCollected).length}/${_allLevelBooks[_currentLevel].length})',
                       style: TextStyle(
+                        // WARNA: teks '_currentLevel'.
                         color: _currentLevel == 2 && _hasStartedMoving ? const Color(0xFFFACC15) : Colors.white,
                         fontSize: 11.5,
                         fontWeight: FontWeight.w600,
@@ -1588,15 +1705,19 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                   ActionChip(
                     padding: EdgeInsets.zero,
                     visualDensity: VisualDensity.compact,
+                    // WARNA: latar komponen ini.
                     backgroundColor: _useDpad ? Colors.amber.shade800 : const Color(0xFF1E293B),
+                    // WARNA: warna elemen permainan.
                     side: BorderSide(color: _useDpad ? Colors.amber.shade400 : Colors.grey.shade700),
                     avatar: Icon(
                       _useDpad ? Icons.gamepad_rounded : Icons.touch_app_rounded,
                       size: 15,
+                      // WARNA: garis tepi kartu/komponen.
                       color: Colors.white,
                     ),
                     label: Text(
                       _useDpad ? 'D-Pad' : 'Sentuh',
+                      // WARNA: garis tepi kartu/komponen.
                       style: const TextStyle(fontSize: 10.5, color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () => setState(() => _useDpad = !_useDpad),
@@ -1609,10 +1730,13 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
+                        // WARNA: latar elemen permainan.
                         color: Colors.black.withValues(alpha: 0.35),
                         shape: BoxShape.circle,
+                        // WARNA: latar elemen permainan.
                         border: Border.all(color: Colors.white24),
                       ),
+                      // WARNA: garis tepi kartu/komponen.
                       child: const Icon(Icons.restart_alt_rounded, size: 18, color: Colors.white70),
                     ),
                   ),
@@ -1624,9 +1748,11 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                // WARNA: warna elemen permainan.
                 color: _isChaserActive ? const Color(0xFF4C5E1E) : Colors.red.shade800,
                 child: Text(
                   _statusMessage!,
+                  // WARNA: teks '_statusMessage'.
                   style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                   maxLines: 1,
@@ -1650,12 +1776,15 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
+                            // WARNA: gradasi banner hasil permainan.
                             colors: [Color(0xFFB45309), Color(0xFFD97706), Color(0xFF78350F)],
                           ),
                           borderRadius: BorderRadius.circular(14),
+                          // WARNA: latar elemen permainan.
                           border: Border.all(color: const Color(0xFFFDE047), width: 1.8),
                           boxShadow: [
                             BoxShadow(
+                              // WARNA: bayangan elemen permainan.
                               color: Colors.amber.withValues(alpha: 0.5),
                               blurRadius: 12,
                               spreadRadius: 2,
@@ -1668,12 +1797,15 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                             Container(
                               padding: const EdgeInsets.all(7),
                               decoration: BoxDecoration(
+                                // WARNA: latar elemen permainan.
                                 color: Colors.black.withValues(alpha: 0.35),
                                 shape: BoxShape.circle,
+                                // WARNA: latar elemen permainan.
                                 border: Border.all(color: const Color(0xFFFDE047), width: 1.4),
                               ),
                               child: const Icon(
                                 Icons.auto_stories_rounded,
+                                // WARNA: garis tepi kartu/komponen.
                                 color: Color(0xFFFEF08A),
                                 size: 24,
                               ),
@@ -1689,12 +1821,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
                                         decoration: BoxDecoration(
+                                          // WARNA: latar elemen permainan.
                                           color: Colors.black54,
                                           borderRadius: BorderRadius.circular(5),
                                         ),
                                         child: const Text(
                                           '+1 BUKU BERHASIL DIKOLEKSI!',
                                           style: TextStyle(
+                                            // WARNA: teks '+1 BUKU BERHASIL DIKOLEKSI!'.
                                             color: Color(0xFFFEF08A),
                                             fontSize: 10.5,
                                             fontWeight: FontWeight.w900,
@@ -1708,6 +1842,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                   Text(
                                     '"$_lastCollectedBookTitle"',
                                     style: const TextStyle(
+                                      // WARNA: teks '"$_lastCollectedBookTitle"'.
                                       color: Colors.white,
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,
@@ -1722,13 +1857,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
+                                // WARNA: latar elemen permainan.
                                 color: const Color(0xFF15803D),
                                 borderRadius: BorderRadius.circular(8),
+                                // WARNA: latar elemen permainan.
                                 border: Border.all(color: const Color(0xFF86EFAC)),
                               ),
                               child: const Text(
                                 '+POIN',
                                 style: TextStyle(
+                                  // WARNA: teks '+POIN'.
                                   color: Colors.white,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w900,
@@ -1771,30 +1909,42 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             decoration: BoxDecoration(
+                              // WARNA: latar elemen permainan.
                               color: _isFlashingRed
                                   ? const Color(0xFF450A0A)
                                   : (_currentLevel == 0
+                                      // WARNA: latar layar permainan.
                                       ? const Color(0xFF2A190F)
                                       : _currentLevel == 1
+                                          // WARNA: latar layar permainan.
                                           ? const Color(0xFF0F172A)
+                                          // WARNA: latar layar permainan.
                                           : const Color(0xFF120303)),
                               borderRadius: BorderRadius.circular(16),
+                              // WARNA: garis tepi kartu hasil labirin.
                               border: Border.all(
+                                // WARNA: garis tepi kartu/komponen.
                                 color: _isFlashingRed
                                     ? Colors.redAccent
                                     : (_currentLevel == 2
+                                        // WARNA: latar layar permainan.
                                         ? const Color(0xFF84A333)
                                         : _currentLevel == 1
+                                            // WARNA: latar layar permainan.
                                             ? Colors.cyan.shade400.withValues(alpha: 0.6)
+                                            // WARNA: latar layar permainan.
                                             : Colors.amber.shade400.withValues(alpha: 0.6)),
                                 width: 2,
                               ),
                               boxShadow: [
                                 BoxShadow(
+                                  // WARNA: bayangan elemen permainan.
                                   color: (_currentLevel == 2
                                           ? const Color(0xFF6E882B)
                                           : _currentLevel == 1
+                                              // WARNA: bayangan kartu.
                                               ? Colors.cyanAccent
+                                              // WARNA: bayangan kartu.
                                               : Colors.amberAccent)
                                       .withValues(alpha: 0.2),
                                   blurRadius: 16,
@@ -1835,13 +1985,16 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                                         child: Icon(
                                           Icons.menu_book_rounded,
                                           size: cellW * 0.76,
+                                          // WARNA: ikon menu_book_rounded.
                                           color: const Color(0xFFFBBF24),
                                           shadows: const [
                                             Shadow(
+                                              // WARNA: bayangan ikon/teks.
                                               color: Color(0xFFD97706),
                                               blurRadius: 8,
                                             ),
                                             Shadow(
+                                              // WARNA: bayangan ikon/teks.
                                               color: Colors.black45,
                                               blurRadius: 2,
                                               offset: Offset(0, 1),
@@ -1903,6 +2056,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
             if (_useDpad)
               Container(
                 padding: const EdgeInsets.only(top: 8, bottom: 22, left: 16, right: 16),
+                // WARNA: warna elemen permainan.
                 color: _currentLevel == 2 ? const Color(0xFF190606) : const Color(0xFF0F172A),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1940,6 +2094,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // WARNA: warna elemen permainan.
                     Icon(Icons.touch_app_rounded, color: Colors.amber.shade300, size: 15),
                     const SizedBox(width: 6),
                     Expanded(
@@ -1949,6 +2104,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
                             : 'Koleksi buku-buku di lorong dan bawa menuju PINTU KELUAR!',
                         style: TextStyle(
                           fontSize: 11,
+                          // WARNA: teks '_currentLevel'.
                           color: _currentLevel == 2 ? const Color(0xFFFDE047) : Colors.amber.shade200,
                           fontWeight: FontWeight.w500,
                         ),
@@ -1991,6 +2147,7 @@ class _PersonPlayerIcon extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
+                  // WARNA: bayangan elemen permainan.
                   color: const Color(0xFFF59E0B).withValues(alpha: 0.6),
                   blurRadius: 8,
                   spreadRadius: 1.5,
@@ -2011,11 +2168,14 @@ class _PersonPlayerIcon extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
                 decoration: BoxDecoration(
+                  // WARNA: latar elemen permainan.
                   color: const Color(0xFF67343A),
                   borderRadius: BorderRadius.circular(8),
+                  // WARNA: latar elemen permainan.
                   border: Border.all(color: Colors.white, width: 1.2),
                   boxShadow: const [
                     BoxShadow(
+                      // WARNA: bayangan elemen permainan.
                       color: Colors.black45,
                       blurRadius: 4,
                       offset: Offset(0, 1),
@@ -2028,12 +2188,14 @@ class _PersonPlayerIcon extends StatelessWidget {
                     const Icon(
                       Icons.menu_book_rounded,
                       size: 10,
+                      // WARNA: ikon menu_book_rounded.
                       color: Color(0xFFFEF08A),
                     ),
                     const SizedBox(width: 2),
                     Text(
                       '$carriedBooksCount',
                       style: const TextStyle(
+                        // WARNA: teks '$carriedBooksCount'.
                         color: Colors.white,
                         fontSize: 9.5,
                         fontWeight: FontWeight.bold,
@@ -2064,11 +2226,13 @@ class _WikwokMazeIcon extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
+            // WARNA: bayangan elemen permainan.
             color: const Color(0xFF5C6F2B).withValues(alpha: 0.65),
             blurRadius: 10,
             spreadRadius: 2,
           ),
           BoxShadow(
+            // WARNA: bayangan elemen permainan.
             color: Colors.black.withValues(alpha: 0.8),
             blurRadius: 6,
           ),
@@ -2115,12 +2279,19 @@ class _WikwokPixelPainter extends CustomPainter {
     ];
 
     final Map<int, Paint> palette = {
+      // WARNA: warna gambar/ilustrasi labirin permainan.
       1: Paint()..color = const Color(0xFF5C6F2B), // Hijau zaitun busuk Springtrap
+      // WARNA: gambar ilustrasi burung hantu.
       2: Paint()..color = const Color(0xFF3E4D1A), // Pangkal telinga patah gelap
+      // WARNA: gambar ilustrasi burung hantu.
       3: Paint()..color = const Color(0xFF94A3B8), // Kawat logam mencuat
+      // WARNA: gambar ilustrasi burung hantu.
       4: Paint()..color = const Color(0xFF0F120A), // Rongga mata hitam
+      // WARNA: gambar ilustrasi burung hantu.
       5: Paint()..color = const Color(0xFFF1F5F9), // Pupil perak pucat
+      // WARNA: gambar ilustrasi burung hantu.
       6: Paint()..color = const Color(0xFF0D1007), // Moncong / rongga mulut
+      // WARNA: gambar ilustrasi burung hantu.
       7: Paint()..color = const Color(0xFFFEF08A), // Gigi bernoda kuning
     };
 
@@ -2152,12 +2323,19 @@ class _LargeWikwokJumpscarePainter extends CustomPainter {
     final pixelW = size.width / cols;
     final pixelH = size.height / rows;
 
+    // WARNA: gambar ilustrasi burung hantu.
     final suitPaint = Paint()..color = const Color(0xFF536329);
+    // WARNA: gambar ilustrasi burung hantu.
     final darkSuit = Paint()..color = const Color(0xFF2E3814);
+    // WARNA: gambar ilustrasi burung hantu.
     final wirePaint = Paint()..color = const Color(0xFF94A3B8);
+    // WARNA: gambar ilustrasi burung hantu.
     final eyeVoid = Paint()..color = const Color(0xFF0B0E07);
+    // WARNA: gambar ilustrasi burung hantu.
     final pupilPaint = Paint()..color = const Color(0xFFF8FAFC);
+    // WARNA: gambar ilustrasi burung hantu.
     final teethPaint = Paint()..color = const Color(0xFFFEF08A);
+    // WARNA: gambar ilustrasi burung hantu.
     final mouthVoid = Paint()..color = Colors.black;
 
     // Telinga Kiri Utuh
@@ -2167,6 +2345,7 @@ class _LargeWikwokJumpscarePainter extends CustomPainter {
     // Telinga Kanan Buntung dengan Kawat Logam Mencuat
     canvas.drawRect(Rect.fromLTWH(10 * pixelW, 2 * pixelH, 2.5 * pixelW, 1.5 * pixelH), suitPaint);
     canvas.drawRect(Rect.fromLTWH(11 * pixelW, 0.5 * pixelH, 0.6 * pixelW, 1.5 * pixelH), wirePaint); // Kawat baja
+    // WARNA: gambar ilustrasi burung hantu.
     canvas.drawRect(Rect.fromLTWH(12 * pixelW, 1.0 * pixelH, 0.5 * pixelW, 1.0 * pixelH), Paint()..color = Colors.red);
 
     // Batok Kepala Kelinci Animatronik
@@ -2234,6 +2413,7 @@ class _CrtScanlinesPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final linePaint = Paint()
+      // WARNA: gambar ilustrasi burung hantu.
       ..color = const Color(0x22000000)
       ..strokeWidth = 1.0;
 
@@ -2241,6 +2421,7 @@ class _CrtScanlinesPainter extends CustomPainter {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
     }
 
+    // WARNA: gambar ilustrasi burung hantu.
     final strobePaint = Paint()..color = strobeColor;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), strobePaint);
   }
@@ -2293,17 +2474,21 @@ class _HoldDpadButtonState extends State<_HoldDpadButton> {
         width: 58,
         height: 58,
         decoration: BoxDecoration(
+          // WARNA: latar elemen permainan.
           color: const Color(0xFF1E293B),
           borderRadius: BorderRadius.circular(16),
+          // WARNA: latar elemen permainan.
           border: Border.all(color: const Color(0xFFFBBF24).withValues(alpha: 0.4), width: 1.8),
           boxShadow: [
             BoxShadow(
+              // WARNA: bayangan elemen permainan.
               color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
         ),
+        // WARNA: bayangan elemen permainan.
         child: Icon(widget.icon, color: const Color(0xFFFBBF24), size: 32),
       ),
     );
@@ -2327,36 +2512,54 @@ class _PixelLibraryMazePainter extends CustomPainter {
 
     // Palet Kayu Rak Perpustakaan Pixel
     final Color woodShelfBg = isFlashing
+        // WARNA: bayangan kartu.
         ? const Color(0xFF7F1D1D)
         : (level == 0
+            // WARNA: bayangan kartu.
             ? const Color(0xFF2E1508) // Level 1: Rak kayu oak tua pekat
             : level == 1
+                // WARNA: warna gambar/ilustrasi labirin permainan.
                 ? const Color(0xFF0F172A) // Level 2: Rak mahogani midnight gelap
+                // WARNA: warna gambar/ilustrasi labirin permainan.
                 : const Color(0xFF0C0507)); // Level 3: Rak tua terkutuk hitam pekat
 
     // Warna Lorong Jalan (Sangat kontras, tidak nyatu dengan background map!)
     final Color pathColor = level == 0
+        // WARNA: warna gambar/ilustrasi labirin permainan.
         ? const Color(0xFFEBD8B8) // Level 1: Parket kayu krem terang benderang
         : level == 1
+            // WARNA: warna gambar/ilustrasi labirin permainan.
             ? const Color(0xFF64748B) // Level 2: Ubin batu abu-abu kebiruan terang jelas
+            // WARNA: warna gambar/ilustrasi labirin permainan.
             : const Color(0xFF5A4452); // Level 3: Jalur lantai arsip bertekstur jelas terlihat
 
+    // WARNA: warna gambar/ilustrasi labirin permainan.
     final shelfPaint = Paint()..color = woodShelfBg;
+    // WARNA: gambar ilustrasi burung hantu.
     final pathPaint = Paint()..color = pathColor;
 
     final plankLinePaint = Paint()
+      // WARNA: gambar ilustrasi burung hantu.
       ..color = (level == 0
+          // WARNA: gambar ilustrasi burung hantu.
           ? const Color(0xFF1B0B04)
           : level == 1
+              // WARNA: gambar ilustrasi burung hantu.
               ? const Color(0xFF020617)
+              // WARNA: gambar ilustrasi burung hantu.
               : const Color(0xFF260505))
       ..strokeWidth = 1.0;
 
     final bookSpinePaints = [
+      // WARNA: gambar ilustrasi burung hantu.
       Paint()..color = const Color(0xFFDC2626), // Merah
+      // WARNA: gambar ilustrasi burung hantu.
       Paint()..color = const Color(0xFF16A34A), // Hijau
+      // WARNA: gambar ilustrasi burung hantu.
       Paint()..color = const Color(0xFFB45309), // Cokelat Amber
+      // WARNA: gambar ilustrasi burung hantu.
       Paint()..color = const Color(0xFFD97706), // Emas
+      // WARNA: gambar ilustrasi burung hantu.
       Paint()..color = const Color(0xFF9333EA), // Ungu
     ];
 
@@ -2423,12 +2626,14 @@ class _PixelLibraryMazePainter extends CustomPainter {
               _drawBackgroundDemon(canvas, demonId, c * cellW, r * cellH, cellW, cellH);
             } else {
               // Rak tua rusak berantakan dengan goresan cakar
+              // WARNA: gambar ilustrasi burung hantu.
               final decayedBook = Paint()..color = const Color(0xFF4A1010);
               canvas.drawRect(Rect.fromLTWH(c * cellW + 4, r * cellH + 3, cellW * 0.25, cellH * 0.35), decayedBook);
               // Goresan cakar retak
               canvas.drawLine(
                 Offset(c * cellW + 3, r * cellH + 2),
                 Offset(c * cellW + cellW * 0.8, r * cellH + cellH * 0.8),
+                // WARNA: gambar ilustrasi burung hantu.
                 Paint()..color = const Color(0xFF380808)..strokeWidth = 1.2,
               );
             }
@@ -2442,6 +2647,7 @@ class _PixelLibraryMazePainter extends CustomPainter {
             if ((r + c) % 2 == 0) {
               canvas.drawRect(
                 Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+                // WARNA: gambar ilustrasi burung hantu.
                 Paint()..color = const Color(0xFFDFC6A0),
               );
             }
@@ -2449,6 +2655,7 @@ class _PixelLibraryMazePainter extends CustomPainter {
             canvas.drawRect(
               rect,
               Paint()
+                // WARNA: gambar ilustrasi burung hantu.
                 ..color = const Color(0xFFB59367)
                 ..style = PaintingStyle.stroke
                 ..strokeWidth = 0.8,
@@ -2458,12 +2665,14 @@ class _PixelLibraryMazePainter extends CustomPainter {
             if ((r + c) % 2 == 0) {
               canvas.drawRect(
                 Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+                // WARNA: gambar ilustrasi burung hantu.
                 Paint()..color = const Color(0xFF536277),
               );
             }
             canvas.drawRect(
               rect,
               Paint()
+                // WARNA: gambar ilustrasi burung hantu.
                 ..color = const Color(0xFF475569)
                 ..style = PaintingStyle.stroke
                 ..strokeWidth = 0.8,
@@ -2473,12 +2682,14 @@ class _PixelLibraryMazePainter extends CustomPainter {
             if ((r + c) % 2 == 0) {
               canvas.drawRect(
                 Rect.fromLTWH(c * cellW, r * cellH, cellW, cellH),
+                // WARNA: gambar ilustrasi burung hantu.
                 Paint()..color = const Color(0xFF685161),
               );
             }
             canvas.drawRect(
               rect,
               Paint()
+                // WARNA: gambar ilustrasi burung hantu.
                 ..color = const Color(0xFF836278)
                 ..style = PaintingStyle.stroke
                 ..strokeWidth = 0.8,
@@ -2486,58 +2697,70 @@ class _PixelLibraryMazePainter extends CustomPainter {
           }
         } else if (cell == '2') {
           // --- TITIK AWAL (START) ---
+          // WARNA: gambar ilustrasi burung hantu.
           canvas.drawRect(rect, Paint()..color = const Color(0xFFB91C1C));
         } else if (cell == '3') {
           // --- TITIK AKHIR (END POINT) ---
           if (level < 2) {
             // Level 1 & Level 2: END POINT ADALAH PINTU KELUAR (DOOR)!
             // Kusen Pintu
+            // WARNA: gambar ilustrasi burung hantu.
             canvas.drawRect(rect, Paint()..color = const Color(0xFF1E293B));
             // Daun Pintu Kayu
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + 2, r * cellH + 2, cellW - 4, cellH - 4),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFF6B4226),
             );
             // Panel Pintu
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + 4, r * cellH + 4, (cellW - 8) * 0.45, (cellH - 8) * 0.4),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFF4A2E1B),
             );
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + cellW * 0.52, r * cellH + 4, (cellW - 8) * 0.45, (cellH - 8) * 0.4),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFF4A2E1B),
             );
             // Gagang Pintu Kuningan
             canvas.drawCircle(
               Offset(c * cellW + cellW * 0.25, r * cellH + cellH * 0.55),
               cellW * 0.08,
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFFFBBF24),
             );
             // Lampu EXIT Hijau di atas pintu
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + cellW * 0.2, r * cellH - 1, cellW * 0.6, 3),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFF22C55E),
             );
           } else {
             // Level 3: END POINT ADALAH RAK BUKU EMAS (SECRET GOLDEN BOOKSHELF)!
             // Lemari Rak Emas Kuno
+            // WARNA: gambar ilustrasi burung hantu.
             canvas.drawRect(rect, Paint()..color = const Color(0xFF78350F));
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + 2, r * cellH + 2, cellW - 4, cellH - 4),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFFB45309),
             );
             // Buku Emas Menyala di Rak
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + 4, r * cellH + 4, cellW * 0.35, cellH * 0.6),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFFFBBF24),
             );
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + cellW * 0.5, r * cellH + 4, cellW * 0.35, cellH * 0.6),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFFFEF08A),
             );
             // Ornamen Mahkota Rak Emas
             canvas.drawRect(
               Rect.fromLTWH(c * cellW + 2, r * cellH + 1, cellW - 4, 3),
+              // WARNA: gambar ilustrasi burung hantu.
               Paint()..color = const Color(0xFFFDE047),
             );
           }
@@ -2550,6 +2773,7 @@ class _PixelLibraryMazePainter extends CustomPainter {
     textPainter.text = const TextSpan(
       text: 'START',
       style: TextStyle(
+        // WARNA: teks judul/isi pada bagian ini.
         color: Colors.white,
         fontSize: 8.5,
         fontWeight: FontWeight.bold,
@@ -2563,6 +2787,7 @@ class _PixelLibraryMazePainter extends CustomPainter {
     textPainter.text = TextSpan(
       text: level < 2 ? 'PINTU' : 'EMAS',
       style: TextStyle(
+        // WARNA: teks judul/isi pada bagian ini.
         color: level < 2 ? Colors.white : Colors.black,
         fontSize: 8.5,
         fontWeight: FontWeight.bold,
@@ -2580,59 +2805,72 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 1: Iblis Tanduk Merah (Red Horned Shadow Demon)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.15, cy + cellH * 0.22, cellW * 0.7, cellH * 0.68),
+          // WARNA: teks 'START'.
           Paint()..color = const Color(0xFF140508),
         );
         // Tanduk Merah Kiri
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.14, cy + cellH * 0.08, cellW * 0.14, cellH * 0.18),
+          // WARNA: teks 'EMAS'.
           Paint()..color = const Color(0xFFDC2626),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.08, cy + cellH * 0.02, cellW * 0.1, cellH * 0.1),
+          // WARNA: teks 'EMAS'.
           Paint()..color = const Color(0xFFB91C1C),
         );
         // Tanduk Merah Kanan
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.72, cy + cellH * 0.08, cellW * 0.14, cellH * 0.18),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFDC2626),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.82, cy + cellH * 0.02, cellW * 0.1, cellH * 0.1),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFB91C1C),
         );
         // Mata Merah Menyala
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.26, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFF0033),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.58, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFF0033),
         );
         // Pupil Kuning Terang
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.31, cy + cellH * 0.39, cellW * 0.07, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFEF08A),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.63, cy + cellH * 0.39, cellW * 0.07, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFEF08A),
         );
         // Rahang & Taring Putih Runcing
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.32, cy + cellH * 0.62, cellW * 0.36, cellH * 0.18),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF000000),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.white,
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.46, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.white,
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.58, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.white,
         );
         break;
@@ -2641,45 +2879,55 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 2: Iblis Mata Ungu Bertanduk Gelap (Purple Void Fiend)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.22, cellW * 0.64, cellH * 0.68),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF240638),
         );
         // Mahkota Tanduk Ungu
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.22, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFA855F7),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.64, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFA855F7),
         );
         // Mata Magenta Neon
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.38, cellW * 0.16, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFF43F5E),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.38, cellW * 0.16, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFF43F5E),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.33, cy + cellH * 0.40, cellW * 0.06, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.white,
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.61, cy + cellH * 0.40, cellW * 0.06, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.white,
         );
         // Seringai Gigi Ungu
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.62, cellW * 0.32, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF0F0218),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.38, cy + cellH * 0.62, cellW * 0.06, cellH * 0.07),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFE9D5FF),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.54, cy + cellH * 0.62, cellW * 0.06, cellH * 0.07),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFE9D5FF),
         );
         break;
@@ -2688,33 +2936,40 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 3: Ghoul Bertaring Mencekam (Grinning Skull Ghoul)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.2, cy + cellH * 0.18, cellW * 0.6, cellH * 0.65),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF1E293B),
         );
         // Mata Kucing Kuning Tajam
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.32, cellW * 0.16, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFACC15),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.32, cellW * 0.16, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFACC15),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.32, cellW * 0.04, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.black,
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.62, cy + cellH * 0.32, cellW * 0.04, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.black,
         );
         // Seringai Lebar Mencekam
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.24, cy + cellH * 0.55, cellW * 0.52, cellH * 0.22),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.black,
         );
         for (int i = 0; i < 4; i++) {
           canvas.drawRect(
             Rect.fromLTWH(cx + cellW * (0.28 + i * 0.12), cy + cellH * 0.55, cellW * 0.07, cellH * 0.09),
+            // WARNA: gambar ilustrasi burung hantu.
             Paint()..color = Colors.white,
           );
         }
@@ -2724,33 +2979,40 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 4: Iblis Pengintai 4 Mata di Rak (Four-Eyed Shelf Lurker)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.14, cy + cellH * 0.2, cellW * 0.72, cellH * 0.7),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF100714),
         );
         // Pasang Mata Merah Atas
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.25, cy + cellH * 0.28, cellW * 0.18, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFEF4444),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.57, cy + cellH * 0.28, cellW * 0.18, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFEF4444),
         );
         // Pasang Mata Emas Bawah
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.32, cy + cellH * 0.46, cellW * 0.14, cellH * 0.1),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFF59E0B),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.54, cy + cellH * 0.46, cellW * 0.14, cellH * 0.1),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFF59E0B),
         );
         // Cakar Memegang Papan Rak
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.2, cy + cellH * 0.75, cellW * 0.18, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF581C87),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.62, cy + cellH * 0.75, cellW * 0.18, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF581C87),
         );
         break;
@@ -2759,45 +3021,55 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 5: Iblis Hijau Beracun Bertanduk (Toxic Green Horned Fiend)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.22, cellW * 0.64, cellH * 0.68),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF062817),
         );
         // Tanduk Hijau Tajam
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF16A34A),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.68, cy + cellH * 0.06, cellW * 0.14, cellH * 0.2),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF16A34A),
         );
         // Mata Hijau Radioaktif
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF22C55E),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.36, cellW * 0.16, cellH * 0.14),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF22C55E),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.33, cy + cellH * 0.39, cellW * 0.06, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFEF08A),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.61, cy + cellH * 0.39, cellW * 0.06, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFFEF08A),
         );
         // Mulut & Taring Beracun
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.32, cy + cellH * 0.62, cellW * 0.36, cellH * 0.16),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.black,
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.36, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF86EFAC),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.62, cellW * 0.08, cellH * 0.08),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF86EFAC),
         );
         break;
@@ -2806,29 +3078,35 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 6: Hantu Jubah Merah Berdiri di Rak (Grim Crimson Wraith)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.15, cy + cellH * 0.15, cellW * 0.7, cellH * 0.75),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF450A0A),
         );
         // Lubang Jubah Hitam Kelam
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.26, cellW * 0.44, cellH * 0.36),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = Colors.black,
         );
         // Mata Biru Es Hantu Menyala
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.34, cy + cellH * 0.36, cellW * 0.12, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF38BDF8),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.54, cy + cellH * 0.36, cellW * 0.12, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF38BDF8),
         );
         // Lilin Terkutuk Menyala di Sebelahnya
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.78, cy + cellH * 0.45, cellW * 0.14, cellH * 0.35),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFE2E8F0),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.81, cy + cellH * 0.32, cellW * 0.08, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFEA580C),
         );
         break;
@@ -2837,24 +3115,29 @@ class _PixelLibraryMazePainter extends CustomPainter {
         // Demon 7: Wajah Iblis Berlumur Darah (Bleeding Demon Face)
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.18, cy + cellH * 0.2, cellW * 0.64, cellH * 0.7),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFF1E0608),
         );
         // Mata Berdarah
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.28, cy + cellH * 0.34, cellW * 0.16, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFB91C1C),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.56, cy + cellH * 0.34, cellW * 0.16, cellH * 0.12),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFB91C1C),
         );
         // Lelehan Darah Mengalir ke Bawah
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.33, cy + cellH * 0.46, cellW * 0.06, cellH * 0.45),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFDC2626),
         );
         canvas.drawRect(
           Rect.fromLTWH(cx + cellW * 0.61, cy + cellH * 0.46, cellW * 0.06, cellH * 0.45),
+          // WARNA: gambar ilustrasi burung hantu.
           Paint()..color = const Color(0xFFDC2626),
         );
         break;
@@ -2884,11 +3167,13 @@ class _PixelResultBackdropPainter extends CustomPainter {
     for (var row = 0; row < (size.height / tile).ceil(); row++) {
       for (var col = 0; col < (size.width / tile).ceil(); col++) {
         if ((row + col) % 2 == 0 && (row * 3 + col) % 4 != 0) {
+          // WARNA: gambar ilustrasi burung hantu.
           paint.color = (won ? const Color(0xFFEDE2CF) : const Color(0xFFB9854D)).withValues(alpha: .045);
           canvas.drawRect(Rect.fromLTWH(col * tile, row * tile, tile - 1, tile - 1), paint);
         }
       }
     }
+    // WARNA: gambar ilustrasi burung hantu.
     paint.color = const Color(0xFFEDE2CF).withValues(alpha: .2);
     for (var i = 0; i < 5; i++) {
       final x = size.width * (.12 + i * .13);
@@ -2925,17 +3210,29 @@ class _CutePixelHappyAdventurerPainter extends CustomPainter {
     ];
 
     final Map<int, Paint> p = {
+      // WARNA: gambar ilustrasi burung hantu.
       1: Paint()..color = const Color(0xFF67343A), // Oxblood hat
+      // WARNA: gambar ilustrasi burung hantu.
       2: Paint()..color = const Color(0xFFFFD1A9), // Skin
+      // WARNA: gambar ilustrasi burung hantu.
       3: Paint()..color = const Color(0xFF302622), // Joyful eyes
+      // WARNA: gambar ilustrasi burung hantu.
       4: Paint()..color = const Color(0xFFB91C1C), // Joyful smile
+      // WARNA: gambar ilustrasi burung hantu.
       5: Paint()..color = const Color(0xFF9A704F), // Shirt
+      // WARNA: gambar ilustrasi burung hantu.
       6: Paint()..color = const Color(0xFF4C272C), // Pants
+      // WARNA: gambar ilustrasi burung hantu.
       7: Paint()..color = const Color(0xFF302622), // Shoes
+      // WARNA: gambar ilustrasi burung hantu.
       8: Paint()..color = const Color(0xFF1D4ED8), // Blue book
+      // WARNA: gambar ilustrasi burung hantu.
       9: Paint()..color = const Color(0xFFFEF08A), // Book pages
+      // WARNA: gambar ilustrasi burung hantu.
       10: Paint()..color = const Color(0xFFF59E0B), // Golden trophy
+      // WARNA: gambar ilustrasi burung hantu.
       11: Paint()..color = const Color(0xFFFDE047), // Trophy shine
+      // WARNA: gambar ilustrasi burung hantu.
       12: Paint()..color = const Color(0xFFF87171), // Cheerful blush
     };
 
@@ -2974,13 +3271,21 @@ class _CutePixelAdventurerPainter extends CustomPainter {
     ];
 
     final Map<int, Paint> p = {
+      // WARNA: gambar ilustrasi burung hantu.
       1: Paint()..color = const Color(0xFF67343A), // Oxblood hat
+      // WARNA: gambar ilustrasi burung hantu.
       2: Paint()..color = const Color(0xFFFFD1A9), // Skin
+      // WARNA: gambar ilustrasi burung hantu.
       3: Paint()..color = const Color(0xFF302622), // Eyes
+      // WARNA: gambar ilustrasi burung hantu.
       4: Paint()..color = const Color(0xFFE57373), // Smile
+      // WARNA: gambar ilustrasi burung hantu.
       5: Paint()..color = const Color(0xFF9A704F), // Shirt
+      // WARNA: gambar ilustrasi burung hantu.
       6: Paint()..color = const Color(0xFFD4AF37), // Book bag
+      // WARNA: gambar ilustrasi burung hantu.
       7: Paint()..color = const Color(0xFF4C272C), // Pants
+      // WARNA: gambar ilustrasi burung hantu.
       8: Paint()..color = const Color(0xFF302622), // Shoes
     };
 
@@ -3021,8 +3326,11 @@ class _CutePixelBookPainter extends CustomPainter {
     ];
 
     final Map<int, Paint> p = {
+      // WARNA: gambar ilustrasi burung hantu.
       1: Paint()..color = const Color(0xFF67343A),
+      // WARNA: gambar ilustrasi burung hantu.
       2: Paint()..color = const Color(0xFFEDE2CF), // Kertas
+      // WARNA: gambar ilustrasi burung hantu.
       3: Paint()..color = const Color(0xFF8A7663), // Tulisan
     };
 
@@ -3061,9 +3369,13 @@ class _CutePixelGoldenBookPainter extends CustomPainter {
     ];
 
     final Map<int, Paint> p = {
+      // WARNA: gambar ilustrasi burung hantu.
       1: Paint()..color = const Color(0xFFB45309), // Gold border
+      // WARNA: gambar ilustrasi burung hantu.
       2: Paint()..color = const Color(0xFFFEF08A), // Bright gold
+      // WARNA: gambar ilustrasi burung hantu.
       3: Paint()..color = const Color(0xFFD97706), // Gold lines
+      // WARNA: gambar ilustrasi burung hantu.
       4: Paint()..color = const Color(0xFFFFFFFF), // Sparkle
     };
 
@@ -3102,11 +3414,17 @@ class _CutePixelWikwokPainter extends CustomPainter {
     ];
 
     final Map<int, Paint> p = {
+      // WARNA: gambar ilustrasi burung hantu.
       1: Paint()..color = const Color(0xFF5C6F2B), // Moss green
+      // WARNA: gambar ilustrasi burung hantu.
       2: Paint()..color = const Color(0xFF94A3B8), // Wire
+      // WARNA: gambar ilustrasi burung hantu.
       3: Paint()..color = const Color(0xFF0F120A), // Eyes socket
+      // WARNA: gambar ilustrasi burung hantu.
       4: Paint()..color = const Color(0xFFFEF08A), // Glow eye
+      // WARNA: gambar ilustrasi burung hantu.
       5: Paint()..color = const Color(0xFF0D1007), // Mouth cavity
+      // WARNA: gambar ilustrasi burung hantu.
       6: Paint()..color = const Color(0xFFFEF08A), // Teeth
     };
 

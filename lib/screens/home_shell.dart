@@ -39,7 +39,9 @@ class _HomeShellState extends State<HomeShell> {
     } catch (_) {}
   }
 
+  // WARNA: palet _cOxblood ().
   static const Color _cOxblood = Color(0xFF67343A);
+  // WARNA: palet _cMuted ().
   static const Color _cMuted = Color(0xFF8C7362);
 
   @override
@@ -47,8 +49,11 @@ class _HomeShellState extends State<HomeShell> {
         body: _pages[_i],
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
+            // WARNA: latar kartu/komponen.
             color: Color(0xFFFAF7F2),
+            // WARNA: garis tepi komponen.
             border: Border(
+              // WARNA: latar kartu/komponen.
               top: BorderSide(color: Color(0xFFEADBCE), width: 1.2),
             ),
           ),
@@ -58,9 +63,12 @@ class _HomeShellState extends State<HomeShell> {
               child: BottomNavigationBar(
                 currentIndex: _i,
                 elevation: 0,
+                // WARNA: latar menu navigasi bawah.
                 backgroundColor: const Color(0xFFFAF7F2),
                 type: BottomNavigationBarType.fixed,
+                // WARNA: ikon dan teks menu yang sedang dipilih.
                 selectedItemColor: _cOxblood,
+                // WARNA: ikon dan teks menu yang sedang dipilih.
                 unselectedItemColor: _cMuted,
                 selectedLabelStyle: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
@@ -98,12 +106,14 @@ class _HomeShellState extends State<HomeShell> {
       curve: Curves.easeOutCubic,
       padding: EdgeInsets.symmetric(horizontal: isSelected ? 18 : 6, vertical: 4),
       decoration: BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: isSelected ? const Color(0xFFEDE2CF) : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Icon(
         icon,
         size: 22,
+        // WARNA: latar kartu/komponen.
         color: isSelected ? _cOxblood : _cMuted,
       ),
     );

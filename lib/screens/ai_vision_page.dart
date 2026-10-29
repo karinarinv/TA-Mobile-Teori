@@ -72,6 +72,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Gagal membuka kamera atau gambar: $e'),
+            // WARNA: latar notifikasi.
             backgroundColor: AppColors.oxblood,
           ),
         );
@@ -196,10 +197,13 @@ class _AiVisionPageState extends State<AiVisionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: AppColors.background,
       appBar: AppBar(
         elevation: 0,
+        // WARNA: latar AppBar.
         backgroundColor: AppColors.oxblood,
+        // WARNA: teks/ikon tombol.
         foregroundColor: AppColors.parchment,
         title: Text(
           'AI Vision: Scan Cover Buku',
@@ -216,11 +220,13 @@ class _AiVisionPageState extends State<AiVisionPage> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
+                  // WARNA: gradasi komponen ini.
                   colors: [Color(0xFFFAF2E6), Color(0xFFF1E6D4)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(16),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: const Color(0xFFD4BE9D), width: 1.2),
               ),
               child: Row(
@@ -228,11 +234,13 @@ class _AiVisionPageState extends State<AiVisionPage> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
+                      // WARNA: latar kartu/komponen.
                       color: AppColors.oxblood.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.camera_enhance_rounded,
+                      // WARNA: latar kartu/komponen.
                       color: AppColors.oxblood,
                       size: 26,
                     ),
@@ -247,6 +255,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            // WARNA: teks 'Scan Sampul Buku Anda'.
                             color: AppColors.walnut,
                           ),
                         ),
@@ -255,6 +264,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                           'Arahkan kamera ke cover buku fisik, AI Vision akan mendeteksi judul, penulis, dan ringkasannya secara instan.',
                           style: GoogleFonts.poppins(
                             fontSize: 11.5,
+                            // WARNA: teks 'Scan Sampul Buku Anda'.
                             color: AppColors.textSecondary,
                             height: 1.35,
                           ),
@@ -272,11 +282,14 @@ class _AiVisionPageState extends State<AiVisionPage> {
               width: double.infinity,
               height: 260,
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border, width: 1.5),
                 boxShadow: [
                   BoxShadow(
+                    // WARNA: bayangan kartu.
                     color: AppColors.walnut.withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
@@ -295,16 +308,19 @@ class _AiVisionPageState extends State<AiVisionPage> {
                           ),
                           if (_analyzing)
                             Container(
+                              // WARNA: warna komponen.
                               color: Colors.black.withValues(alpha: 0.55),
                               child: Center(
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
+                                    // WARNA: warna komponen.
                                     const CircularProgressIndicator(color: Color(0xFFFEF08A)),
                                     const SizedBox(height: 14),
                                     Text(
                                       'AI Vision Sedang Menganalisis...',
                                       style: GoogleFonts.poppins(
+                                        // WARNA: teks 'AI Vision Sedang Menganalisis...'.
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 13,
@@ -322,12 +338,14 @@ class _AiVisionPageState extends State<AiVisionPage> {
                           Icon(
                             Icons.add_a_photo_outlined,
                             size: 56,
+                            // WARNA: ikon add_a_photo_outlined.
                             color: AppColors.tobacco.withValues(alpha: 0.7),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'Belum ada foto yang dipilih',
                             style: GoogleFonts.poppins(
+                              // WARNA: teks 'Belum ada foto yang dipilih'.
                               color: AppColors.walnut,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -337,6 +355,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                           Text(
                             'Gunakan kamera atau pilih dari galeri HP Anda',
                             style: GoogleFonts.poppins(
+                              // WARNA: teks 'Belum ada foto yang dipilih'.
                               color: Colors.grey.shade500,
                               fontSize: 12,
                             ),
@@ -353,7 +372,9 @@ class _AiVisionPageState extends State<AiVisionPage> {
                 Expanded(
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
+                      // WARNA: latar tombol.
                       backgroundColor: AppColors.oxblood,
+                      // WARNA: teks/ikon tombol 'Buka Kamera'.
                       foregroundColor: AppColors.parchment,
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -370,7 +391,9 @@ class _AiVisionPageState extends State<AiVisionPage> {
                 Expanded(
                   child: OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
+                      // WARNA: teks/ikon tombol 'Pilih Galeri'.
                       foregroundColor: AppColors.oxblood,
+                      // WARNA: teks 'Buka Kamera'.
                       side: const BorderSide(color: AppColors.border, width: 1.5),
                       padding: const EdgeInsets.symmetric(vertical: 13),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -394,6 +417,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
+                  // WARNA: teks 'Pilih Galeri'.
                   color: AppColors.walnut,
                 ),
               ),
@@ -402,11 +426,14 @@ class _AiVisionPageState extends State<AiVisionPage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
+                  // WARNA: latar kartu/komponen.
                   border: Border.all(color: AppColors.border),
                   boxShadow: [
                     BoxShadow(
+                      // WARNA: bayangan kartu.
                       color: AppColors.walnut.withValues(alpha: 0.06),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
@@ -420,6 +447,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: const Color(0xFFEDE2CF),
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -428,6 +456,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                         style: GoogleFonts.poppins(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
+                          // WARNA: teks '_analysisResult'.
                           color: AppColors.oxblood,
                         ),
                       ),
@@ -440,6 +469,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        // WARNA: teks '_analysisResult'.
                         color: AppColors.walnut,
                       ),
                     ),
@@ -448,12 +478,14 @@ class _AiVisionPageState extends State<AiVisionPage> {
                     // Penulis
                     Row(
                       children: [
+                        // WARNA: teks pada komponen ini.
                         const Icon(Icons.edit_note_rounded, size: 16, color: AppColors.tobacco),
                         const SizedBox(width: 4),
                         Text(
                           _analysisResult!['author'] ?? 'Penulis tidak diketahui',
                           style: GoogleFonts.poppins(
                             fontSize: 13,
+                            // WARNA: teks '_analysisResult'.
                             color: AppColors.tobacco,
                             fontWeight: FontWeight.w600,
                           ),
@@ -468,6 +500,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
+                        // WARNA: teks 'Sinopsis & Ringkasan:'.
                         color: AppColors.walnut,
                       ),
                     ),
@@ -476,6 +509,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                       _analysisResult!['summary'] ?? '-',
                       style: GoogleFonts.poppins(
                         fontSize: 12.5,
+                        // WARNA: teks 'Sinopsis & Ringkasan:'.
                         color: AppColors.textSecondary,
                         height: 1.45,
                       ),
@@ -486,13 +520,16 @@ class _AiVisionPageState extends State<AiVisionPage> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: const Color(0xFFFAF7F2),
                         borderRadius: BorderRadius.circular(12),
+                        // WARNA: latar kartu/komponen.
                         border: Border.all(color: const Color(0xFFEADBCE)),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // WARNA: garis tepi kartu/komponen.
                           const Icon(Icons.recommend_rounded, color: Colors.green, size: 20),
                           const SizedBox(width: 8),
                           Expanded(
@@ -500,6 +537,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                               _analysisResult!['why_read'] ?? 'Rekomendasi bacaan bermutu tinggi.',
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
+                                // WARNA: teks '_analysisResult'.
                                 color: AppColors.walnut,
                                 height: 1.35,
                               ),
@@ -516,7 +554,9 @@ class _AiVisionPageState extends State<AiVisionPage> {
                         width: double.infinity,
                         child: FilledButton.icon(
                           style: FilledButton.styleFrom(
+                            // WARNA: latar tombol.
                             backgroundColor: AppColors.oxblood,
+                            // WARNA: teks/ikon tombol 'Cari Buku Ini di Katalog'.
                             foregroundColor: AppColors.parchment,
                             padding: const EdgeInsets.symmetric(vertical: 13),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -541,12 +581,15 @@ class _AiVisionPageState extends State<AiVisionPage> {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                         decoration: BoxDecoration(
+                          // WARNA: latar kartu/komponen.
                           color: const Color(0xFFFAF7F2),
                           borderRadius: BorderRadius.circular(12),
+                          // WARNA: latar kartu/komponen.
                           border: Border.all(color: const Color(0xFFEADBCE)),
                         ),
                         child: Row(
                           children: [
+                            // WARNA: garis tepi kartu/komponen.
                             const Icon(Icons.info_outline_rounded, size: 20, color: AppColors.tobacco),
                             const SizedBox(width: 10),
                             Expanded(
@@ -554,6 +597,7 @@ class _AiVisionPageState extends State<AiVisionPage> {
                                 'Tombol pencarian katalog dinonaktifkan karena foto yang dipindai bukan merupakan buku atau novel.',
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
+                                  // WARNA: teks judul/isi pada bagian ini.
                                   color: AppColors.walnut,
                                   fontWeight: FontWeight.w500,
                                 ),

@@ -20,6 +20,7 @@ class RentalBottomSheet extends StatefulWidget {
     return showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // WARNA: latar komponen.
       backgroundColor: Colors.transparent,
       builder: (_) => RentalBottomSheet(book: book),
     );
@@ -76,8 +77,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        // WARNA: latar dialog.
         backgroundColor: const Color(0xFFFAF7F2),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        // WARNA: warna komponen.
         title: const Text('Voucher Saya', style: TextStyle(color: Color(0xFF67343A), fontWeight: FontWeight.bold)),
         content: _hasAvailableVoucher
             ? InkWell(
@@ -89,14 +92,19 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 },
                 child: Container(
                   padding: const EdgeInsets.all(14),
+                  // WARNA: teks 'Voucher Saya'.
                   decoration: BoxDecoration(color: const Color(0xFFEDE2CF), borderRadius: BorderRadius.circular(14), border: Border.all(color: const Color(0xFF67343A).withValues(alpha: .25))),
                   child: const Row(children: [
+                    // WARNA: garis tepi kartu/komponen.
                     Icon(Icons.confirmation_number_rounded, color: Color(0xFF67343A)),
                     SizedBox(width: 12),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                      // WARNA: ikon confirmation_number_rounded.
                       Text('DISKON10', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF67343A), letterSpacing: 1)),
+                      // WARNA: teks judul/isi pada bagian ini.
                       SizedBox(height: 3), Text('Potongan 10% untuk sewa buku', style: TextStyle(fontSize: 12, color: Color(0xFF302622))),
                     ])),
+                    // WARNA: teks 'DISKON10'.
                     Icon(Icons.chevron_right_rounded, color: Color(0xFF67343A)),
                   ]),
                 ),
@@ -104,12 +112,16 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             : const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  // WARNA: ikon chevron_right_rounded.
                   Icon(Icons.confirmation_number_outlined, size: 42, color: Color(0xFFB9A99A)),
                   SizedBox(height: 10),
+                  // WARNA: ikon confirmation_number_outlined.
                   Text('Belum ada voucher tersedia', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF302622))),
+                  // WARNA: teks 'Potongan 10% untuk sewa buku'.
                   SizedBox(height: 4), Text('Voucher DISKON10 sudah digunakan.', textAlign: TextAlign.center, style: TextStyle(fontSize: 12, color: Colors.black54)),
                 ]),
               ),
+        // WARNA: teks 'Belum ada voucher tersedia'.
         actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Tutup', style: TextStyle(color: Color(0xFF67343A))))],
       ),
     );
@@ -148,6 +160,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Voucher DISKON10 sudah pernah Anda gunakan sebelumnya.'),
+            // WARNA: latar notifikasi.
             backgroundColor: Colors.red.shade700,
             behavior: SnackBarBehavior.floating,
           ),
@@ -165,11 +178,13 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         SnackBar(
           content: const Row(
             children: [
+              // WARNA: warna komponen.
               Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
               SizedBox(width: 8),
               Expanded(child: Text('Voucher DISKON10 berhasil dipasang! Potongan 10%')),
             ],
           ),
+          // WARNA: latar notifikasi.
           backgroundColor: Colors.green.shade700,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -215,6 +230,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
 
     return Container(
       decoration: const BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -235,6 +251,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 width: 44,
                 height: 5,
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -251,6 +268,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                   child: Container(
                     width: 55,
                     height: 80,
+                    // WARNA: warna komponen.
                     color: Colors.grey[200],
                     child: img != null
                         ? Image.network(img, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.book))
@@ -271,6 +289,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       const SizedBox(height: 4),
                       Text(
                         authors,
+                        // WARNA: judul buku.
                         style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -279,6 +298,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
+                          // WARNA: latar kartu/komponen.
                           color: const Color(0xFFF7EDED),
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -287,6 +307,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
+                            // WARNA: teks '${_formatRupiah(pricePerDay)} / hari'.
                             color: const Color(0xFF5A2A38),
                           ),
                         ),
@@ -316,9 +337,12 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
+                          // WARNA: latar kartu/komponen.
                           color: isSelected ? const Color(0xFF67343A) : Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(10),
+                          // WARNA: garis tepi komponen.
                           border: Border.all(
+                            // WARNA: garis tepi kartu/komponen.
                             color: isSelected ? const Color(0xFF67343A) : Colors.grey.shade300,
                           ),
                         ),
@@ -327,6 +351,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                             '$d Hari',
                             style: TextStyle(
                               fontSize: 13,
+                              // WARNA: teks '$d Hari'.
                               color: isSelected ? Colors.white : Colors.black87,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                             ),
@@ -346,12 +371,14 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
               children: [
                 Text(
                   'Kustom hari:',
+                  // WARNA: teks 'Kustom hari:'.
                   style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                 ),
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline),
+                      // WARNA: ikon remove_circle_outline.
                       color: const Color(0xFF67343A),
                       onPressed: _duration > 1 ? () => setState(() => _duration--) : null,
                     ),
@@ -361,6 +388,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.add_circle_outline),
+                      // WARNA: ikon add_circle_outline.
                       color: const Color(0xFF67343A),
                       onPressed: _duration < 60 ? () => setState(() => _duration++) : null,
                     ),
@@ -374,6 +402,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -383,21 +412,25 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // WARNA: latar kartu/komponen ini.
                         Text('Mulai Sewa', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
                         const SizedBox(height: 2),
                         Text(dateFmt.format(now), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                       ],
                     ),
                   ),
+                  // WARNA: teks 'Mulai Sewa'.
                   const Icon(Icons.arrow_forward, size: 16, color: Colors.grey),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        // WARNA: ikon arrow_forward.
                         Text('Jatuh Tempo', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
                         const SizedBox(height: 2),
                         Text(
                           dateFmt.format(returnDate),
+                          // WARNA: teks 'Mulai Sewa'.
                           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.deepOrange),
                         ),
                       ],
@@ -417,6 +450,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -433,6 +467,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       value: opt,
                       child: Row(
                         children: [
+                          // WARNA: warna komponen.
                           Icon(icon, size: 20, color: const Color(0xFF67343A)),
                           const SizedBox(width: 10),
                           Text(opt, style: const TextStyle(fontSize: 13)),
@@ -451,6 +486,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             // Voucher Diskon 
             Row(
               children: [
+                // WARNA: warna komponen.
                 Icon(Icons.card_giftcard_rounded, size: 18, color: Colors.amber.shade800),
                 const SizedBox(width: 6),
                 const Text(
@@ -462,8 +498,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
+                      // WARNA: latar kartu/komponen.
                       color: const Color(0xFFFEF3C7),
                       borderRadius: BorderRadius.circular(6),
+                      // WARNA: latar kartu/komponen.
                       border: Border.all(color: const Color(0xFFF59E0B)),
                     ),
                     child: const Text(
@@ -471,6 +509,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
+                        // WARNA: teks 'VIP'.
                         color: Color(0xFFB45309),
                       ),
                     ),
@@ -484,8 +523,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: const Color(0xFFFAF7F2),
                   borderRadius: BorderRadius.circular(12),
+                  // WARNA: latar kartu/komponen.
                   border: Border.all(color: const Color(0xFFEADBCE)),
                 ),
                 child: Row(
@@ -493,6 +534,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     const Icon(
                       Icons.workspace_premium_rounded,
                       size: 20,
+                      // WARNA: garis tepi kartu/komponen.
                       color: Color(0xFFB45309),
                     ),
                     const SizedBox(width: 10),
@@ -502,6 +544,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                         style: TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
+                          // WARNA: teks 'Voucher diskon hanya tersedia untuk Member VIP.'.
                           color: Colors.grey.shade700,
                         ),
                       ),
@@ -513,12 +556,15 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: Colors.green.shade50,
                   borderRadius: BorderRadius.circular(10),
+                  // WARNA: latar kartu/komponen.
                   border: Border.all(color: Colors.green.shade400),
                 ),
                 child: Row(
                   children: [
+                    // WARNA: garis tepi kartu/komponen.
                     const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
@@ -527,16 +573,19 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                         children: [
                           Text(
                             'Voucher $_appliedVoucher Terpasang',
+                            // WARNA: ikon check_circle_rounded.
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.green),
                           ),
                           Text(
                             'Potongan 10% (-${_formatRupiah(discountAmount)})',
+                            // WARNA: teks 'Voucher $_appliedVoucher Terpasang'.
                             style: TextStyle(fontSize: 12, color: Colors.green.shade800),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
+                      // WARNA: teks 'Voucher $_appliedVoucher Terpasang'.
                       icon: const Icon(Icons.close_rounded, size: 20, color: Colors.grey),
                       onPressed: _removeVoucher,
                       tooltip: 'Hapus Voucher',
@@ -551,17 +600,22 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
                   decoration: BoxDecoration(
+                    // WARNA: latar kartu/komponen.
                     color: const Color(0xFFFAF7F2),
                     borderRadius: BorderRadius.circular(12),
+                    // WARNA: latar kartu/komponen.
                     border: Border.all(color: const Color(0xFFEADBCE)),
                   ),
                   child: Row(children: [
+                    // WARNA: garis tepi kartu/komponen.
                     const Icon(Icons.confirmation_number_outlined, size: 20, color: Color(0xFF67343A)),
                     const SizedBox(width: 9),
                     Expanded(child: Text(
                       _hasAvailableVoucher ? 'Pilih voucher yang tersedia' : 'Tidak ada voucher tersedia',
+                      // WARNA: ikon confirmation_number_outlined.
                       style: TextStyle(fontSize: 13, color: _hasAvailableVoucher ? const Color(0xFF302622) : Colors.grey.shade600),
                     )),
+                    // WARNA: teks '_hasAvailableVoucher'.
                     const Icon(Icons.chevron_right_rounded, color: Color(0xFF67343A)),
                   ]),
                 ),
@@ -571,6 +625,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 padding: const EdgeInsets.only(top: 6, left: 4),
                 child: Text(
                   _voucherMessage!,
+                  // WARNA: ikon chevron_right_rounded.
                   style: TextStyle(fontSize: 12, color: Colors.red.shade700, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -580,7 +635,9 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: const Color(0xFFEADBCE)),
+                // WARNA: garis tepi kartu/komponen.
                 color: const Color(0xFFF7EDED).withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -598,7 +655,9 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // WARNA: teks 'Tarif (${_formatRupiah(pricePerDay)} × $_duration hari)'.
                         Text('Potongan Voucher ($_appliedVoucher)', style: TextStyle(fontSize: 13, color: Colors.green.shade800, fontWeight: FontWeight.bold)),
+                        // WARNA: teks 'Tarif (${_formatRupiah(pricePerDay)} × $_duration hari)'.
                         Text('-${_formatRupiah(discountAmount)}', style: TextStyle(fontSize: 13, color: Colors.green.shade800, fontWeight: FontWeight.bold)),
                       ],
                     ),
@@ -608,6 +667,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
                       Text('Biaya Layanan & Enkripsi', style: TextStyle(fontSize: 13)),
+                      // WARNA: teks 'Potongan Voucher ($_appliedVoucher)'.
                       Text('Gratis', style: TextStyle(fontSize: 13, color: Colors.green, fontWeight: FontWeight.bold)),
                     ],
                   ),
@@ -624,6 +684,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
+                          // WARNA: teks 'Gratis'.
                           color: const Color(0xFF302622),
                         ),
                       ),
@@ -640,6 +701,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
               height: 48,
               child: FilledButton(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: const Color(0xFF67343A),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -648,6 +710,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                     ? const SizedBox(
                         width: 22,
                         height: 22,
+                        // WARNA: warna komponen.
                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                       )
                     : Text(
@@ -730,6 +793,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // WARNA: latar komponen.
       backgroundColor: Colors.transparent,
       builder: (ctx) => _QrisPaymentModal(
         title: title,
@@ -761,6 +825,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // WARNA: latar komponen.
       backgroundColor: Colors.transparent,
       builder: (ctx) => _VaPaymentModal(
         title: title,
@@ -793,9 +858,11 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.green.shade50,
                 shape: BoxShape.circle,
               ),
+              // WARNA: latar kartu/komponen.
               child: const Icon(Icons.check_circle, color: Colors.green, size: 54),
             ),
             const SizedBox(height: 14),
@@ -806,6 +873,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             const SizedBox(height: 6),
             Text(
               'Buku telah berhasil disewa dan tercatat di Blockchain.',
+              // WARNA: teks 'Penyewaan Berhasil!'.
               style: TextStyle(fontSize: 13, color: Colors.grey[700]),
               textAlign: TextAlign.center,
             ),
@@ -814,6 +882,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.grey[100],
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -822,6 +891,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 children: [
                   Text('Judul: $title', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 4),
+                  // WARNA: teks judul/isi pada bagian ini.
                   Text('Batas Pengembalian: $dueDateStr', style: const TextStyle(fontSize: 12, color: Colors.deepOrange)),
                   const SizedBox(height: 4),
                   Text('Total Biaya: $totalFormatted', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
@@ -831,11 +901,13 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             const SizedBox(height: 12),
             Row(
               children: const [
+                // WARNA: teks 'Judul: $title'.
                 Icon(Icons.shield_outlined, size: 16, color: Color(0xFF67343A)),
                 SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     'Transaksi terlindungi & tercatat abadi di ledger blockchain.',
+                    // WARNA: ikon shield_outlined.
                     style: TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ),
@@ -847,7 +919,9 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
         actions: [
           OutlinedButton(
             style: OutlinedButton.styleFrom(
+              // WARNA: teks/ikon tombol 'Tutup'.
               foregroundColor: const Color(0xFF67343A),
+              // WARNA: warna komponen.
               side: const BorderSide(color: Color(0xFF67343A)),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -858,7 +932,9 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
           const SizedBox(width: 8),
           FilledButton.icon(
             style: FilledButton.styleFrom(
+              // WARNA: latar tombol.
               backgroundColor: const Color(0xFF67343A),
+              // WARNA: teks/ikon tombol 'Cek Blockchain'.
               foregroundColor: const Color(0xFFEDE2CF),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -969,6 +1045,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       decoration: const BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -981,6 +1058,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
             Container(
               width: 40,
               height: 4,
+              // WARNA: warna komponen.
               decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 12),
@@ -994,9 +1072,11 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: const Color(0xFF67343A),
                         borderRadius: BorderRadius.circular(6),
                       ),
+                      // WARNA: latar kartu/komponen.
                       child: const Text('QRIS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                     const SizedBox(width: 8),
@@ -1014,10 +1094,12 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
             // Info Merchant
             const Text(
               'RentBook Official Library',
+              // WARNA: ikon close.
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Color(0xFF302622)),
             ),
             Text(
               'NMID: ID1020039281728 • A01',
+              // WARNA: teks 'RentBook Official Library'.
               style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 12),
@@ -1028,11 +1110,14 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
               height: 170,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: const Color(0xFFEADBCE), width: 2),
                 boxShadow: [
                   BoxShadow(
+                    // WARNA: bayangan kartu.
                     color: Colors.black.withValues(alpha: 0.06),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
@@ -1046,6 +1131,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
+                      // WARNA: warna komponen.
                       Icon(Icons.qr_code_2_rounded, size: 70, color: Color(0xFF67343A)),
                       SizedBox(height: 6),
                       Text('QRIS Siap Di-scan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
@@ -1060,16 +1146,20 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: const Color(0xFFFAF7F2),
                 borderRadius: BorderRadius.circular(12),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: const Color(0xFFEADBCE)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  // WARNA: garis tepi kartu/komponen.
                   const Text('Total Tagihan QRIS:', style: TextStyle(fontSize: 13, color: Colors.black87)),
                   Text(
                     widget.totalFormatted,
+                    // WARNA: teks judul/isi pada bagian ini.
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF67343A)),
                   ),
                 ],
@@ -1080,6 +1170,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
             Text(
               'Mendukung GoPay, OVO, Dana, ShopeePay, LinkAja, dan Mobile Banking.',
               textAlign: TextAlign.center,
+              // WARNA: teks 'Total Tagihan QRIS:'.
               style: TextStyle(fontSize: 11.5, color: Colors.grey.shade600),
             ),
             const SizedBox(height: 16),
@@ -1090,7 +1181,9 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: const Color(0xFF67343A),
+                  // WARNA: teks/ikon tombol.
                   foregroundColor: const Color(0xFFEDE2CF),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 ),
@@ -1101,6 +1194,7 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
                     ? const SizedBox(
                         width: 22,
                         height: 22,
+                        // WARNA: ikon check_circle_outline_rounded.
                         child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                       )
                     : const Text(
@@ -1163,11 +1257,13 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
       SnackBar(
         content: Row(
           children: const [
+            // WARNA: warna komponen.
             Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
             SizedBox(width: 8),
             Text('Nomor Virtual Account disalin ke clipboard!'),
           ],
         ),
+        // WARNA: latar notifikasi.
         backgroundColor: Colors.green.shade700,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1223,6 +1319,7 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
         maxHeight: MediaQuery.of(context).size.height * 0.88,
       ),
       decoration: const BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1237,6 +1334,7 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
             child: Container(
               width: 40,
               height: 4,
+              // WARNA: warna komponen.
               decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
             ),
           ),
@@ -1263,9 +1361,12 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
                 child: ChoiceChip(
                   label: Text(bank),
                   selected: isSel,
+                  // WARNA: teks 'Pilih Bank:'.
                   selectedColor: const Color(0xFF67343A),
+                  // WARNA: latar komponen.
                   backgroundColor: const Color(0xFFFAF7F2),
                   labelStyle: TextStyle(
+                    // WARNA: teks 'bank'.
                     color: isSel ? const Color(0xFFEDE2CF) : Colors.black87,
                     fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
                     fontSize: 12,
@@ -1283,8 +1384,10 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
+              // WARNA: latar kartu/komponen.
               color: const Color(0xFFFAF7F2),
               borderRadius: BorderRadius.circular(14),
+              // WARNA: latar kartu/komponen.
               border: Border.all(color: const Color(0xFFEADBCE)),
             ),
             child: Column(
@@ -1293,13 +1396,16 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    // WARNA: garis tepi kartu/komponen.
                     Text('Nomor Virtual Account $_selectedBank', style: TextStyle(fontSize: 12, color: Colors.grey.shade700)),
                     InkWell(
                       onTap: () => _copyVa(vaNumber),
                       child: Row(
                         children: const [
+                          // WARNA: teks judul/isi pada bagian ini.
                           Icon(Icons.copy_rounded, size: 14, color: Color(0xFF67343A)),
                           SizedBox(width: 4),
+                          // WARNA: ikon copy_rounded.
                           Text('Salin', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF67343A))),
                         ],
                       ),
@@ -1309,9 +1415,11 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
                 const SizedBox(height: 6),
                 Text(
                   vaNumber,
+                  // WARNA: teks 'Nomor Virtual Account $_selectedBank'.
                   style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Color(0xFF302622)),
                 ),
                 const SizedBox(height: 8),
+                // WARNA: teks 'Salin'.
                 Text('Atas Nama: RentBook Official', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
               ],
             ),
@@ -1322,14 +1430,17 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
+              // WARNA: latar kartu/komponen.
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              // WARNA: latar kartu/komponen.
               border: Border.all(color: Colors.grey.shade200),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Total Transfer:', style: TextStyle(fontSize: 13)),
+                // WARNA: teks judul/isi pada bagian ini.
                 Text(widget.totalFormatted, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF67343A))),
               ],
             ),
@@ -1342,12 +1453,15 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
             height: 48,
             child: FilledButton.icon(
               style: FilledButton.styleFrom(
+                // WARNA: latar tombol.
                 backgroundColor: const Color(0xFF67343A),
+                // WARNA: teks/ikon tombol.
                 foregroundColor: const Color(0xFFEDE2CF),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               icon: _isProcessing ? const SizedBox.shrink() : const Icon(Icons.verified_rounded, size: 20),
               label: _isProcessing
+                  // WARNA: ikon verified_rounded.
                   ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                   : const Text('Konfirmasi Pembayaran VA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
               onPressed: _isProcessing ? null : _processPayment,

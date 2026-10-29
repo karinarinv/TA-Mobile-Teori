@@ -69,8 +69,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
         SnackBar(
           content: Text(
             'Mohon isi kesan mata kuliah Anda terlebih dahulu.',
+            // WARNA: teks 'Mohon isi kesan mata kuliah Anda terlebih dahulu.'.
             style: GoogleFonts.poppins(color: AppColors.parchment),
           ),
+          // WARNA: latar notifikasi.
           backgroundColor: AppColors.oxblood,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -107,6 +109,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         SnackBar(
           content: Row(
             children: [
+              // WARNA: warna komponen.
               const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
               const SizedBox(width: 10),
               Expanded(
@@ -114,11 +117,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   cloudResult.success
                       ? 'Kesan & saran berhasil disimpan ke Supabase!'
                       : 'Tersimpan di perangkat. Gagal mengirim ke Supabase: ${cloudResult.message}',
+                  // WARNA: ikon check_circle_rounded.
                   style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
                 ),
               ),
             ],
           ),
+          // WARNA: latar komponen.
           backgroundColor: cloudResult.success
               ? Colors.green.shade700
               : Colors.orange.shade800,
@@ -132,10 +137,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: AppColors.background,
       appBar: AppBar(
         elevation: 0,
+        // WARNA: latar AppBar.
         backgroundColor: AppColors.oxblood,
+        // WARNA: teks/ikon tombol.
         foregroundColor: AppColors.parchment,
         title: Text(
           'Kesan & Saran Mata Kuliah',
@@ -160,11 +168,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
+            // WARNA: latar kartu/komponen.
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            // WARNA: latar kartu/komponen.
             border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
+                // WARNA: bayangan kartu.
                 color: AppColors.walnut.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
@@ -176,9 +187,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: AppColors.parchment,
                   shape: BoxShape.circle,
                 ),
+                // WARNA: latar kartu/komponen.
                 child: const Icon(Icons.rate_review_rounded, color: AppColors.oxblood, size: 24),
               ),
               const SizedBox(width: 14),
@@ -191,6 +204,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
+                        // WARNA: teks 'Evaluasi Mata Kuliah'.
                         color: AppColors.walnut,
                       ),
                     ),
@@ -199,6 +213,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       'Bagikan kesan dan pesan Anda selama mengikuti perkuliahan Pemrograman Aplikasi Mobile.',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
+                        // WARNA: teks 'Evaluasi Mata Kuliah'.
                         color: AppColors.textSecondary,
                         height: 1.35,
                       ),
@@ -216,8 +231,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
+            // WARNA: latar kartu/komponen.
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
+            // WARNA: latar kartu/komponen.
             border: Border.all(color: AppColors.border),
           ),
           child: Column(
@@ -228,6 +245,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 13.5,
+                  // WARNA: rating buku.
                   color: AppColors.walnut,
                 ),
               ),
@@ -241,6 +259,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     icon: Icon(
                       starIndex <= _rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                      // WARNA: ikon star_rounded.
                       color: Colors.amber.shade700,
                     ),
                     onPressed: () => setState(() => _rating = starIndex),
@@ -261,6 +280,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
+                    // WARNA: rating buku.
                     color: AppColors.tobacco,
                   ),
                 ),
@@ -275,6 +295,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 14,
+            // WARNA: teks 'Kesan untuk Mata Kuliah PAM'.
             color: AppColors.walnut,
           ),
         ),
@@ -282,23 +303,30 @@ class _FeedbackPageState extends State<FeedbackPage> {
         TextField(
           controller: _kesanController,
           maxLines: 4,
+          // WARNA: warna komponen.
           style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: 'Tuliskan kesan dan pengalaman Anda selama mengikuti mata kuliah Pemrograman Aplikasi Mobile...',
+            // WARNA: teks 'Kesan untuk Mata Kuliah PAM'.
             hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: Colors.grey.shade400),
             filled: true,
+            // WARNA: teks judul/isi pada bagian ini.
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.all(14),
+            // WARNA: garis tepi komponen.
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
+              // WARNA: teks judul/isi pada bagian ini.
               borderSide: const BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
+              // WARNA: garis tepi kartu/komponen.
               borderSide: const BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
+              // WARNA: garis tepi kartu/komponen.
               borderSide: const BorderSide(color: AppColors.oxblood, width: 1.5),
             ),
           ),
@@ -311,6 +339,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 14,
+            // WARNA: teks 'Pesan & Saran untuk Mata Kuliah PAM'.
             color: AppColors.walnut,
           ),
         ),
@@ -318,23 +347,30 @@ class _FeedbackPageState extends State<FeedbackPage> {
         TextField(
           controller: _saranController,
           maxLines: 4,
+          // WARNA: warna komponen.
           style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: 'Tuliskan kritik, pesan, atau saran membangun untuk mata kuliah Pemrograman Aplikasi Mobile ke depannya...',
+            // WARNA: teks 'Pesan & Saran untuk Mata Kuliah PAM'.
             hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: Colors.grey.shade400),
             filled: true,
+            // WARNA: teks judul/isi pada bagian ini.
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.all(14),
+            // WARNA: garis tepi komponen.
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
+              // WARNA: teks judul/isi pada bagian ini.
               borderSide: const BorderSide(color: AppColors.border),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
+              // WARNA: garis tepi kartu/komponen.
               borderSide: const BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
+              // WARNA: garis tepi kartu/komponen.
               borderSide: const BorderSide(color: AppColors.oxblood, width: 1.5),
             ),
           ),
@@ -347,7 +383,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
               Expanded(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
+                    // WARNA: teks/ikon tombol 'Batal'.
                     foregroundColor: AppColors.textSecondary,
+                    // WARNA: warna komponen.
                     side: const BorderSide(color: AppColors.border),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -365,7 +403,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
               flex: _hasSavedData ? 2 : 1,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: AppColors.oxblood,
+                  // WARNA: teks/ikon tombol.
                   foregroundColor: AppColors.parchment,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -393,11 +433,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
           width: double.infinity,
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
+            // WARNA: latar kartu/komponen.
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
+            // WARNA: latar kartu/komponen.
             border: Border.all(color: AppColors.border),
             boxShadow: [
               BoxShadow(
+                // WARNA: bayangan kartu.
                 color: AppColors.walnut.withValues(alpha: 0.06),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
@@ -416,10 +459,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
                         Container(
                           padding: const EdgeInsets.all(7),
                           decoration: BoxDecoration(
+                            // WARNA: latar kartu/komponen.
                             color: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(10),
+                            // WARNA: latar kartu/komponen.
                             border: Border.all(color: Colors.green.shade200),
                           ),
+                          // WARNA: garis tepi kartu/komponen.
                           child: Icon(Icons.verified_rounded, size: 18, color: Colors.green.shade700),
                         ),
                         const SizedBox(width: 8),
@@ -429,6 +475,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
+                              // WARNA: teks 'Kesan & Pesan Tersimpan'.
                               color: AppColors.walnut,
                             ),
                             maxLines: 1,
@@ -441,7 +488,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   const SizedBox(width: 8),
                   OutlinedButton.icon(
                     style: OutlinedButton.styleFrom(
+                      // WARNA: teks/ikon tombol 'Ubah'.
                       foregroundColor: AppColors.oxblood,
+                      // WARNA: ikon pada komponen ini.
                       side: const BorderSide(color: AppColors.border),
                       visualDensity: VisualDensity.compact,
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -465,6 +514,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       (i) => Icon(
                         i < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
                         size: 19,
+                        // WARNA: ikon star_rounded.
                         color: Colors.amber.shade700,
                       ),
                     ),
@@ -476,6 +526,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
+                        // WARNA: rating buku.
                         color: AppColors.tobacco,
                       ),
                       maxLines: 1,
@@ -488,6 +539,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 const SizedBox(height: 6),
                 Text(
                   'Terakhir diperbarui: $_lastSavedDate',
+                  // WARNA: teks 'Terakhir diperbarui: $_lastSavedDate'.
                   style: GoogleFonts.poppins(fontSize: 11, color: Colors.grey.shade500),
                 ),
               ],
@@ -499,7 +551,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
         _buildSectionCard(
           title: 'Kesan Mata Kuliah PAM',
           icon: Icons.favorite_rounded,
+          // WARNA: warna komponen.
           iconColor: const Color(0xFFB45309),
+          // WARNA: warna komponen.
           bgColor: const Color(0xFFFEF3C7),
           content: _kesanController.text,
         ),
@@ -508,7 +562,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
         _buildSectionCard(
           title: 'Pesan & Saran Mata Kuliah PAM',
           icon: Icons.lightbulb_rounded,
+          // WARNA: warna komponen.
           iconColor: const Color(0xFF43634B),
+          // WARNA: warna komponen.
           bgColor: const Color(0xFFE8F0E9),
           content: _saranController.text.isNotEmpty ? _saranController.text : '(Tidak ada saran yang ditulis)',
         ),
@@ -519,7 +575,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
           width: double.infinity,
           child: FilledButton.icon(
             style: FilledButton.styleFrom(
+              // WARNA: latar tombol.
               backgroundColor: AppColors.oxblood,
+              // WARNA: teks/ikon tombol 'Edit Kesan & Pesan Mata Kuliah Ini'.
               foregroundColor: AppColors.parchment,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -548,8 +606,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        // WARNA: latar kartu/komponen.
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
@@ -560,9 +620,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
               Container(
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: bgColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
+                // WARNA: latar kartu/komponen.
                 child: Icon(icon, size: 16, color: iconColor),
               ),
               const SizedBox(width: 8),
@@ -571,6 +633,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
+                  // WARNA: judul buku.
                   color: AppColors.walnut,
                 ),
               ),
@@ -581,6 +644,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             content,
             style: GoogleFonts.poppins(
               fontSize: 13,
+              // WARNA: judul buku.
               color: AppColors.textPrimary,
               height: 1.5,
             ),

@@ -111,6 +111,7 @@ class SessionService {
                 content: Text(
                   'Sesi telah berakhir karena tidak ada aktivitas selama 15 menit. Silakan login kembali.',
                 ),
+                // WARNA: latar notifikasi.
                 backgroundColor: Color(0xFF67343A),
                 behavior: SnackBarBehavior.floating,
                 duration: Duration(seconds: 4),

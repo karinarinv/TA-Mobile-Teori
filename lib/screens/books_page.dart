@@ -268,6 +268,7 @@ class _BooksPageState extends State<BooksPage> {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
+          // WARNA: gradasi komponen ini.
           colors: [Color(0xFF7A4B3A), Color(0xFF67343A), Color(0xFF302622)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -280,6 +281,7 @@ class _BooksPageState extends State<BooksPage> {
           children: [
             const Icon(
               Icons.menu_book_rounded,
+              // WARNA: ikon menu_book_rounded.
               color: Color(0xFFEDE2CF),
               size: 24,
             ),
@@ -290,6 +292,7 @@ class _BooksPageState extends State<BooksPage> {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: GoogleFonts.playfairDisplay(
+                // WARNA: judul buku.
                 color: const Color(0xFFEDE2CF),
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
@@ -352,34 +355,42 @@ class _BooksPageState extends State<BooksPage> {
                 hintText: 'Cari judul, penulis, atau genre...',
                 hintStyle: TextStyle(
                   fontSize: 12.5,
+                  // WARNA: teks judul/isi pada bagian ini.
                   color: Colors.grey.shade500,
                 ),
                 filled: true,
+                // WARNA: teks judul/isi pada bagian ini.
                 fillColor: const Color(0xFFFAF7F2),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 12,
                 ),
+                // WARNA: garis tepi komponen.
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
+                  // WARNA: warna komponen.
                   borderSide: const BorderSide(color: Color(0xFFEADBCE)),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
+                  // WARNA: garis tepi kartu/komponen.
                   borderSide: const BorderSide(color: Color(0xFFEADBCE)),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
                   borderSide: const BorderSide(
+                    // WARNA: garis tepi kartu/komponen.
                     color: Color(0xFF67343A),
                     width: 1.6,
                   ),
                 ),
                 prefixIcon: const Icon(
                   Icons.menu_book,
+                  // WARNA: garis tepi kartu/komponen.
                   color: Color(0xFF67343A),
                 ),
                 suffixIcon: IconButton(
+                  // WARNA: ikon menu_book.
                   icon: const Icon(Icons.search, color: Color(0xFF67343A)),
                   onPressed: _search,
                 ),
@@ -412,15 +423,19 @@ class _BooksPageState extends State<BooksPage> {
                       fontWeight: isSelected
                           ? FontWeight.bold
                           : FontWeight.w500,
+                      // WARNA: teks 'genre'.
                       color: isSelected
                           ? const Color(0xFFEDE2CF)
                           : const Color(0xFF302622),
                     ),
+                    // WARNA: latar komponen.
                     backgroundColor: const Color(0xFFFAF7F2),
+                    // WARNA: warna komponen.
                     selectedColor: const Color(0xFF67343A),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
+                        // WARNA: garis tepi kartu/komponen.
                         color: isSelected
                             ? const Color(0xFF67343A)
                             : const Color(0xFFEADBCE),
@@ -445,6 +460,7 @@ class _BooksPageState extends State<BooksPage> {
               padding: const EdgeInsets.all(16),
               child: Text(
                 _status,
+                // WARNA: teks '_status'.
                 style: const TextStyle(color: Colors.grey, fontSize: 14),
                 textAlign: TextAlign.center,
               ),
@@ -473,14 +489,18 @@ class _BooksPageState extends State<BooksPage> {
 
                 return Container(
                   decoration: BoxDecoration(
+                    // WARNA: latar kartu/komponen.
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
+                    // WARNA: garis tepi komponen.
                     border: Border.all(
+                      // WARNA: garis tepi kartu/komponen.
                       color: const Color(0xFFEADBCE),
                       width: 1.1,
                     ),
                     boxShadow: [
                       BoxShadow(
+                        // WARNA: bayangan kartu.
                         color: const Color(0xFF302622).withValues(alpha: 0.06),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
@@ -488,6 +508,7 @@ class _BooksPageState extends State<BooksPage> {
                     ],
                   ),
                   child: Material(
+                    // WARNA: bayangan kartu.
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
@@ -512,6 +533,7 @@ class _BooksPageState extends State<BooksPage> {
                                     borderRadius: BorderRadius.circular(8),
                                     boxShadow: [
                                       BoxShadow(
+                                        // WARNA: bayangan kartu.
                                         color: Colors.black.withValues(
                                           alpha: 0.20,
                                         ),
@@ -547,10 +569,12 @@ class _BooksPageState extends State<BooksPage> {
                                                 gradient: LinearGradient(
                                                   begin: Alignment.centerLeft,
                                                   end: Alignment.centerRight,
+                                                  // WARNA: gradasi komponen ini.
                                                   colors: [
                                                     Colors.black.withValues(
                                                       alpha: 0.38,
                                                     ),
+                                                    // WARNA: latar kartu.
                                                     Colors.transparent,
                                                   ],
                                                 ),
@@ -574,6 +598,7 @@ class _BooksPageState extends State<BooksPage> {
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: judul buku.
                                 color: const Color(0xFF302622),
                                 height: 1.25,
                               ),
@@ -587,6 +612,7 @@ class _BooksPageState extends State<BooksPage> {
                               overflow: TextOverflow.ellipsis,
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
+                                // WARNA: nama penulis buku.
                                 color: const Color(0xFF9A704F),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -605,6 +631,7 @@ class _BooksPageState extends State<BooksPage> {
                                     vertical: 3.5,
                                   ),
                                   decoration: BoxDecoration(
+                                    // WARNA: latar kartu/komponen.
                                     color: const Color(0xFFEDE2CF),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
@@ -613,6 +640,7 @@ class _BooksPageState extends State<BooksPage> {
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.bold,
+                                      // WARNA: teks 'Rp ${_formatNumber(pricePerDay)}/hr'.
                                       color: const Color(0xFF67343A),
                                     ),
                                   ),
@@ -625,6 +653,7 @@ class _BooksPageState extends State<BooksPage> {
                                     const Icon(
                                       Icons.star_rounded,
                                       size: 16,
+                                      // WARNA: ikon star_rounded.
                                       color: Color(0xFFD97706),
                                     ),
                                     const SizedBox(width: 2.5),
@@ -633,6 +662,7 @@ class _BooksPageState extends State<BooksPage> {
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 11.5,
                                         fontWeight: FontWeight.bold,
+                                        // WARNA: rating buku.
                                         color: const Color(0xFF302622),
                                       ),
                                     ),

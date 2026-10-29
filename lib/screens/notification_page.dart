@@ -46,8 +46,10 @@ class _NotificationPageState extends State<NotificationPage> {
           value
               ? 'Notifikasi promo harian diaktifkan (Pukul 09.00).'
               : 'Notifikasi promo harian dinonaktifkan.',
+          // WARNA: teks 'value'.
           style: GoogleFonts.plusJakartaSans(color: AppColors.parchment),
         ),
+        // WARNA: latar notifikasi.
         backgroundColor: AppColors.oxblood,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
@@ -97,8 +99,10 @@ class _NotificationPageState extends State<NotificationPage> {
   Color _getColorForType(String type) {
     switch (type) {
       case 'vip':
+        // WARNA: warna elemen.
         return const Color(0xFFB45309);
       case 'kembali':
+        // WARNA: warna elemen.
         return Colors.deepOrange;
       case 'promo':
         return AppColors.tobacco;
@@ -122,6 +126,7 @@ class _NotificationPageState extends State<NotificationPage> {
     }).toList();
 
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text(
@@ -129,8 +134,11 @@ class _NotificationPageState extends State<NotificationPage> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)
         ),
         elevation: 0,
+        // WARNA: latar AppBar.
         backgroundColor: AppColors.oxblood,
+        // WARNA: teks/ikon tombol 'Tandai Dibaca'.
         foregroundColor: AppColors.parchment,
+        // WARNA: teks 'Pemberitahuan'.
         iconTheme: const IconThemeData(color: AppColors.parchment),
         actions: [
           if (unreadCount > 0)
@@ -139,6 +147,7 @@ class _NotificationPageState extends State<NotificationPage> {
               child: Text(
                 'Tandai Dibaca',
                 style: GoogleFonts.plusJakartaSans(
+                  // WARNA: teks 'Tandai Dibaca'.
                   color: AppColors.parchment,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -156,7 +165,9 @@ class _NotificationPageState extends State<NotificationPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                   decoration: const BoxDecoration(
+                    // WARNA: latar kartu/komponen.
                     color: Colors.white,
+                    // WARNA: latar kartu/komponen.
                     border: Border(bottom: BorderSide(color: AppColors.border)),
                   ),
                   child: Row(
@@ -164,12 +175,14 @@ class _NotificationPageState extends State<NotificationPage> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
+                          // WARNA: latar kartu/komponen.
                           color: AppColors.parchment,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
                           Icons.notifications_active_outlined,
                           size: 20,
+                          // WARNA: latar kartu/komponen.
                           color: AppColors.oxblood,
                         ),
                       ),
@@ -183,6 +196,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
+                                // WARNA: teks 'Notifikasi Promo Harian'.
                                 color: AppColors.walnut,
                               ),
                             ),
@@ -190,6 +204,7 @@ class _NotificationPageState extends State<NotificationPage> {
                               'Info diskon buku dan voucher pukul 09.00 WIB',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
+                                // WARNA: teks 'Notifikasi Promo Harian'.
                                 color: AppColors.textSecondary,
                               ),
                             ),
@@ -199,7 +214,9 @@ class _NotificationPageState extends State<NotificationPage> {
                       Switch(
                         value: _promoEnabled,
                         onChanged: _togglePromo,
+                        // WARNA: warna komponen.
                         activeThumbColor: AppColors.oxblood,
+                        // WARNA: warna komponen.
                         activeTrackColor: AppColors.oxblood.withValues(alpha: 0.3),
                       ),
                     ],
@@ -219,13 +236,16 @@ class _NotificationPageState extends State<NotificationPage> {
                           label: Text(f),
                           selected: isSelected,
                           onSelected: (_) => setState(() => _selectedFilter = f),
+                          // WARNA: warna komponen.
                           selectedColor: AppColors.oxblood,
+                          // WARNA: latar komponen.
                           backgroundColor: Colors.white,
                           labelStyle: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: isSelected
                                 ? FontWeight.bold
                                 : FontWeight.normal,
+                            // WARNA: teks 'f'.
                             color: isSelected
                                 ? AppColors.parchment
                                 : AppColors.walnut,
@@ -233,6 +253,7 @@ class _NotificationPageState extends State<NotificationPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                             side: BorderSide(
+                              // WARNA: garis tepi kartu/komponen.
                               color: isSelected
                                   ? AppColors.oxblood
                                   : AppColors.border,
@@ -256,6 +277,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                 Icon(
                                   Icons.notifications_off_outlined,
                                   size: 48,
+                                  // WARNA: ikon notifications_off_outlined.
                                   color: Colors.grey.shade400,
                                 ),
                                 const SizedBox(height: 12),
@@ -264,6 +286,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                   style: GoogleFonts.playfairDisplay(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
+                                    // WARNA: teks 'Tidak Ada Pemberitahuan'.
                                     color: AppColors.walnut,
                                   ),
                                 ),
@@ -273,6 +296,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 12,
+                                    // WARNA: teks 'Tidak Ada Pemberitahuan'.
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
@@ -297,11 +321,14 @@ class _NotificationPageState extends State<NotificationPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(14),
                                 decoration: BoxDecoration(
+                                  // WARNA: latar kartu/komponen.
                                   color: item.isRead
                                       ? Colors.white
                                       : const Color(0xFFFFFBF5),
                                   borderRadius: BorderRadius.circular(14),
+                                  // WARNA: garis tepi komponen.
                                   border: Border.all(
+                                    // WARNA: garis tepi kartu/komponen.
                                     color: item.isRead
                                         ? AppColors.border
                                         : AppColors.oxblood.withValues(alpha: 0.35),
@@ -315,9 +342,11 @@ class _NotificationPageState extends State<NotificationPage> {
                                     Container(
                                       padding: const EdgeInsets.all(9),
                                       decoration: BoxDecoration(
+                                        // WARNA: latar kartu/komponen.
                                         color: color.withValues(alpha: 0.1),
                                         shape: BoxShape.circle,
                                       ),
+                                      // WARNA: latar kartu/komponen.
                                       child: Icon(icon, color: color, size: 20),
                                     ),
                                     const SizedBox(width: 12),
@@ -337,6 +366,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                       .playfairDisplay(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 13.5,
+                                                    // WARNA: teks 'item.title'.
                                                     color: AppColors.walnut,
                                                   ),
                                                 ),
@@ -347,6 +377,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   height: 8,
                                                   decoration: const BoxDecoration(
                                                     shape: BoxShape.circle,
+                                                    // WARNA: latar kartu/komponen.
                                                     color: AppColors.oxblood,
                                                   ),
                                                 ),
@@ -358,6 +389,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             style: GoogleFonts
                                                 .plusJakartaSans(
                                               fontSize: 12,
+                                              // WARNA: teks 'item.message'.
                                               color: AppColors.textPrimary,
                                               height: 1.35,
                                             ),
@@ -368,6 +400,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                             style: GoogleFonts
                                                 .plusJakartaSans(
                                               fontSize: 11,
+                                              // WARNA: teks '_formatTime'.
                                               color: Colors.grey.shade600,
                                             ),
                                           ),

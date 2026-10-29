@@ -281,10 +281,13 @@ class _MenuPageState extends State<MenuPage> {
         Navigator.push(context, MaterialPageRoute(builder: (_) => w));
 
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: const Color(0xFFFAF7F2),
       body: SafeArea(
         child: RefreshIndicator(
+          // WARNA: warna elemen beranda.
           color: AppColors.oxblood,
+          // WARNA: latar spinner tarik-refresh.
           backgroundColor: AppColors.parchment,
           onRefresh: () async {
             await _loadUser();
@@ -300,12 +303,14 @@ class _MenuPageState extends State<MenuPage> {
               children: [
                 Container(
                   decoration: const BoxDecoration(
+                    // WARNA: latar elemen beranda.
                     color: Color(0xFF67343A),
                     borderRadius: BorderRadius.vertical(
                       bottom: Radius.circular(24),
                     ),
                     boxShadow: [
                       BoxShadow(
+                        // WARNA: bayangan kartu beranda.
                         color: Colors.black12,
                         blurRadius: 6,
                         offset: Offset(0, 3),
@@ -317,6 +322,7 @@ class _MenuPageState extends State<MenuPage> {
                     children: [
                       // Baris Profil Pengguna, Ikon Panduan & Notifikasi
                       Container(
+                        // WARNA: warna elemen beranda.
                         color: const Color(0xFF4C272C),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -341,13 +347,17 @@ class _MenuPageState extends State<MenuPage> {
                                   height: 44,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    // WARNA: latar elemen beranda.
                                     color: const Color(0xFFEDE2CF),
+                                    // WARNA: garis tepi foto profil bulat.
                                     border: Border.all(
+                                      // WARNA: garis tepi kartu/komponen.
                                       color: const Color(0xFFD4BE9D),
                                       width: 1.8,
                                     ),
                                     boxShadow: const [
                                       BoxShadow(
+                                        // WARNA: bayangan kartu beranda.
                                         color: Colors.black12,
                                         blurRadius: 4,
                                         offset: Offset(0, 1),
@@ -370,6 +380,7 @@ class _MenuPageState extends State<MenuPage> {
                                                     : 'R',
                                                 style:
                                                     GoogleFonts.playfairDisplay(
+                                                      // WARNA: teks '_user.isNotEmpty'.
                                                       color: const Color(
                                                         0xFF67343A,
                                                       ),
@@ -387,6 +398,7 @@ class _MenuPageState extends State<MenuPage> {
                                                   : 'R',
                                               style:
                                                   GoogleFonts.playfairDisplay(
+                                                    // WARNA: teks '_user.isNotEmpty'.
                                                     color: const Color(
                                                       0xFF67343A,
                                                     ),
@@ -427,6 +439,7 @@ class _MenuPageState extends State<MenuPage> {
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
+                                          // WARNA: teks tanggal profil.
                                           color: const Color(0xFFD4BE9D),
                                         ),
                                       ),
@@ -438,6 +451,7 @@ class _MenuPageState extends State<MenuPage> {
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
+                                          // WARNA: teks status VIP/anggota.
                                           color: const Color(0xFFEDE2CF),
                                         ),
                                       ),
@@ -452,6 +466,7 @@ class _MenuPageState extends State<MenuPage> {
                                 visualDensity: VisualDensity.compact,
                                 icon: const Icon(
                                   Icons.help_outline_rounded,
+                                  // WARNA: ikon help_outline_rounded.
                                   color: Color(0xFFEDE2CF),
                                   size: 24,
                                 ),
@@ -467,6 +482,7 @@ class _MenuPageState extends State<MenuPage> {
                                     visualDensity: VisualDensity.compact,
                                     icon: const Icon(
                                       Icons.notifications_none_rounded,
+                                      // WARNA: ikon notifications_none_rounded.
                                       color: Color(0xFFEDE2CF),
                                       size: 24,
                                     ),
@@ -488,6 +504,7 @@ class _MenuPageState extends State<MenuPage> {
                                       child: Container(
                                         padding: const EdgeInsets.all(3),
                                         decoration: const BoxDecoration(
+                                          // WARNA: latar elemen beranda.
                                           color: Color(0xFFC0392B),
                                           shape: BoxShape.circle,
                                         ),
@@ -498,6 +515,7 @@ class _MenuPageState extends State<MenuPage> {
                                         child: Text(
                                           '$_unreadNotifications',
                                           style: const TextStyle(
+                                            // WARNA: teks '$_unreadNotifications'.
                                             color: Colors.white,
                                             fontSize: 9,
                                             fontWeight: FontWeight.bold,
@@ -525,6 +543,7 @@ class _MenuPageState extends State<MenuPage> {
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: teks 'Selamat datang $_user!'.
                                 color: const Color(0xFFEDE2CF),
                                 letterSpacing: 0.2,
                               ),
@@ -534,6 +553,7 @@ class _MenuPageState extends State<MenuPage> {
                               'Temukan bacaan yang mungkin kamu sukai.',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 12.5,
+                                // WARNA: teks 'Selamat datang $_user!'.
                                 color: const Color(0xFFD4BE9D),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -552,6 +572,7 @@ class _MenuPageState extends State<MenuPage> {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
+                                    // WARNA: bayangan kartu beranda.
                                     color: Colors.black.withValues(alpha: 0.2),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
@@ -634,6 +655,7 @@ class _MenuPageState extends State<MenuPage> {
                                   width: isCur ? 20 : 6,
                                   height: 6,
                                   decoration: BoxDecoration(
+                                    // WARNA: latar elemen beranda.
                                     color: isCur
                                         ? const Color(0xFFEDE2CF)
                                         : const Color(0xFFD4BE9D)
@@ -663,6 +685,7 @@ class _MenuPageState extends State<MenuPage> {
                     style: GoogleFonts.playfairDisplay(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      // WARNA: teks 'Eksplor fitur Rentbook'.
                       color: const Color(0xFF302622),
                     ),
                   ),
@@ -683,6 +706,7 @@ class _MenuPageState extends State<MenuPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: Material(
+                    // WARNA: warna elemen beranda.
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
@@ -694,17 +718,21 @@ class _MenuPageState extends State<MenuPage> {
                         ),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
+                            // WARNA: latar kartu fitur beranda.
                             colors: [Color(0xFF67343A), Color(0xFF4C272C)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
+                          // WARNA: garis tepi kartu fitur beranda.
                           border: Border.all(
+                            // WARNA: garis tepi kartu/komponen.
                             color: const Color(0xFFD4AF37),
                             width: 1.2,
                           ),
                           boxShadow: [
                             BoxShadow(
+                              // WARNA: bayangan kartu beranda.
                               color: const Color(0xFF67343A)
                                   .withValues(alpha: 0.25),
                               blurRadius: 10,
@@ -717,11 +745,13 @@ class _MenuPageState extends State<MenuPage> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: const BoxDecoration(
+                                // WARNA: latar elemen beranda.
                                 color: Color(0xFFFAF7F2),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
                                 Icons.auto_stories_rounded,
+                                // WARNA: latar elemen beranda.
                                 color: Color(0xFF67343A),
                                 size: 22,
                               ),
@@ -738,6 +768,7 @@ class _MenuPageState extends State<MenuPage> {
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.bold,
+                                      // WARNA: teks 'Asisten Buku AI'.
                                       color: const Color(0xFFEDE2CF),
                                     ),
                                   ),
@@ -746,6 +777,7 @@ class _MenuPageState extends State<MenuPage> {
                                     'Cari rekomendasi bacaan dan tanya sinopsis.',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11,
+                                      // WARNA: teks 'Asisten Buku AI'.
                                       color: const Color(0xFFEDE2CF)
                                           .withValues(alpha: 0.9),
                                     ),
@@ -760,6 +792,7 @@ class _MenuPageState extends State<MenuPage> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
+                                // WARNA: latar elemen beranda.
                                 color: const Color(0xFFEDE2CF),
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -768,6 +801,7 @@ class _MenuPageState extends State<MenuPage> {
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
+                                  // WARNA: teks 'Tanya AI'.
                                   color: const Color(0xFF67343A),
                                 ),
                               ),
@@ -799,6 +833,7 @@ class _MenuPageState extends State<MenuPage> {
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: teks 'Pilihan untukmu'.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -810,6 +845,7 @@ class _MenuPageState extends State<MenuPage> {
                                 overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
+                                  // WARNA: teks 'Berdasarkan bacaan terakhir: $_lastRentedGenre'.
                                   color: const Color(0xFF9A704F),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -825,6 +861,7 @@ class _MenuPageState extends State<MenuPage> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
+                            // WARNA: teks 'Lihat Semua'.
                             color: const Color(0xFF67343A),
                           ),
                         ),
@@ -873,6 +910,7 @@ class _MenuPageState extends State<MenuPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
+              // WARNA: bayangan kartu beranda.
               color: Colors.black.withValues(alpha: 0.12),
               blurRadius: 8,
               offset: const Offset(0, 3),
@@ -886,10 +924,12 @@ class _MenuPageState extends State<MenuPage> {
             fit: BoxFit.cover,
             width: double.infinity,
             errorBuilder: (_, __, ___) => Container(
+              // WARNA: warna elemen beranda.
               color: const Color(0xFF67343A),
               child: const Center(
                 child: Icon(
                   Icons.menu_book_rounded,
+                  // WARNA: ikon menu_book_rounded.
                   color: Color(0xFFEDE2CF),
                   size: 36,
                 ),
@@ -914,11 +954,14 @@ class _MenuPageState extends State<MenuPage> {
     return Container(
       width: 136,
       decoration: BoxDecoration(
+        // WARNA: latar elemen beranda.
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
+        // WARNA: latar elemen beranda.
         border: Border.all(color: const Color(0xFFEADBCE), width: 1.1),
         boxShadow: [
           BoxShadow(
+            // WARNA: bayangan kartu beranda.
             color: const Color(0xFF302622).withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 3),
@@ -926,6 +969,7 @@ class _MenuPageState extends State<MenuPage> {
         ],
       ),
       child: Material(
+        // WARNA: bayangan kartu beranda.
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
@@ -948,6 +992,7 @@ class _MenuPageState extends State<MenuPage> {
                         borderRadius: BorderRadius.circular(6),
                         boxShadow: [
                           BoxShadow(
+                            // WARNA: bayangan kartu beranda.
                             color: Colors.black.withValues(alpha: 0.22),
                             blurRadius: 6,
                             offset: const Offset(2, 3),
@@ -981,6 +1026,7 @@ class _MenuPageState extends State<MenuPage> {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
+                    // WARNA: judul buku.
                     color: const Color(0xFF302622),
                   ),
                 ),
@@ -992,6 +1038,7 @@ class _MenuPageState extends State<MenuPage> {
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
+                    // WARNA: nama penulis buku.
                     color: const Color(0xFF7A685A),
                   ),
                 ),
@@ -1006,6 +1053,7 @@ class _MenuPageState extends State<MenuPage> {
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
+                        // WARNA: teks 'Rp ${_formatNumber(price)}/hr'.
                         color: const Color(0xFF67343A),
                       ),
                     ),
@@ -1014,6 +1062,7 @@ class _MenuPageState extends State<MenuPage> {
                         const Icon(
                           Icons.star_rounded,
                           size: 12,
+                          // WARNA: ikon star_rounded.
                           color: Color(0xFFD4AF37),
                         ),
                         Text(
@@ -1021,6 +1070,7 @@ class _MenuPageState extends State<MenuPage> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 9.5,
                             fontWeight: FontWeight.bold,
+                            // WARNA: rating buku.
                             color: const Color(0xFF302622),
                           ),
                         ),
@@ -1038,6 +1088,7 @@ class _MenuPageState extends State<MenuPage> {
 
   Widget _buildFallbackMiniCover(String title) {
     return Container(
+      // WARNA: warna elemen beranda.
       color: const Color(0xFF67343A),
       padding: const EdgeInsets.all(4),
       child: Center(
@@ -1048,6 +1099,7 @@ class _MenuPageState extends State<MenuPage> {
           overflow: TextOverflow.ellipsis,
           style: GoogleFonts.playfairDisplay(
             fontSize: 9,
+            // WARNA: judul buku.
             color: const Color(0xFFEDE2CF),
             fontWeight: FontWeight.bold,
           ),
@@ -1084,6 +1136,7 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Cari Buku',
         imageAsset: pathGambarCariBuku,
         fallbackIcon: Icons.menu_book_rounded,
+        // WARNA: fallback ikon fitur 'Cari Buku'.
         fallbackColor: const Color(0xFF67343A),
         onTap: () => go(const BooksPage()),
       ),
@@ -1091,6 +1144,7 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Perpustakaan GPS',
         imageAsset: pathGambarPerpustakaanGps,
         fallbackIcon: Icons.location_on_rounded,
+        // WARNA: fallback ikon fitur 'Cari Buku'.
         fallbackColor: const Color(0xFF43634B),
         onTap: () => go(const MapPage()),
       ),
@@ -1098,6 +1152,7 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Riwayat Blockchain',
         imageAsset: pathGambarRiwayatBlockchain,
         fallbackIcon: Icons.lock_clock_rounded,
+        // WARNA: fallback ikon fitur 'Perpustakaan GPS'.
         fallbackColor: const Color(0xFF7C3F2B),
         onTap: () => go(const BlockchainPage()),
       ),
@@ -1105,6 +1160,7 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Kenali Buku',
         imageAsset: pathGambarKenaliBuku,
         fallbackIcon: Icons.camera_enhance_rounded,
+        // WARNA: fallback ikon fitur 'Riwayat Blockchain'.
         fallbackColor: const Color(0xFF4C3B71),
         requiresVip: true,
         onTap: () => SubscriptionService.checkAccess(
@@ -1118,6 +1174,7 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Labirin Game',
         imageAsset: pathGambarLabirinGame,
         fallbackIcon: Icons.sports_esports_rounded,
+        // WARNA: fallback ikon fitur 'Labirin Game'.
         fallbackColor: const Color(0xFFB45309),
         requiresVip: true,
         onTap: () => SubscriptionService.checkAccess(
@@ -1131,6 +1188,7 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Konversi Kurs & Jam',
         imageAsset: pathGambarKonversiKurs,
         fallbackIcon: Icons.currency_exchange_rounded,
+        // WARNA: fallback ikon fitur 'Konversi Kurs & Jam'.
         fallbackColor: const Color(0xFF3B506B),
         requiresVip: true,
         onTap: () => SubscriptionService.checkAccess(
@@ -1155,6 +1213,7 @@ class _MenuPageState extends State<MenuPage> {
       itemBuilder: (context, i) {
         final s = services[i];
         return Material(
+          // WARNA: warna elemen beranda.
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
@@ -1168,6 +1227,7 @@ class _MenuPageState extends State<MenuPage> {
                     width: 60,
                     height: 60,
                     decoration: BoxDecoration(
+                      // WARNA: latar elemen beranda.
                       color: const Color(0xFFF1EAE1),
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -1186,6 +1246,7 @@ class _MenuPageState extends State<MenuPage> {
                         if (s.requiresVip && !_isVip)
                           Container(
                             decoration: BoxDecoration(
+                              // WARNA: latar elemen beranda.
                               color: const Color(0xCC302622),
                               borderRadius: BorderRadius.circular(15),
                             ),
@@ -1194,6 +1255,7 @@ class _MenuPageState extends State<MenuPage> {
                               children: [
                                 const Icon(
                                   Icons.lock_rounded,
+                                  // WARNA: latar elemen beranda.
                                   color: Color(0xFFEDE2CF),
                                   size: 22,
                                 ),
@@ -1201,6 +1263,7 @@ class _MenuPageState extends State<MenuPage> {
                                 Text(
                                   'VIP',
                                   style: GoogleFonts.plusJakartaSans(
+                                    // WARNA: teks 'VIP'.
                                     color: const Color(0xFFD4AF37),
                                     fontSize: 9,
                                     fontWeight: FontWeight.w800,
@@ -1223,6 +1286,7 @@ class _MenuPageState extends State<MenuPage> {
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       height: 1.15,
+                      // WARNA: teks 's.title'.
                       color: const Color(0xFF302622),
                     ),
                   ),
@@ -1238,6 +1302,7 @@ class _MenuPageState extends State<MenuPage> {
   Widget _buildFallbackServiceIllustration(_ServiceItem s) {
     return Container(
       decoration: BoxDecoration(
+        // WARNA: latar elemen beranda.
         color: s.fallbackColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -1246,16 +1311,19 @@ class _MenuPageState extends State<MenuPage> {
           width: 52,
           height: 52,
           decoration: BoxDecoration(
+            // WARNA: latar elemen beranda.
             color: Colors.white,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
+                // WARNA: bayangan kartu beranda.
                 color: s.fallbackColor.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
             ],
           ),
+          // WARNA: bayangan kartu beranda.
           child: Icon(s.fallbackIcon, size: 26, color: s.fallbackColor),
         ),
       ),
@@ -1326,17 +1394,21 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      // WARNA: latar elemen beranda.
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 420, maxHeight: 580),
           decoration: BoxDecoration(
+            // WARNA: latar elemen beranda.
             color: const Color(0xFF5A252C),
             borderRadius: BorderRadius.circular(22),
+            // WARNA: latar elemen beranda.
             border: Border.all(color: const Color(0xFFD4AF37), width: 2),
             boxShadow: [
               BoxShadow(
+                // WARNA: bayangan kartu beranda.
                 color: Colors.black.withValues(alpha: 0.45),
                 blurRadius: 22,
                 offset: const Offset(0, 10),
@@ -1355,12 +1427,14 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                   width: 20,
                   height: 34,
                   decoration: BoxDecoration(
+                    // WARNA: latar elemen beranda.
                     color: const Color(0xFF8B2635),
                     borderRadius: const BorderRadius.vertical(
                       bottom: Radius.circular(6),
                     ),
                     boxShadow: [
                       BoxShadow(
+                        // WARNA: bayangan kartu beranda.
                         color: Colors.black.withValues(alpha: 0.3),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
@@ -1370,6 +1444,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                   child: const Center(
                     child: Icon(
                       Icons.bookmark_rounded,
+                      // WARNA: ikon bookmark_rounded.
                       color: Color(0xFFF1E6D4),
                       size: 14,
                     ),
@@ -1380,9 +1455,12 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
               // Lembaran Buku Bertekstur Kertas Tua
               Container(
                 decoration: BoxDecoration(
+                  // WARNA: latar elemen beranda.
                   color: const Color(0xFFFAF7F2),
                   borderRadius: BorderRadius.circular(16),
+                  // WARNA: garis tepi panduan RentBook.
                   border: Border.all(
+                    // WARNA: garis tepi kartu/komponen.
                     color: const Color(0xFFEADBCE),
                     width: 1.5,
                   ),
@@ -1396,11 +1474,14 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
+                        // WARNA: latar elemen beranda.
                         color: const Color(0xFFEDE2CF).withValues(alpha: 0.6),
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(16),
                         ),
+                        // WARNA: garis tepi panduan RentBook.
                         border: const Border(
+                          // WARNA: latar elemen beranda.
                           bottom: BorderSide(color: Color(0xFFEADBCE)),
                         ),
                       ),
@@ -1408,6 +1489,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                         children: [
                           const Icon(
                             Icons.auto_stories_rounded,
+                            // WARNA: garis tepi kartu/komponen.
                             color: Color(0xFF67343A),
                             size: 20,
                           ),
@@ -1418,6 +1500,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                               style: GoogleFonts.playfairDisplay(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: teks 'Panduan RentBook'.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -1430,6 +1513,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                               child: Icon(
                                 Icons.close_rounded,
                                 size: 20,
+                                // WARNA: ikon close_rounded.
                                 color: Color(0xFF67343A),
                               ),
                             ),
@@ -1460,11 +1544,14 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
+                        // WARNA: latar elemen beranda.
                         color: const Color(0xFFEDE2CF).withValues(alpha: 0.6),
                         borderRadius: const BorderRadius.vertical(
                           bottom: Radius.circular(16),
                         ),
+                        // WARNA: garis tepi panduan RentBook.
                         border: const Border(
+                          // WARNA: latar elemen beranda.
                           top: BorderSide(color: Color(0xFFEADBCE)),
                         ),
                       ),
@@ -1473,6 +1560,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                         children: [
                           TextButton.icon(
                             style: TextButton.styleFrom(
+                              // WARNA: teks/ikon tombol 'Kembali'.
                               foregroundColor: const Color(0xFF67343A),
                               visualDensity: VisualDensity.compact,
                               padding: const EdgeInsets.symmetric(
@@ -1502,9 +1590,12 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
+                              // WARNA: latar elemen beranda.
                               color: const Color(0xFFFAF7F2),
                               borderRadius: BorderRadius.circular(12),
+                              // WARNA: garis tepi panduan RentBook.
                               border: Border.all(
+                                // WARNA: garis tepi kartu/komponen.
                                 color: const Color(0xFFEADBCE),
                               ),
                             ),
@@ -1513,6 +1604,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: teks 'Hal ${_currentPage + 1} dari $_totalPages'.
                                 color: const Color(0xFF67343A),
                               ),
                             ),
@@ -1520,7 +1612,9 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
 
                           FilledButton.icon(
                             style: FilledButton.styleFrom(
+                              // WARNA: latar tombol.
                               backgroundColor: const Color(0xFF67343A),
+                              // WARNA: teks/ikon tombol.
                               foregroundColor: const Color(0xFFEDE2CF),
                               visualDensity: VisualDensity.compact,
                               padding: const EdgeInsets.symmetric(
@@ -1683,12 +1777,14 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
+                  // WARNA: latar elemen beranda.
                   color: const Color(0xFF67343A),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   chapter,
                   style: GoogleFonts.plusJakartaSans(
+                    // WARNA: teks 'chapter'.
                     color: const Color(0xFFEDE2CF),
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -1703,13 +1799,16 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
+                    // WARNA: judul buku.
                     color: const Color(0xFF302622),
                   ),
                 ),
               ),
+              // WARNA: judul buku.
               Icon(icon, color: const Color(0xFF67343A), size: 20),
             ],
           ),
+          // WARNA: ikon icon.
           const Divider(height: 18, color: Color(0xFFEADBCE), thickness: 1.2),
           const SizedBox(height: 4),
           ...sections,
@@ -1731,6 +1830,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                 width: 6,
                 height: 6,
                 decoration: const BoxDecoration(
+                  // WARNA: latar elemen beranda.
                   color: Color(0xFF67343A),
                   shape: BoxShape.circle,
                 ),
@@ -1742,6 +1842,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 12.5,
                     fontWeight: FontWeight.bold,
+                    // WARNA: judul buku.
                     color: const Color(0xFF302622),
                   ),
                 ),
@@ -1755,6 +1856,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
               desc,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11.5,
+                // WARNA: teks 'desc'.
                 color: const Color(0xFF5A4A3E),
                 height: 1.45,
               ),

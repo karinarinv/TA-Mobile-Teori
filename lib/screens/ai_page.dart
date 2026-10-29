@@ -140,6 +140,7 @@ class _AiPageState extends State<AiPage> {
               Navigator.pop(ctx);
               setState(() => _msgs.clear());
             },
+            // WARNA: teks 'Hapus Percakapan'.
             child: const Text('Hapus', style: TextStyle(color: Colors.red)),
           ),
         ],
@@ -181,6 +182,7 @@ class _AiPageState extends State<AiPage> {
                           Container(
                             padding: const EdgeInsets.all(18),
                             decoration: BoxDecoration(
+                              // WARNA: latar kartu/komponen.
                               color: const Color(0xFFF7EDED),
                               shape: BoxShape.circle,
                             ),
@@ -194,6 +196,7 @@ class _AiPageState extends State<AiPage> {
                           const SizedBox(height: 6),
                           Text(
                             'Bingung mau baca buku apa? Pilih saran cepat di bawah atau ketik langsung permintaan Anda',
+                            // WARNA: teks 'Tanya Apa Saja tentang Buku!'.
                             style: TextStyle(fontSize: 13, color: Colors.grey[600]),
                             textAlign: TextAlign.center,
                           ),
@@ -205,7 +208,9 @@ class _AiPageState extends State<AiPage> {
                             children: _quickPrompts
                                 .map((p) => ActionChip(
                                       label: Text(p, style: const TextStyle(fontSize: 12)),
+                                      // WARNA: teks judul/isi pada bagian ini.
                                       avatar: const Icon(Icons.auto_awesome, size: 14, color: Color(0xFF67343A)),
+                                      // WARNA: latar komponen.
                                       backgroundColor: const Color(0xFFF7EDED).withValues(alpha: 0.5),
                                       onPressed: () => _send(p),
                                     ))
@@ -232,6 +237,7 @@ class _AiPageState extends State<AiPage> {
                             if (!isUser) ...[
                               CircleAvatar(
                                 radius: 16,
+                                // WARNA: latar komponen.
                                 backgroundColor: const Color(0xFFEADBCE),
                                 child: const OwlBookIcon(size: 30),
                               ),
@@ -241,6 +247,7 @@ class _AiPageState extends State<AiPage> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                 decoration: BoxDecoration(
+                                  // WARNA: latar kartu/komponen.
                                   color: isUser ? const Color(0xFF67343A) : Colors.white,
                                   borderRadius: BorderRadius.only(
                                     topLeft: const Radius.circular(16),
@@ -248,9 +255,11 @@ class _AiPageState extends State<AiPage> {
                                     bottomLeft: Radius.circular(isUser ? 16 : 4),
                                     bottomRight: Radius.circular(isUser ? 4 : 16),
                                   ),
+                                  // WARNA: latar kartu/komponen.
                                   border: isUser ? null : Border.all(color: Colors.grey.shade300),
                                   boxShadow: [
                                     BoxShadow(
+                                      // WARNA: bayangan kartu.
                                       color: Colors.black.withValues(alpha: 0.04),
                                       blurRadius: 6,
                                       offset: const Offset(0, 2),
@@ -262,6 +271,7 @@ class _AiPageState extends State<AiPage> {
                                   style: TextStyle(
                                     fontSize: 14,
                                     height: 1.4,
+                                    // WARNA: teks 'text'.
                                     color: isUser ? Colors.white : Colors.black87,
                                   ),
                                 ),
@@ -271,7 +281,9 @@ class _AiPageState extends State<AiPage> {
                               const SizedBox(width: 8),
                               CircleAvatar(
                                 radius: 16,
+                                // WARNA: latar komponen.
                                 backgroundColor: const Color(0xFF67343A),
+                                // WARNA: warna komponen.
                                 child: const Icon(Icons.person, size: 18, color: Colors.white),
                               ),
                             ],
@@ -292,11 +304,13 @@ class _AiPageState extends State<AiPage> {
                   const SizedBox(
                     width: 14,
                     height: 14,
+                    // WARNA: warna komponen.
                     child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF67343A)),
                   ),
                   const SizedBox(width: 10),
                   Text(
                     'Asisten AI sedang menyusun rekomendasi...',
+                    // WARNA: teks 'Asisten AI sedang menyusun rekomendasi...'.
                     style: TextStyle(fontSize: 12, color: const Color(0xFF67343A), fontStyle: FontStyle.italic),
                   ),
                 ],
@@ -307,9 +321,11 @@ class _AiPageState extends State<AiPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
+              // WARNA: latar kartu/komponen.
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
+                  // WARNA: bayangan kartu.
                   color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
@@ -326,14 +342,18 @@ class _AiPageState extends State<AiPage> {
                       onSubmitted: (_) => _send(),
                       decoration: InputDecoration(
                         hintText: 'Tanyakan genre, mood, atau rekomendasi buku...',
+                        // WARNA: warna komponen.
                         hintStyle: TextStyle(fontSize: 13, color: Colors.grey[500]),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        // WARNA: bayangan kartu/panel.
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
+                          // WARNA: teks judul/isi pada bagian ini.
                           borderSide: BorderSide(color: Colors.grey.shade300),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
+                          // WARNA: garis tepi kartu/komponen.
                           borderSide: BorderSide(color: Colors.grey.shade300),
                         ),
                       ),
@@ -341,6 +361,7 @@ class _AiPageState extends State<AiPage> {
                   ),
                   const SizedBox(width: 8),
                   IconButton.filled(
+                    // WARNA: latar komponen.
                     style: IconButton.styleFrom(backgroundColor: const Color(0xFF67343A)),
                     icon: const Icon(Icons.send, size: 20),
                     onPressed: _busy ? null : () => _send(),

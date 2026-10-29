@@ -17,8 +17,11 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  // WARNA: warna elemen.
   static const _background = Color(0xFFEDE2CF);
+  // WARNA: warna elemen.
   static const _coverColor = Color(0xFF67343A);
+  // WARNA: warna elemen.
   static const _logoColor = Color(0xFFEDE2CF);
 
   late final AnimationController _controller;
@@ -107,15 +110,18 @@ class _SplashScreenState extends State<SplashScreen>
       height: 282,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
+          // WARNA: gradasi komponen ini.
           colors: [Color(0xFF82464C), _coverColor, Color(0xFF4E252B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           stops: [0, .28, 1],
         ),
         borderRadius: BorderRadius.circular(8),
+        // WARNA: latar kartu/komponen.
         border: Border.all(color: const Color(0xFFD4BE9D), width: 1.5),
         boxShadow: const [
           BoxShadow(
+            // WARNA: bayangan kartu.
             color: Color(0x55271A16),
             blurRadius: 22,
             offset: Offset(7, 13),
@@ -158,6 +164,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: _background,
       body: SafeArea(
         child: AnimatedBuilder(
@@ -205,6 +212,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Positioned.fill(
                     child: IgnorePointer(
                       child: ColoredBox(
+                        // WARNA: warna komponen.
                         color: Colors.white.withValues(alpha: _whiteFade.value),
                       ),
                     ),
@@ -222,10 +230,12 @@ class _BookCoverOrnamentPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final gold = Paint()
+      // WARNA: gambar ilustrasi burung hantu.
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .76)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
     final fineGold = Paint()
+      // WARNA: gambar ilustrasi burung hantu.
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .42)
       ..style = PaintingStyle.stroke
       ..strokeWidth = .7;
@@ -309,12 +319,17 @@ class _OpenBookPainter extends CustomPainter {
       ..cubicTo(centerX + spread * .62, bottom - 1, centerX + spread * .25, bottom + 2, centerX, bottom - 5)
       ..close();
 
+    // WARNA: gambar ilustrasi burung hantu.
     canvas.drawShadow(leftPage, Colors.black.withValues(alpha: .2 * progress), 8, true);
+    // WARNA: gambar ilustrasi burung hantu.
     canvas.drawShadow(rightPage, Colors.black.withValues(alpha: .2 * progress), 8, true);
+    // WARNA: bayangan ikon/teks.
     canvas.drawPath(leftPage, Paint()..color = const Color(0xFFFFFCF3).withValues(alpha: progress));
+    // WARNA: bayangan ikon/teks.
     canvas.drawPath(rightPage, Paint()..color = const Color(0xFFFFFCF3).withValues(alpha: progress));
 
     final pageEdge = Paint()
+      // WARNA: bayangan ikon/teks.
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .82 * progress)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
@@ -351,9 +366,11 @@ class _OpenBookPainter extends CustomPainter {
           bottom - 5,
         )
         ..close();
+      // WARNA: warna elemen.
       canvas.drawShadow(sheet, Colors.black.withValues(alpha: .12 * progress), 5, true);
       canvas.drawPath(
         sheet,
+        // WARNA: bayangan ikon/teks.
         Paint()..color = const Color(0xFFFFFDF7).withValues(alpha: .94 * progress),
       );
       canvas.drawPath(sheet, pageEdge..strokeWidth = .8..style = PaintingStyle.stroke);
@@ -366,6 +383,7 @@ class _OpenBookPainter extends CustomPainter {
     }
 
     final textRule = Paint()
+      // WARNA: gambar ilustrasi burung hantu.
       ..color = const Color(0xFFB9A687).withValues(alpha: .48 * progress)
       ..strokeWidth = 1;
     for (var i = 0; i < 5; i++) {
@@ -377,6 +395,7 @@ class _OpenBookPainter extends CustomPainter {
     }
 
     final binding = Paint()
+      // WARNA: gambar ilustrasi burung hantu.
       ..color = const Color(0xFF8D7460).withValues(alpha: .45 * progress)
       ..strokeWidth = 2;
     canvas.drawLine(Offset(centerX, top + 5), Offset(centerX, bottom - 6), binding);

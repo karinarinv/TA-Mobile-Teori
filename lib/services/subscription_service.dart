@@ -299,6 +299,7 @@ class SubscriptionService {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      // WARNA: latar komponen.
       backgroundColor: Colors.transparent,
       builder: (ctx) => _SubscriptionPaywallSheet(
         featureName: featureName,
@@ -359,6 +360,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
+        // WARNA: latar komponen.
         backgroundColor: Colors.transparent,
         builder: (ctx) => _VipQrisPaymentModal(
           plan: _selectedPlan,
@@ -371,6 +373,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,
+        // WARNA: latar komponen.
         backgroundColor: Colors.transparent,
         builder: (ctx) => _VipVaPaymentModal(
           plan: _selectedPlan,
@@ -389,6 +392,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
         maxHeight: MediaQuery.of(context).size.height * 0.88,
       ),
       decoration: const BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -403,6 +407,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
               width: 42,
               height: 4,
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: AppColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
@@ -413,12 +418,15 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: AppColors.agedPaper.withValues(alpha: 0.5),
                 shape: BoxShape.circle,
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.oxblood, width: 1.5),
               ),
               child: const Icon(
                 Icons.workspace_premium_rounded,
+                // WARNA: garis tepi kartu/komponen.
                 color: AppColors.oxblood,
                 size: 38,
               ),
@@ -430,6 +438,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
               style: GoogleFonts.poppins(
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
+                // WARNA: teks 'Keanggotaan VIP RentBook'.
                 color: AppColors.walnut,
               ),
             ),
@@ -439,6 +448,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 12.5,
+                // WARNA: teks 'Keanggotaan VIP RentBook'.
                 color: AppColors.textSecondary,
                 height: 1.4,
               ),
@@ -449,8 +459,10 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Column(
@@ -481,6 +493,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                 style: GoogleFonts.poppins(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
+                  // WARNA: teks 'Pilih Paket VIP:'.
                   color: AppColors.walnut,
                 ),
               ),
@@ -501,8 +514,10 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: AppColors.agedPaper.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(12),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Row(
@@ -515,6 +530,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                         'Biaya Langganan',
                         style: GoogleFonts.poppins(
                           fontSize: 11,
+                          // WARNA: teks 'Biaya Langganan'.
                           color: AppColors.oxblood,
                           fontWeight: FontWeight.w600,
                         ),
@@ -524,6 +540,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
+                          // WARNA: teks 'Biaya Langganan'.
                           color: AppColors.walnut,
                         ),
                       ),
@@ -539,6 +556,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                           ),
                           style: GoogleFonts.poppins(
                             fontSize: 12,
+                            // WARNA: teks 'SubscriptionService._formatPrice'.
                             color: AppColors.textSecondary,
                             decoration: TextDecoration.lineThrough,
                           ),
@@ -548,6 +566,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                         style: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
+                          // WARNA: teks 'SubscriptionService._formatPrice'.
                           color: AppColors.oxblood,
                         ),
                       ),
@@ -556,6 +575,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                           'Hemat ${SubscriptionService._formatPrice(_selectedOriginalPriceIdr - _selectedPriceIdr)}',
                           style: GoogleFonts.poppins(
                             fontSize: 10,
+                            // WARNA: teks '_selectedPriceLabel'.
                             color: Colors.green.shade800,
                             fontWeight: FontWeight.w600,
                           ),
@@ -575,6 +595,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                 style: GoogleFonts.poppins(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
+                  // WARNA: teks 'Pilih Metode Pembayaran:'.
                   color: AppColors.walnut,
                 ),
               ),
@@ -584,7 +605,9 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -602,12 +625,14 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
                       value: opt,
                       child: Row(
                         children: [
+                          // WARNA: warna komponen.
                           Icon(icon, size: 20, color: AppColors.oxblood),
                           const SizedBox(width: 10),
                           Text(
                             opt,
                             style: GoogleFonts.poppins(
                               fontSize: 13,
+                              // WARNA: teks 'opt'.
                               color: AppColors.walnut,
                             ),
                           ),
@@ -629,7 +654,9 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
               height: 48,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: AppColors.oxblood,
+                  // WARNA: teks/ikon tombol 'Lanjut Pembayaran ($_selectedPriceLabel)'.
                   foregroundColor: AppColors.parchment,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -654,6 +681,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
               child: Text(
                 'Kembali',
                 style: GoogleFonts.poppins(
+                  // WARNA: teks 'Kembali'.
                   color: AppColors.textSecondary,
                   fontSize: 13,
                 ),
@@ -669,6 +697,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // WARNA: warna komponen.
         Icon(icon, size: 18, color: AppColors.oxblood),
         const SizedBox(width: 10),
         Expanded(
@@ -677,6 +706,7 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
             style: GoogleFonts.poppins(
               fontSize: 12,
               fontWeight: FontWeight.w500,
+              // WARNA: teks 'text'.
               color: AppColors.walnut,
             ),
           ),
@@ -755,6 +785,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
         maxHeight: MediaQuery.of(context).size.height * 0.85,
       ),
       decoration: const BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -768,6 +799,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: AppColors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
@@ -786,12 +818,14 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: AppColors.oxblood,
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         'QRIS',
                         style: GoogleFonts.poppins(
+                          // WARNA: teks 'QRIS'.
                           color: AppColors.parchment,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
@@ -804,17 +838,20 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
+                        // WARNA: teks 'QRIS'.
                         color: AppColors.walnut,
                       ),
                     ),
                   ],
                 ),
                 IconButton(
+                  // WARNA: teks 'QRIS'.
                   icon: const Icon(Icons.close, color: AppColors.walnut),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
+            // WARNA: ikon close.
             const Divider(height: 14, color: AppColors.border),
 
             Text(
@@ -822,6 +859,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
+                // WARNA: teks 'RentBook Official VIP Membership'.
                 color: AppColors.walnut,
               ),
             ),
@@ -829,6 +867,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
               'NMID: ID1020039281728 • A01',
               style: GoogleFonts.poppins(
                 fontSize: 11,
+                // WARNA: teks 'RentBook Official VIP Membership'.
                 color: AppColors.textSecondary,
               ),
             ),
@@ -840,11 +879,14 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
               height: 170,
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border, width: 2),
                 boxShadow: [
                   BoxShadow(
+                    // WARNA: bayangan kartu.
                     color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
@@ -858,6 +900,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                   child: Icon(
                     Icons.qr_code_2_rounded,
                     size: 70,
+                    // WARNA: ikon qr_code_2_rounded.
                     color: AppColors.oxblood,
                   ),
                 ),
@@ -869,8 +912,10 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Row(
@@ -880,6 +925,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                     'Total Tagihan:',
                     style: GoogleFonts.poppins(
                       fontSize: 12.5,
+                      // WARNA: teks 'Total Tagihan:'.
                       color: AppColors.walnut,
                     ),
                   ),
@@ -888,6 +934,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
+                      // WARNA: teks 'Total Tagihan:'.
                       color: AppColors.oxblood,
                     ),
                   ),
@@ -901,6 +948,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 11.5,
+                // WARNA: teks 'Mendukung GoPay, OVO, Dana, ShopeePay, LinkAja, dan Mobile Banking.'.
                 color: AppColors.textSecondary,
               ),
             ),
@@ -912,7 +960,9 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
               height: 46,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: AppColors.oxblood,
+                  // WARNA: teks/ikon tombol.
                   foregroundColor: AppColors.parchment,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -926,6 +976,7 @@ class _VipQrisPaymentModalState extends State<_VipQrisPaymentModal> {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
+                          // WARNA: ikon check_circle_outline_rounded.
                           color: Colors.white,
                           strokeWidth: 2,
                         ),
@@ -985,11 +1036,13 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
       SnackBar(
         content: Row(
           children: const [
+            // WARNA: warna komponen.
             Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
             SizedBox(width: 8),
             Text('Nomor Virtual Account disalin ke clipboard!'),
           ],
         ),
+        // WARNA: latar notifikasi.
         backgroundColor: AppColors.oxblood,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -1036,6 +1089,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
         maxHeight: MediaQuery.of(context).size.height * 0.88,
       ),
       decoration: const BoxDecoration(
+        // WARNA: latar kartu/komponen.
         color: AppColors.background,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -1051,6 +1105,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: AppColors.border,
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -1066,15 +1121,18 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
+                    // WARNA: teks 'Transfer Virtual Account VIP'.
                     color: AppColors.walnut,
                   ),
                 ),
                 IconButton(
+                  // WARNA: teks 'Transfer Virtual Account VIP'.
                   icon: const Icon(Icons.close, color: AppColors.walnut),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
+            // WARNA: ikon close.
             const Divider(height: 14, color: AppColors.border),
 
             Text(
@@ -1082,6 +1140,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
                 fontSize: 12.5,
+                // WARNA: teks 'Pilih Bank Tujuan:'.
                 color: AppColors.walnut,
               ),
             ),
@@ -1095,9 +1154,12 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                   child: ChoiceChip(
                     label: Text(bank),
                     selected: isSel,
+                    // WARNA: warna komponen.
                     selectedColor: AppColors.oxblood,
+                    // WARNA: latar komponen.
                     backgroundColor: Colors.white,
                     labelStyle: GoogleFonts.poppins(
+                      // WARNA: teks 'bank'.
                       color: isSel ? AppColors.parchment : AppColors.walnut,
                       fontWeight: isSel ? FontWeight.bold : FontWeight.normal,
                       fontSize: 12,
@@ -1115,8 +1177,10 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(14),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Column(
@@ -1129,6 +1193,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                         'Nomor Virtual Account $_selectedBank',
                         style: GoogleFonts.poppins(
                           fontSize: 11.5,
+                          // WARNA: teks 'Nomor Virtual Account $_selectedBank'.
                           color: AppColors.textSecondary,
                         ),
                       ),
@@ -1139,6 +1204,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                             const Icon(
                               Icons.copy_rounded,
                               size: 14,
+                              // WARNA: ikon copy_rounded.
                               color: AppColors.oxblood,
                             ),
                             const SizedBox(width: 4),
@@ -1147,6 +1213,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: teks 'Salin'.
                                 color: AppColors.oxblood,
                               ),
                             ),
@@ -1162,6 +1229,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.1,
+                      // WARNA: teks 'vaNumber'.
                       color: AppColors.walnut,
                     ),
                   ),
@@ -1170,6 +1238,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                     'Atas Nama: RentBook VIP Official',
                     style: GoogleFonts.poppins(
                       fontSize: 11.5,
+                      // WARNA: teks 'Atas Nama: RentBook VIP Official'.
                       color: AppColors.textSecondary,
                     ),
                   ),
@@ -1182,8 +1251,10 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: AppColors.agedPaper.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(12),
+                // WARNA: latar kartu/komponen.
                 border: Border.all(color: AppColors.border),
               ),
               child: Row(
@@ -1193,6 +1264,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                     'Total Tagihan:',
                     style: GoogleFonts.poppins(
                       fontSize: 12.5,
+                      // WARNA: teks 'Total Tagihan:'.
                       color: AppColors.walnut,
                     ),
                   ),
@@ -1201,6 +1273,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
+                      // WARNA: teks 'Total Tagihan:'.
                       color: AppColors.oxblood,
                     ),
                   ),
@@ -1214,7 +1287,9 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
               height: 46,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(
+                  // WARNA: latar tombol.
                   backgroundColor: AppColors.oxblood,
+                  // WARNA: teks/ikon tombol.
                   foregroundColor: AppColors.parchment,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1228,6 +1303,7 @@ class _VipVaPaymentModalState extends State<_VipVaPaymentModal> {
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
+                          // WARNA: ikon verified_rounded.
                           color: Colors.white,
                           strokeWidth: 2,
                         ),
@@ -1260,9 +1336,11 @@ void _showVipReceiptDialog(
   showDialog(
     context: context,
     builder: (ctx) => AlertDialog(
+      // WARNA: latar dialog.
       backgroundColor: AppColors.background,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
+        // WARNA: warna komponen.
         side: const BorderSide(color: AppColors.border, width: 1.2),
       ),
       contentPadding: const EdgeInsets.all(20),
@@ -1272,12 +1350,15 @@ void _showVipReceiptDialog(
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
+              // WARNA: latar kartu/komponen.
               color: AppColors.agedPaper.withValues(alpha: 0.5),
               shape: BoxShape.circle,
+              // WARNA: latar kartu/komponen.
               border: Border.all(color: AppColors.oxblood, width: 1.5),
             ),
             child: const Icon(
               Icons.workspace_premium_rounded,
+              // WARNA: garis tepi kartu/komponen.
               color: AppColors.oxblood,
               size: 40,
             ),
@@ -1288,6 +1369,7 @@ void _showVipReceiptDialog(
             style: GoogleFonts.poppins(
               fontSize: 17,
               fontWeight: FontWeight.bold,
+              // WARNA: teks 'Keanggotaan VIP Aktif'.
               color: AppColors.walnut,
             ),
           ),
@@ -1297,6 +1379,7 @@ void _showVipReceiptDialog(
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               fontSize: 12,
+              // WARNA: teks 'Keanggotaan VIP Aktif'.
               color: AppColors.textSecondary,
               height: 1.4,
             ),
@@ -1306,8 +1389,10 @@ void _showVipReceiptDialog(
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
+              // WARNA: latar kartu/komponen.
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
+              // WARNA: latar kartu/komponen.
               border: Border.all(color: AppColors.border),
             ),
             child: Column(
@@ -1332,7 +1417,9 @@ void _showVipReceiptDialog(
       actions: [
         FilledButton(
           style: FilledButton.styleFrom(
+            // WARNA: latar tombol.
             backgroundColor: AppColors.oxblood,
+            // WARNA: teks/ikon tombol 'Selesai'.
             foregroundColor: AppColors.parchment,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -1358,6 +1445,7 @@ Widget _buildReceiptRow(String label, String value) {
         label,
         style: GoogleFonts.poppins(
           fontSize: 11.5,
+          // WARNA: teks 'label'.
           color: AppColors.textSecondary,
         ),
       ),
@@ -1366,6 +1454,7 @@ Widget _buildReceiptRow(String label, String value) {
         style: GoogleFonts.poppins(
           fontSize: 11.5,
           fontWeight: FontWeight.bold,
+          // WARNA: teks 'label'.
           color: AppColors.walnut,
         ),
       ),

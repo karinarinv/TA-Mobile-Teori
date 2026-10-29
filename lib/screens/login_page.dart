@@ -19,12 +19,19 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
 
   // Palet Warna
+  // WARNA: palet _cWalnut ().
   static const Color _cWalnut = Color(0xFF302622);
+  // WARNA: palet _cOxblood ().
   static const Color _cOxblood = Color(0xFF67343A);
+  // WARNA: palet _cTobacco ().
   static const Color _cTobacco = Color(0xFF9A704F);
+  // WARNA: palet _cAgedPaper ().
   static const Color _cAgedPaper = Color(0xFFD4BE9D);
+  // WARNA: palet _cParchment ().
   static const Color _cParchment = Color(0xFFEDE2CF);
+  // WARNA: palet _cCardBg ().
   static const Color _cCardBg = Color(0xFFD8C7B0);
+  // WARNA: palet _cTabInactive ().
   static const Color _cTabInactive = Color(0xFFC7B197);
 
   @override
@@ -42,10 +49,12 @@ class _LoginPageState extends State<LoginPage> {
         content: Text(
           s,
           style: GoogleFonts.poppins(
+            // WARNA: teks 's'.
             color: _cParchment,
             fontWeight: FontWeight.w500,
           ),
         ),
+        // WARNA: latar notifikasi.
         backgroundColor: isError ? _cOxblood : _cWalnut,
         duration: Duration(seconds: isError ? 6 : 2),
         behavior: SnackBarBehavior.floating,
@@ -134,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: _cWalnut,
       body: Stack(
         fit: StackFit.expand,
@@ -141,6 +151,7 @@ class _LoginPageState extends State<LoginPage> {
           Image.asset(
             'assets/images/library_bg.jpg',
             fit: BoxFit.cover,
+            // WARNA: warna komponen.
             errorBuilder: (_, __, ___) => Container(color: _cWalnut),
           ),
 
@@ -149,9 +160,11 @@ class _LoginPageState extends State<LoginPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
+                // WARNA: gradasi komponen ini.
                 colors: [
                   Colors.black.withValues(alpha: 0.52),
                   Colors.black.withValues(alpha: 0.32),
+                  // WARNA: latar kartu 'RENT\nBOOK'.
                   Colors.black.withValues(alpha: 0.68),
                 ],
               ),
@@ -171,6 +184,7 @@ class _LoginPageState extends State<LoginPage> {
                     Image.asset(
                       'assets/images/rentbook_logo.png',
                       height: 85,
+                      // WARNA: warna komponen.
                       color: _cParchment,
                       colorBlendMode: BlendMode.srcIn,
                       errorBuilder: (_, __, ___) => Row(
@@ -178,6 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           const Icon(
                             Icons.menu_book_rounded,
+                            // WARNA: ikon menu_book_rounded.
                             color: _cParchment,
                             size: 42,
                           ),
@@ -185,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                           Text(
                             'RENT\nBOOK',
                             style: GoogleFonts.poppins(
+                              // WARNA: teks 'RENT\nBOOK'.
                               color: _cParchment,
                               fontWeight: FontWeight.w900,
                               fontSize: 22,
@@ -199,10 +215,12 @@ class _LoginPageState extends State<LoginPage> {
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: _cCardBg,
                         borderRadius: BorderRadius.circular(26),
                         boxShadow: [
                           BoxShadow(
+                            // WARNA: bayangan kartu.
                             color: Colors.black.withValues(alpha: 0.4),
                             blurRadius: 28,
                             spreadRadius: 2,
@@ -217,6 +235,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: 44,
                             padding: const EdgeInsets.all(3.5),
                             decoration: BoxDecoration(
+                              // WARNA: latar kartu/komponen.
                               color: _cTabInactive,
                               borderRadius: BorderRadius.circular(22),
                             ),
@@ -231,6 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                                         milliseconds: 200,
                                       ),
                                       decoration: BoxDecoration(
+                                        // WARNA: latar kartu/komponen.
                                         color: !_isRegister
                                             ? _cOxblood
                                             : Colors.transparent,
@@ -238,6 +258,7 @@ class _LoginPageState extends State<LoginPage> {
                                         boxShadow: !_isRegister
                                             ? [
                                                 BoxShadow(
+                                                  // WARNA: bayangan kartu.
                                                   color: Colors.black
                                                       .withValues(alpha: 0.18),
                                                   blurRadius: 4,
@@ -252,6 +273,7 @@ class _LoginPageState extends State<LoginPage> {
                                           style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 13.5,
+                                            // WARNA: teks 'Masuk'.
                                             color: !_isRegister
                                                 ? _cParchment
                                                 : _cWalnut,
@@ -270,6 +292,7 @@ class _LoginPageState extends State<LoginPage> {
                                         milliseconds: 200,
                                       ),
                                       decoration: BoxDecoration(
+                                        // WARNA: latar kartu/komponen.
                                         color: _isRegister
                                             ? _cOxblood
                                             : Colors.transparent,
@@ -277,6 +300,7 @@ class _LoginPageState extends State<LoginPage> {
                                         boxShadow: _isRegister
                                             ? [
                                                 BoxShadow(
+                                                  // WARNA: bayangan kartu.
                                                   color: Colors.black
                                                       .withValues(alpha: 0.18),
                                                   blurRadius: 4,
@@ -291,6 +315,7 @@ class _LoginPageState extends State<LoginPage> {
                                           style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 13.5,
+                                            // WARNA: teks 'Daftar Baru'.
                                             color: _isRegister
                                                 ? _cParchment
                                                 : _cWalnut,
@@ -309,19 +334,23 @@ class _LoginPageState extends State<LoginPage> {
                           TextField(
                             controller: _u,
                             style: GoogleFonts.poppins(
+                              // WARNA: teks judul/isi pada bagian ini.
                               color: _cWalnut,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
+                            // WARNA: teks judul/isi pada bagian ini.
                             cursorColor: _cOxblood,
                             decoration: InputDecoration(
                               hintText: 'Username',
                               hintStyle: GoogleFonts.poppins(
+                                // WARNA: teks judul/isi pada bagian ini.
                                 color: _cWalnut.withValues(alpha: 0.6),
                                 fontSize: 13.5,
                               ),
                               prefixIcon: const Icon(
                                 Icons.person_outline_rounded,
+                                // WARNA: teks judul/isi pada bagian ini.
                                 color: _cWalnut,
                                 size: 21,
                               ),
@@ -330,10 +359,12 @@ class _LoginPageState extends State<LoginPage> {
                                 vertical: 13,
                               ),
                               filled: true,
+                              // WARNA: warna komponen.
                               fillColor: _cAgedPaper.withValues(alpha: 0.35),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: _cTobacco,
                                   width: 1.1,
                                 ),
@@ -341,6 +372,7 @@ class _LoginPageState extends State<LoginPage> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: _cOxblood,
                                   width: 1.8,
                                 ),
@@ -354,19 +386,23 @@ class _LoginPageState extends State<LoginPage> {
                             controller: _p,
                             obscureText: _obscure,
                             style: GoogleFonts.poppins(
+                              // WARNA: teks judul/isi pada bagian ini.
                               color: _cWalnut,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
+                            // WARNA: teks judul/isi pada bagian ini.
                             cursorColor: _cOxblood,
                             decoration: InputDecoration(
                               hintText: 'Password',
                               hintStyle: GoogleFonts.poppins(
+                                // WARNA: teks judul/isi pada bagian ini.
                                 color: _cWalnut.withValues(alpha: 0.6),
                                 fontSize: 13.5,
                               ),
                               prefixIcon: const Icon(
                                 Icons.lock_outline_rounded,
+                                // WARNA: teks judul/isi pada bagian ini.
                                 color: _cWalnut,
                                 size: 21,
                               ),
@@ -375,6 +411,7 @@ class _LoginPageState extends State<LoginPage> {
                                   _obscure
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
+                                  // WARNA: ikon visibility_outlined.
                                   color: _cWalnut,
                                   size: 20,
                                 ),
@@ -386,10 +423,12 @@ class _LoginPageState extends State<LoginPage> {
                                 vertical: 13,
                               ),
                               filled: true,
+                              // WARNA: warna komponen.
                               fillColor: _cAgedPaper.withValues(alpha: 0.35),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: _cTobacco,
                                   width: 1.1,
                                 ),
@@ -397,6 +436,7 @@ class _LoginPageState extends State<LoginPage> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: _cOxblood,
                                   width: 1.8,
                                 ),
@@ -410,9 +450,12 @@ class _LoginPageState extends State<LoginPage> {
                             height: 48,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
+                                // WARNA: latar tombol.
                                 backgroundColor: _cOxblood,
+                                // WARNA: teks/ikon tombol.
                                 foregroundColor: _cParchment,
                                 elevation: 3,
+                                // WARNA: warna komponen.
                                 shadowColor: Colors.black26,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -425,6 +468,7 @@ class _LoginPageState extends State<LoginPage> {
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
+                                        // WARNA: warna komponen.
                                         color: _cParchment,
                                       ),
                                     )
@@ -446,6 +490,7 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               Expanded(
                                 child: Divider(
+                                  // WARNA: warna komponen.
                                   color: _cTobacco.withValues(alpha: 0.5),
                                   thickness: 0.9,
                                 ),
@@ -457,6 +502,7 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Text(
                                   'atau',
                                   style: GoogleFonts.poppins(
+                                    // WARNA: teks 'atau'.
                                     color: _cWalnut.withValues(alpha: 0.7),
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w500,
@@ -465,6 +511,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Expanded(
                                 child: Divider(
+                                  // WARNA: teks 'atau'.
                                   color: _cTobacco.withValues(alpha: 0.5),
                                   thickness: 0.9,
                                 ),
@@ -474,6 +521,7 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 16),
 
                           Material(
+                            // WARNA: warna komponen.
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(14),
@@ -482,10 +530,13 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 48,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(14),
+                                  // WARNA: garis tepi komponen.
                                   border: Border.all(
+                                    // WARNA: garis tepi kartu/komponen.
                                     color: _cTobacco,
                                     width: 1.1,
                                   ),
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: _cAgedPaper.withValues(alpha: 0.3),
                                 ),
                                 child: Row(
@@ -494,6 +545,7 @@ class _LoginPageState extends State<LoginPage> {
                                     const Icon(
                                       Icons.fingerprint,
                                       size: 24,
+                                      // WARNA: ikon fingerprint.
                                       color: _cWalnut,
                                     ),
                                     const SizedBox(width: 10),
@@ -502,6 +554,7 @@ class _LoginPageState extends State<LoginPage> {
                                       style: GoogleFonts.poppins(
                                         fontWeight: FontWeight.w600,
                                         fontSize: 13.5,
+                                        // WARNA: teks 'Masuk dengan Biometrik'.
                                         color: _cWalnut,
                                         letterSpacing: 0.2,
                                       ),

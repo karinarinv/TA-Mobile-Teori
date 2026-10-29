@@ -153,6 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
+                  // WARNA: latar kartu/komponen.
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -167,9 +168,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
+                    // WARNA: latar kartu/komponen.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  // WARNA: latar kartu/komponen.
                   child: const Icon(Icons.camera_alt, color: Color(0xFF67343A)),
                 ),
                 title: const Text('Ambil dari Kamera'),
@@ -182,11 +185,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
+                    // WARNA: latar kartu/komponen.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.photo_library,
+                    // WARNA: latar kartu/komponen.
                     color: Color(0xFF67343A),
                   ),
                 ),
@@ -207,9 +212,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final yes = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
+        // WARNA: latar dialog.
         backgroundColor: const Color(0xFFFAF7F2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
+          // WARNA: warna komponen.
           side: const BorderSide(color: Color(0xFFEADBCE), width: 1.2),
         ),
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
@@ -220,15 +227,19 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
+                // WARNA: latar kartu/komponen.
                 color: const Color(0xFF67343A).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
+                // WARNA: garis tepi komponen.
                 border: Border.all(
+                  // WARNA: garis tepi kartu/komponen.
                   color: const Color(0xFF67343A).withValues(alpha: 0.2),
                   width: 1.2,
                 ),
               ),
               child: const Icon(
                 Icons.logout_rounded,
+                // WARNA: garis tepi kartu/komponen.
                 color: Color(0xFF67343A),
                 size: 26,
               ),
@@ -240,6 +251,7 @@ class _ProfilePageState extends State<ProfilePage> {
               style: GoogleFonts.playfairDisplay(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                // WARNA: teks 'Konfirmasi Keluar'.
                 color: const Color(0xFF302622),
               ),
             ),
@@ -250,6 +262,7 @@ class _ProfilePageState extends State<ProfilePage> {
           textAlign: TextAlign.center,
           style: GoogleFonts.plusJakartaSans(
             fontSize: 12.5,
+            // WARNA: teks judul/isi pada bagian ini.
             color: const Color(0xFF6B564A),
             height: 1.45,
           ),
@@ -260,8 +273,10 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
+                    // WARNA: teks/ikon tombol 'Batal'.
                     foregroundColor: const Color(0xFF302622),
                     side: const BorderSide(
+                      // WARNA: garis tepi kartu/komponen.
                       color: Color(0xFFEADBCE),
                       width: 1.2,
                     ),
@@ -276,6 +291,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
+                      // WARNA: teks 'Batal'.
                       color: const Color(0xFF302622),
                     ),
                   ),
@@ -285,7 +301,9 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: FilledButton(
                   style: FilledButton.styleFrom(
+                    // WARNA: latar tombol.
                     backgroundColor: const Color(0xFF67343A),
+                    // WARNA: teks/ikon tombol 'Keluar'.
                     foregroundColor: const Color(0xFFEDE2CF),
                     padding: const EdgeInsets.symmetric(vertical: 11),
                     elevation: 0,
@@ -299,6 +317,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
+                      // WARNA: teks 'Keluar'.
                       color: const Color(0xFFEDE2CF),
                     ),
                   ),
@@ -324,6 +343,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
         title: Text(
@@ -331,10 +351,13 @@ class _ProfilePageState extends State<ProfilePage> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         elevation: 0,
+        // WARNA: latar AppBar.
         backgroundColor: const Color(0xFF67343A),
+        // WARNA: teks/ikon tombol.
         foregroundColor: const Color(0xFFEDE2CF),
         actions: [
           IconButton(
+            // WARNA: teks 'Profil Pengguna'.
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFFEDE2CF)),
             tooltip: 'Segarkan',
             onPressed: _load,
@@ -343,10 +366,13 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: _loading
           ? const Center(
+              // WARNA: ikon refresh_rounded.
               child: CircularProgressIndicator(color: Color(0xFF67343A)),
             )
           : RefreshIndicator(
+              // WARNA: ikon pada komponen ini.
               color: const Color(0xFF67343A),
+              // WARNA: latar spinner tarik-refresh.
               backgroundColor: const Color(0xFFEDE2CF),
               onRefresh: _load,
               child: SingleChildScrollView(
@@ -365,14 +391,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
+                        // WARNA: garis tepi komponen.
                         border: Border.all(
+                          // WARNA: garis tepi kartu/komponen.
                           color: const Color(0xFFEADBCE),
                           width: 1.2,
                         ),
                         boxShadow: [
                           BoxShadow(
+                            // WARNA: bayangan kartu.
                             color: const Color(0xFF302622)
                                 .withValues(alpha: 0.05),
                             blurRadius: 12,
@@ -394,14 +424,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       gradient: LinearGradient(
+                                        // WARNA: gradasi komponen ini.
                                         colors: _isVip
                                             ? const [
                                                 Color(0xFFD4AF37),
+                                                // WARNA: bayangan kartu.
                                                 Color(0xFFB45309),
+                                                // WARNA: bayangan kartu.
                                                 Color(0xFF67343A),
                                               ]
                                             : const [
+                                                // WARNA: bayangan kartu.
                                                 Color(0xFFEADBCE),
+                                                // WARNA: bayangan kartu.
                                                 Color(0xFFEDE2CF),
                                               ],
                                         begin: Alignment.topLeft,
@@ -409,6 +444,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
+                                          // WARNA: bayangan kartu.
                                           color: const Color(0xFF302622)
                                               .withValues(alpha: 0.16),
                                           blurRadius: 10,
@@ -418,6 +454,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     child: CircleAvatar(
                                       radius: 50,
+                                      // WARNA: latar komponen.
                                       backgroundColor: const Color(0xFFEDE2CF),
                                       backgroundImage: _photo != null
                                           ? FileImage(File(_photo!))
@@ -426,6 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ? const Icon(
                                               Icons.person,
                                               size: 52,
+                                              // WARNA: ikon person.
                                               color: Color(0xFF67343A),
                                             )
                                           : null,
@@ -440,14 +478,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: Container(
                                       padding: const EdgeInsets.all(7.5),
                                       decoration: BoxDecoration(
+                                        // WARNA: latar kartu/komponen.
                                         color: const Color(0xFF67343A),
                                         shape: BoxShape.circle,
+                                        // WARNA: garis tepi komponen.
                                         border: Border.all(
+                                          // WARNA: garis tepi kartu/komponen.
                                           color: Colors.white,
                                           width: 2,
                                         ),
                                         boxShadow: [
                                           BoxShadow(
+                                            // WARNA: bayangan kartu.
                                             color: Colors.black.withValues(
                                               alpha: 0.2,
                                             ),
@@ -458,6 +500,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       child: const Icon(
                                         Icons.camera_alt_rounded,
                                         size: 15,
+                                        // WARNA: ikon camera_alt_rounded.
                                         color: Color(0xFFEDE2CF),
                                       ),
                                     ),
@@ -483,6 +526,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       style: GoogleFonts.playfairDisplay(
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
+                                        // WARNA: teks '_username'.
                                         color: const Color(0xFF302622),
                                       ),
                                     ),
@@ -502,6 +546,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       icon: Icon(
                                         Icons.edit_rounded,
                                         size: 18,
+                                        // WARNA: ikon edit_rounded.
                                         color: const Color(0xFF9A704F),
                                       ),
                                     ),
@@ -521,6 +566,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             decoration: BoxDecoration(
                               gradient: _isVip
                                   ? const LinearGradient(
+                                      // WARNA: gradasi komponen ini.
                                       colors: [
                                         Color(0xFF67343A),
                                         Color(0xFF4A1F25),
@@ -529,9 +575,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                       end: Alignment.bottomRight,
                                     )
                                   : null,
+                              // WARNA: latar kartu/komponen ini.
                               color: _isVip ? null : const Color(0xFFEDE2CF),
                               borderRadius: BorderRadius.circular(20),
+                              // WARNA: garis tepi komponen.
                               border: Border.all(
+                                // WARNA: garis tepi kartu/komponen.
                                 color: _isVip
                                     ? const Color(0xFFD4AF37)
                                     : const Color(0xFFEADBCE),
@@ -540,6 +589,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               boxShadow: _isVip
                                   ? [
                                       BoxShadow(
+                                        // WARNA: bayangan kartu.
                                         color: const Color(0xFF67343A)
                                             .withValues(alpha: 0.25),
                                         blurRadius: 8,
@@ -556,6 +606,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ? Icons.stars_rounded
                                       : Icons.person_outline_rounded,
                                   size: 14,
+                                  // WARNA: ikon stars_rounded.
                                   color: _isVip
                                       ? const Color(0xFFD4AF37)
                                       : const Color(0xFF67343A),
@@ -569,6 +620,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.8,
+                                    // WARNA: teks status VIP/anggota.
                                     color: _isVip
                                         ? const Color(0xFFEDE2CF)
                                         : const Color(0xFF67343A),
@@ -590,22 +642,27 @@ class _ProfilePageState extends State<ProfilePage> {
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
+                            // WARNA: gradasi komponen ini.
                             colors: [
                               Color(0xFF5E2B31),
                               Color(0xFF4A1F25),
+                              // WARNA: latar kartu.
                               Color(0xFF302622),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(18),
+                          // WARNA: garis tepi komponen.
                           border: Border.all(
+                            // WARNA: garis tepi kartu/komponen.
                             color: const Color(0xFFD4AF37)
                                 .withValues(alpha: 0.65),
                             width: 1.4,
                           ),
                           boxShadow: [
                             BoxShadow(
+                              // WARNA: bayangan kartu.
                               color: const Color(0xFF302622)
                                   .withValues(alpha: 0.22),
                               blurRadius: 14,
@@ -628,10 +685,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
+                                        // WARNA: latar kartu/komponen.
                                         color: const Color(0xFFEDE2CF)
                                             .withValues(alpha: 0.15),
                                         shape: BoxShape.circle,
+                                        // WARNA: bayangan kartu/panel.
                                         border: Border.all(
+                                          // WARNA: garis tepi kartu/komponen.
                                           color: const Color(0xFFD4AF37)
                                               .withValues(alpha: 0.6),
                                           width: 1.2,
@@ -639,6 +699,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       child: const Icon(
                                         Icons.workspace_premium_rounded,
+                                        // WARNA: garis tepi kartu/komponen.
                                         color: Color(0xFFD4AF37),
                                         size: 22,
                                       ),
@@ -654,6 +715,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           style: GoogleFonts.playfairDisplay(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
+                                            // WARNA: teks 'Keanggotaan VIP Club'.
                                             color: const Color(0xFFEDE2CF),
                                             letterSpacing: 0.3,
                                           ),
@@ -663,6 +725,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           'Akses eksklusif fitur premium',
                                           style: GoogleFonts.plusJakartaSans(
                                             fontSize: 11,
+                                            // WARNA: teks 'Keanggotaan VIP Club'.
                                             color: const Color(0xFFD4BE9D),
                                           ),
                                         ),
@@ -677,14 +740,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                     vertical: 4.5,
                                   ),
                                   decoration: BoxDecoration(
+                                    // WARNA: latar kartu/komponen.
                                     color: const Color(0xFFEDE2CF),
                                     borderRadius: BorderRadius.circular(20),
+                                    // WARNA: garis tepi komponen.
                                     border: Border.all(
+                                      // WARNA: garis tepi kartu/komponen.
                                       color: const Color(0xFFD4AF37),
                                       width: 1.2,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
+                                        // WARNA: bayangan kartu.
                                         color: Colors.black.withValues(
                                           alpha: 0.2,
                                         ),
@@ -699,6 +766,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       const Icon(
                                         Icons.verified_rounded,
                                         size: 13,
+                                        // WARNA: ikon verified_rounded.
                                         color: Color(0xFF67343A),
                                       ),
                                       const SizedBox(width: 4),
@@ -709,6 +777,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.w800,
+                                          // WARNA: teks '_vipPlanName.isNotEmpty'.
                                           color: const Color(0xFF67343A),
                                           letterSpacing: 0.6,
                                         ),
@@ -723,9 +792,11 @@ class _ProfilePageState extends State<ProfilePage> {
                               height: 1,
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
+                                  // WARNA: gradasi komponen ini.
                                   colors: [
                                     const Color(0xFFD4AF37)
                                         .withValues(alpha: 0.45),
+                                    // WARNA: latar kartu 'Paket $_vipPlanName • aktif hingga $_vipExpiry'.
                                     Colors.transparent,
                                   ],
                                 ),
@@ -738,6 +809,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 const Icon(
                                   Icons.event_available_rounded,
                                   size: 16,
+                                  // WARNA: ikon event_available_rounded.
                                   color: Color(0xFFD4BE9D),
                                 ),
                                 const SizedBox(width: 8),
@@ -747,6 +819,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w600,
+                                      // WARNA: teks 'Paket $_vipPlanName • aktif hingga $_vipExpiry'.
                                       color: const Color(0xFFEDE2CF),
                                     ),
                                   ),
@@ -760,6 +833,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 'Akses tak terbatas: Labirin Perpustakaan, Konversi Kurs & Scan Cover AI.',
                                 style: GoogleFonts.plusJakartaSans(
                                   fontSize: 10.5,
+                                  // WARNA: teks judul/isi pada bagian ini.
                                   color: const Color(0xFFD4BE9D)
                                       .withValues(alpha: 0.85),
                                   height: 1.3,
@@ -775,17 +849,21 @@ class _ProfilePageState extends State<ProfilePage> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
+                            // WARNA: gradasi komponen ini.
                             colors: [Color(0xFFFAF2E6), Color(0xFFF1E6D4)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(18),
+                          // WARNA: garis tepi komponen.
                           border: Border.all(
+                            // WARNA: garis tepi kartu/komponen.
                             color: const Color(0xFFD4BE9D),
                             width: 1.3,
                           ),
                           boxShadow: [
                             BoxShadow(
+                              // WARNA: bayangan kartu.
                               color: const Color(0xFF302622)
                                   .withValues(alpha: 0.05),
                               blurRadius: 10,
@@ -798,11 +876,13 @@ class _ProfilePageState extends State<ProfilePage> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: const BoxDecoration(
+                                // WARNA: latar kartu/komponen.
                                 color: Color(0xFFEDE2CF),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
                                 Icons.workspace_premium_outlined,
+                                // WARNA: latar kartu/komponen.
                                 color: Color(0xFF67343A),
                                 size: 24,
                               ),
@@ -817,6 +897,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     style: GoogleFonts.playfairDisplay(
                                       fontSize: 14.5,
                                       fontWeight: FontWeight.bold,
+                                      // WARNA: teks 'Tingkatkan ke VIP Club'.
                                       color: const Color(0xFF302622),
                                     ),
                                   ),
@@ -825,6 +906,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     'Akses Labirin Game, Konversi Kurs & AI Vision Scanner.',
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11,
+                                      // WARNA: teks 'Tingkatkan ke VIP Club'.
                                       color: const Color(0xFF7A4B3A),
                                       height: 1.3,
                                     ),
@@ -835,7 +917,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             const SizedBox(width: 10),
                             FilledButton(
                               style: FilledButton.styleFrom(
+                                // WARNA: latar tombol.
                                 backgroundColor: const Color(0xFF67343A),
+                                // WARNA: teks/ikon tombol 'Upgrade'.
                                 foregroundColor: const Color(0xFFEDE2CF),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 14,
@@ -869,14 +953,18 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
+                        // WARNA: latar kartu/komponen.
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
+                        // WARNA: garis tepi komponen.
                         border: Border.all(
+                          // WARNA: garis tepi kartu/komponen.
                           color: const Color(0xFFEADBCE),
                           width: 1.1,
                         ),
                         boxShadow: [
                           BoxShadow(
+                            // WARNA: bayangan kartu.
                             color: const Color(0xFF302622)
                                 .withValues(alpha: 0.04),
                             blurRadius: 8,
@@ -894,6 +982,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
+                                // WARNA: teks 'PENGATURAN & AKUN'.
                                 color: const Color(0xFF9A704F),
                                 letterSpacing: 0.8,
                               ),
@@ -903,14 +992,18 @@ class _ProfilePageState extends State<ProfilePage> {
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
+                                // WARNA: latar kartu/komponen.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
+                                // WARNA: garis tepi komponen.
                                 border: Border.all(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.collections_bookmark_rounded,
+                                // WARNA: garis tepi kartu/komponen.
                                 color: Color(0xFF67343A),
                                 size: 19,
                               ),
@@ -920,6 +1013,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
+                                // WARNA: teks 'Buku Tersimpan'.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -927,12 +1021,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               '$_savedCount buku favorit tersimpan',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
+                                // WARNA: teks 'Buku Tersimpan'.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
+                              // WARNA: teks 'Buku Tersimpan'.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: () async {
@@ -949,20 +1045,25 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 1,
                             indent: 16,
                             endIndent: 16,
+                            // WARNA: warna komponen.
                             color: Color(0xFFEADBCE),
                           ),
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
+                                // WARNA: latar kartu/komponen.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
+                                // WARNA: garis tepi komponen.
                                 border: Border.all(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.lock_clock_rounded,
+                                // WARNA: garis tepi kartu/komponen.
                                 color: Color(0xFF67343A),
                                 size: 19,
                               ),
@@ -972,6 +1073,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
+                                // WARNA: teks 'Riwayat Sewa (Blockchain)'.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -979,12 +1081,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               '$_rentalCount transaksi sewa tercatat di blockchain',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
+                                // WARNA: teks 'Riwayat Sewa (Blockchain)'.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
+                              // WARNA: teks 'Riwayat Sewa (Blockchain)'.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: () async {
@@ -1001,20 +1105,25 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 1,
                             indent: 16,
                             endIndent: 16,
+                            // WARNA: warna komponen.
                             color: Color(0xFFEADBCE),
                           ),
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
+                                // WARNA: latar kartu/komponen.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
+                                // WARNA: garis tepi komponen.
                                 border: Border.all(
+                                  // WARNA: garis tepi kartu/komponen.
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.add_a_photo_outlined,
+                                // WARNA: garis tepi kartu/komponen.
                                 color: Color(0xFF67343A),
                                 size: 19,
                               ),
@@ -1024,6 +1133,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
+                                // WARNA: teks 'Perbarui Foto Profil'.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -1031,12 +1141,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               'Pilih foto baru dari kamera atau galeri ponsel',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
+                                // WARNA: teks 'Perbarui Foto Profil'.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
+                              // WARNA: teks 'Perbarui Foto Profil'.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: _showImagePickerSheet,
@@ -1051,9 +1163,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
+                          // WARNA: teks/ikon tombol 'Keluar dari Akun'.
                           foregroundColor: const Color(0xFF67343A),
+                          // WARNA: latar tombol.
                           backgroundColor: Colors.white,
                           side: const BorderSide(
+                            // WARNA: garis tepi kartu/komponen.
                             color: Color(0xFF67343A),
                             width: 1.4,
                           ),
@@ -1070,6 +1185,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: GoogleFonts.plusJakartaSans(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
+                            // WARNA: teks 'Keluar dari Akun'.
                             color: const Color(0xFF67343A),
                           ),
                         ),
@@ -1084,6 +1200,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const Icon(
                           Icons.shield_outlined,
                           size: 14,
+                          // WARNA: ikon shield_outlined.
                           color: Color(0xFF9A704F),
                         ),
                         const SizedBox(width: 6),
@@ -1091,6 +1208,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           'RentBook • Keamanan SHA-256 Terenkripsi',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
+                            // WARNA: teks 'RentBook • Keamanan SHA-256 Terenkripsi'.
                             color: const Color(0xFF9A704F),
                           ),
                         ),
@@ -1136,22 +1254,32 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
   @override
   Widget build(BuildContext context) {
     final locked = widget.availableAt != null;
+    // WARNA: warna elemen.
     const background = Color(0xFFEDE2CF);
+    // WARNA: warna elemen.
     const fieldBackground = Color(0xFFD4BE9D);
+    // WARNA: warna elemen.
     const walnut = Color(0xFF302622);
+    // WARNA: warna elemen.
     const oxblood = Color(0xFF67343A);
     return Scaffold(
+      // WARNA: latar halaman.
       backgroundColor: background,
       appBar: AppBar(
+        // WARNA: latar AppBar.
         backgroundColor: background,
+        // WARNA: teks/ikon tombol 'Batal'.
         foregroundColor: walnut,
         elevation: 0,
+        // WARNA: warna komponen.
         title: const Text('Ubah nama', style: TextStyle(color: walnut, fontSize: 18, fontWeight: FontWeight.w600)),
+        // WARNA: teks judul/isi pada bagian ini.
         leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal', style: TextStyle(color: walnut, fontSize: 14))),
         leadingWidth: 72,
         actions: [
           TextButton(
             onPressed: locked ? null : () => Navigator.pop(context, _controller.text.trim()),
+            // WARNA: teks 'Ubah nama'.
             child: Text('Simpan', style: TextStyle(color: locked ? walnut.withValues(alpha: 0.4) : oxblood, fontSize: 14, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 8),
@@ -1162,12 +1290,14 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // WARNA: teks 'Ubah nama'.
             const Text('Nama pengguna', style: TextStyle(color: walnut, fontSize: 23, fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             Text(
               locked
                   ? 'Nama pengguna hanya dapat diubah setiap 30 hari. Kamu bisa mengubahnya lagi pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.'
                   : 'Pilih nama pengguna yang mudah dikenali. Nama pengguna hanya dapat diubah setiap 30 hari.',
+              // WARNA: teks 'Simpan'.
               style: const TextStyle(color: walnut, fontSize: 14, height: 1.45),
             ),
             const SizedBox(height: 28),
@@ -1178,16 +1308,24 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
               enabled: !locked,
               maxLength: 20,
               textCapitalization: TextCapitalization.none,
+              // WARNA: teks 'Nama pengguna'.
               style: const TextStyle(color: walnut, fontSize: 16),
               decoration: InputDecoration(
+                // WARNA: teks judul/isi pada bagian ini.
                 prefixText: '@', prefixStyle: const TextStyle(color: walnut, fontSize: 16),
+                // WARNA: teks judul/isi pada bagian ini.
                 counterStyle: TextStyle(color: walnut.withValues(alpha: 0.65)),
+                // WARNA: teks judul/isi pada bagian ini.
                 filled: true, fillColor: fieldBackground,
+                // WARNA: teks judul/isi pada bagian ini.
                 hintText: 'nama_pengguna', hintStyle: TextStyle(color: walnut.withValues(alpha: 0.55)),
                 helperText: '3–20 karakter: huruf, angka, atau garis bawah',
+                // WARNA: teks judul/isi pada bagian ini.
                 helperStyle: TextStyle(color: walnut.withValues(alpha: 0.75), fontSize: 12),
+                // WARNA: garis tepi komponen.
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                // WARNA: teks judul/isi pada bagian ini.
                 focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: oxblood, width: 1.5)),
               ),
             ),
