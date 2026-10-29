@@ -68,7 +68,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Mohon isi kesan Anda terlebih dahulu.',
+            'Mohon isi kesan mata kuliah Anda terlebih dahulu.',
             style: GoogleFonts.poppins(color: AppColors.parchment),
           ),
           backgroundColor: AppColors.oxblood,
@@ -138,7 +138,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         backgroundColor: AppColors.oxblood,
         foregroundColor: AppColors.parchment,
         title: Text(
-          'Kesan & Saran',
+          'Kesan & Saran Mata Kuliah',
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18),
         ),
 
@@ -187,7 +187,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Evaluasi & Masukan',
+                      'Evaluasi Mata Kuliah',
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -196,7 +196,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Bagikan kesan dan saran Anda selama perkuliahan atau menggunakan RentBook.',
+                      'Bagikan kesan dan pesan Anda selama mengikuti perkuliahan Pemrograman Aplikasi Mobile.',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -224,7 +224,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Rating Kepuasan Pengalaman',
+                'Rating Mata Kuliah Pemrograman Aplikasi Mobile',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 13.5,
@@ -271,7 +271,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         const SizedBox(height: 18),
 
         Text(
-          'Kesan',
+          'Kesan untuk Mata Kuliah PAM',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 14,
@@ -284,7 +284,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           maxLines: 4,
           style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Tuliskan kesan Anda selama mengikuti mata kuliah atau proyek aplikasi ini...',
+            hintText: 'Tuliskan kesan dan pengalaman Anda selama mengikuti mata kuliah Pemrograman Aplikasi Mobile...',
             hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: Colors.grey.shade400),
             filled: true,
             fillColor: Colors.white,
@@ -307,7 +307,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
         // Input Saran
         Text(
-          'Saran',
+          'Pesan & Saran untuk Mata Kuliah PAM',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 14,
@@ -320,7 +320,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
           maxLines: 4,
           style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Tuliskan kritik dan saran perbaikan untuk pengembangan ke depannya...',
+            hintText: 'Tuliskan kritik, pesan, atau saran membangun untuk mata kuliah Pemrograman Aplikasi Mobile ke depannya...',
             hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: Colors.grey.shade400),
             filled: true,
             fillColor: Colors.white,
@@ -372,7 +372,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                 ),
                 icon: const Icon(Icons.save_rounded, size: 18),
                 label: Text(
-                  _hasSavedData ? 'Perbarui Masukan' : 'Simpan Kesan & Saran',
+                  _hasSavedData ? 'Perbarui Masukan' : 'Simpan Kesan & Pesan',
                   style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 onPressed: _saveFeedback,
@@ -425,7 +425,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            'Masukan Tersimpan',
+                            'Kesan & Pesan Tersimpan',
                             style: GoogleFonts.poppins(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -497,7 +497,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         const SizedBox(height: 20),
 
         _buildSectionCard(
-          title: 'Kesan',
+          title: 'Kesan Mata Kuliah PAM',
           icon: Icons.favorite_rounded,
           iconColor: const Color(0xFFB45309),
           bgColor: const Color(0xFFFEF3C7),
@@ -506,7 +506,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
         const SizedBox(height: 16),
 
         _buildSectionCard(
-          title: 'Saran',
+          title: 'Pesan & Saran Mata Kuliah PAM',
           icon: Icons.lightbulb_rounded,
           iconColor: const Color(0xFF43634B),
           bgColor: const Color(0xFFE8F0E9),
@@ -526,7 +526,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             ),
             icon: const Icon(Icons.edit_note_rounded, size: 20),
             label: Text(
-              'Edit Kesan & Saran Ini',
+              'Edit Kesan & Pesan Mata Kuliah Ini',
               style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             onPressed: () => setState(() => _isEditing = true),
