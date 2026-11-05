@@ -1,3 +1,20 @@
+// ============================================================================
+// FITUR SUBSCRIPTION (LANGGANAN VIP RENTBOOK)
+// ----------------------------------------------------------------------------
+// Logika Utama:
+// 1. Paywall Gatekeeper (checkAccess): Membatasi fitur eksklusif (Mini Game,
+//    Konversi Kurs & Jam, Scan Cover AI) hanya untuk member yang berlangganan VIP.
+// 2. Status Keanggotaan Hybrid (Cloud + Local Cache):
+//    - Cek status ke tabel 'membership' di Supabase Cloud DB.
+//    - Caching di SharedPreferences untuk performa cepat dan fallback saat offline.
+// 3. Aktivasi VIP (activateVipForCurrentUser):
+//    - Menghitung tanggal kedaluwarsa (started_at + duration_days).
+//    - Upsert status ke Supabase & simpan ke cache lokal SharedPreferences.
+//    - Mencatat bukti transaksi langganan ke Blockchain (SHA-256 & Sepolia).
+//    - Memicu efek suara kemenangan & mengirim push notification konfirmasi.
+// 4. Integrasi Pembayaran (QRIS & Virtual Account) dengan dialog nota resmi.
+// ============================================================================
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -32,8 +49,10 @@ enum _VipPlan {
 }
 
 class SubscriptionService {
-  // Mengelola status VIP lokal/cloud dan alur pembelian dalam aplikasi.
-  /// True only when the account has no recorded annual VIP purchase yet.
+  // =========================================================================
+  // LOGIKA 1: VALIDASI PROMO TAHUNAN (ONE-TIME PROMO)
+  // =========================================================================
+  // Memeriksa apakah user sudah pernah mengambil diskon paket tahunan sebelumnya
   static Future<bool> canUseAnnualPromo() async {
     final username = await AuthService.currentSession();
     if (username == null || username.isEmpty) return false;
@@ -63,7 +82,14 @@ class SubscriptionService {
     return !used;
   }
 
-  /// Cek apakah user yang saat ini sedang login memiliki status VIP aktif
+  // =========================================================================
+  // LOGIKA 2: CEK STATUS VIP USER (HYBRID SUPABASE + LOCAL CACHE)
+  // =========================================================================
+  // 1. Ambil session username yang sedang login (AuthService.currentSession())
+  // 2. Query data dari Supabase tabel 'membership' where username = user
+  // 3. Bandingkan DateTime.now() dengan tanggal kadaluarsa (expires_at)
+  // 4. Update cache SharedPreferences agar aplikasi tetap responsif
+  // 5. Fallback offline: Jika internet bermasalah, baca dari SharedPreferences
   static Future<bool> isVip() async {
     final username = await AuthService.currentSession();
     if (username == null || username.isEmpty) return false;
@@ -117,7 +143,15 @@ class SubscriptionService {
     return _isCachedVip(username, prefs);
   }
 
-  /// Aktifkan langganan VIP khusus untuk user yang sedang aktif
+  // =========================================================================
+  // LOGIKA 3: AKTIVASI LANGGANAN VIP PENGGUNA
+  // =========================================================================
+  // Alur Eksekusi:
+  // 1. Hitung tanggal mulai & masa berlaku (startedAt + durationDays)
+  // 2. Simpan status aktif, paket, dan expiry ke SharedPreferences lokal
+  // 3. Upsert data ke tabel 'membership' Supabase (conflictColumn: 'username')
+  // 4. Catat transaksi ke Blockchain (BlockchainService.addTransaction) sebagai bukti resmi
+  // 5. Mainkan audio kemenangan (GameAudioService.playWin) & Push Notification
   static Future<void> activateVipForCurrentUser({
     required int durationDays,
     required String planName,
@@ -273,8 +307,14 @@ class SubscriptionService {
     return isVip;
   }
 
-  /// Cek akses fitur: jika VIP -> langsung buka; jika bukan -> munculkan dialog Paywall VIP
-  // Periksa hak akses; bila belum VIP, tampilkan pilihan paket berlangganan.
+  // =========================================================================
+  // LOGIKA 4: PAYWALL GATEKEEPER (PEMBATAS AKSES FITUR PREMIUM)
+  // =========================================================================
+  // Dipanggil oleh fitur: Mini Game, Konversi Kurs & Jam, AI Vision Scanner
+  // Alur:
+  // - Cek isVip():
+  //   * JIKA VIP -> Eksekusi callback onAllowed() (langsung buka halaman fitur)
+  //   * JIKA BUKAN VIP -> Tampilkan showPaywallDialog() (modal langganan VIP)
   static Future<void> checkAccess(
     BuildContext context, {
     required String featureName,
@@ -721,9 +761,6 @@ class _SubscriptionPaywallSheetState extends State<_SubscriptionPaywallSheet> {
   }
 }
 
-/// =========================================================================
-/// MODAL QRIS VIP DENGAN AUTO-KONFIRMASI 5 DETIK SETELAH DI-SCAN
-/// =========================================================================
 class _VipQrisPaymentModal extends StatefulWidget {
   // QR yang ditampilkan adalah bagian antarmuka demo; aktivasi tidak diverifikasi provider.
   final _VipPlan plan;

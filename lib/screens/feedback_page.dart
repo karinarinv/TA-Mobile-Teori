@@ -1,3 +1,21 @@
+// ============================================================================
+// FITUR FEEDBACK (KESAN & PESAN MATA KULIAH PEMROGRAMAN APLIKASI MOBILE)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Evaluasi Interaktif Perkuliahan:
+//    - Rating bintang (1 s/d 5) dengan label kualitatif (Sangat Memuaskan, Memuaskan, dll).
+//    - Input teks untuk kesan selama perkuliahan dan saran membangun ke depan.
+// 2. Penyimpanan Dual-Layer (Local Cache + Supabase Cloud):
+//    - SharedPreferences: Data langsung disimpan lokal per username agar instan
+//      dan tetap bisa dibuka walau jaringan offline.
+//    - Supabase (tabel 'user_feedback'): Data dikirim ke cloud database sebagai
+//      arsip evaluasi mahasiswa yang bisa dipantau dosen/penguji.
+// 3. State Management Tampilan (Edit Mode vs Saved Card View):
+//    - Jika user sudah pernah mengisi masukan -> Tampilan berganti otomatis ke kartu
+//      ringkasan elegan yang rapi (Saved View) dengan tanggal pembaruan.
+//    - User dapat menekan tombol "Ubah" untuk mengedit kembali sewaktu-waktu.
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -36,6 +54,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
     super.dispose();
   }
 
+  // =========================================================================
+  // LOGIKA 1: MEMUAT FEEDBACK TERSIMPAN DARI SHAREDPREFERENCES
+  // =========================================================================
+  // 1. Ambil session username pengguna saat ini.
+  // 2. Baca data kesan, saran, rating bintang, dan tanggal submit terakhir.
+  // 3. Jika sudah ada data tersimpan -> Alihkan state ke _isEditing = false
+  //    sehingga layar langsung menampilkan kartu rangkuman hasil evaluasi.
   Future<void> _loadFeedback() async {
     // Pulihkan isian akun ini dari SharedPreferences saat halaman dibuka.
     final username = await AuthService.currentSession() ?? 'guest';
@@ -62,6 +87,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
     });
   }
 
+  // =========================================================================
+  // LOGIKA 2: MENYIMPAN FEEDBACK KE SHAREDPREFERENCES & SUPABASE
+  // =========================================================================
+  // Alur Kerja:
+  // 1. Validasi input: Kesan tidak boleh kosong.
+  // 2. Format tanggal lokal saat submit (dd MMMM yyyy, HH:mm).
+  // 3. Simpan lokal ke SharedPreferences dengan prefix key username.
+  // 4. Kirim row baru ke tabel 'user_feedback' di database Supabase Cloud.
+  // 5. Update UI state: Tampilkan kartu Saved View & SnackBar konfirmasi status sync.
   Future<void> _saveFeedback() async {
     final kesan = _kesanController.text.trim();
     final saran = _saranController.text.trim();

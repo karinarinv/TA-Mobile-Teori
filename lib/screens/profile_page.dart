@@ -1,3 +1,22 @@
+// ============================================================================
+// FITUR PROFILE (MANAJEMEN AKUN & KEANGGOTAAN USER)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Data Agregasi Akun:
+//    - Mengambil data sesi pengguna aktif (AuthService.currentSession()).
+//    - Membaca foto profil & timestamp ganti nama dari database lokal SQLite 'users'.
+//    - Menghitung statistik buku favorit (BookmarkService) & riwayat sewa (BlockchainService).
+//    - Memeriksa status keanggotaan VIP, nama paket, dan tanggal kedaluwarsa.
+// 2. Cooldown Pergantian Username (30 Hari):
+//    - Mencegah spam pergantian username dengan membatasi perubahan hanya boleh
+//      dilakukan sekali setiap 30 hari (AuthService.usernameChangeCooldown).
+// 3. Foto Profil Interaktif:
+//    - Memilih gambar dari Kamera atau Galeri via ImagePicker.
+//    - Menyimpan path file lokal ke SQLite sehingga foto tetap tersimpan saat app dibuka lagi.
+// 4. Logout Aman:
+//    - Menghapus sesi login di AuthService dan mereset stack navigasi ke LoginPage.
+// ============================================================================
+
 import 'package:google_fonts/google_fonts.dart';
 
 import '../services/subscription_service.dart';
@@ -39,6 +58,13 @@ class _ProfilePageState extends State<ProfilePage> {
     _load();
   }
 
+  // =========================================================================
+  // LOGIKA 1: MEMUAT DATA LENGKAP PROFIL & STATUS VIP
+  // =========================================================================
+  // 1. Ambil username sesi aktif dari AuthService.
+  // 2. Query SQLite 'users': ambil path foto dan cek apakah cooldown 30 hari masih aktif.
+  // 3. Hitung jumlah buku tersimpan (bookmarks) dan transaksi sewa (rentals).
+  // 4. Sinkronkan status VIP (SubscriptionService.isVip()) beserta masa aktifnya.
   Future<void> _load() async {
     // Gabungkan data akun SQLite, bookmark lokal, transaksi, dan status VIP.
     final username = await AuthService.currentSession();
@@ -86,6 +112,11 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // =========================================================================
+  // LOGIKA 2: UBAH FOTO PROFIL (IMAGE PICKER & SQLITE UPDATE)
+  // =========================================================================
+  // Mengambil gambar dari ImageSource.camera atau ImageSource.gallery,
+  // lalu memperbarui path file di kolom 'photo' tabel 'users' SQLite lokal.
   Future<void> _pickImage(ImageSource source) async {
     // Pilih foto profil dan simpan path file pada baris akun SQLite.
     final f = await ImagePicker().pickImage(source: source, imageQuality: 70);
@@ -99,6 +130,11 @@ class _ProfilePageState extends State<ProfilePage> {
     _load();
   }
 
+  // =========================================================================
+  // LOGIKA 3: PERGANTIAN USERNAME DENGAN ATURAN COOLDOWN 30 HARI
+  // =========================================================================
+  // Membuka form nama baru, memvalidasi aturan karakter, lalu memanggil
+  // AuthService.changeUsername() yang memperbarui database lokal & cloud.
   Future<void> _changeUsername() async {
     // Buka formulir nama; AuthService menerapkan validasi dan jeda 30 hari.
     final currentUsername = _username;
@@ -213,6 +249,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  // =========================================================================
+  // LOGIKA 4: PROSES LOGOUT & PEMBERSIHAN SESI PENGGUNA
+  // =========================================================================
+  // 1. Munculkan modal dialog konfirmasi keluar akun.
+  // 2. Jika disetujui (yes == true), panggil AuthService.logout().
+  // 3. Arahkan pengguna kembali ke halaman LoginPage dengan menghapus semua rute lama.
   Future<void> _logout() async {
     // Minta konfirmasi; jika setuju, hapus sesi dan kembali ke login.
     final yes = await showDialog<bool>(

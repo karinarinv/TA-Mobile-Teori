@@ -1,3 +1,19 @@
+// ============================================================================
+// FITUR AI VISION (SCANNER COVER BUKU CERDAS DENGAN GEMINI MULTIMODAL)
+// ----------------------------------------------------------------------------
+// Logika Utama:
+// 1. Image Picker & Kompresi: Mengambil gambar dari Kamera atau Galeri ponsel,
+//    mengompres ukuran (max 1024x1024, quality 85) agar pengiriman data efisien.
+// 2. Base64 Encoding: Mengonversi byte citra gambar menjadi string Base64 inlineData.
+// 3. Gemini Multimodal Vision API: Mengirim gambar + prompt rekayasa instruksi:
+//    - Mendeteksi apakah objek merupakan buku/novel fisik atau bukan buku.
+//    - Mengekstrak Judul, Penulis, Genre, Sinopsis ringkas, & Alasan rekomendasi sewa.
+//    - Mengembalikan respons dalam format murni JSON terstruktur.
+// 4. Cascade Fallback Model: Menghubungi model utama (gemini-2.5-flash) dan
+//    secara otomatis beralih ke model cadangan jika terjadi timeout / limit kuota.
+// 5. Filter Katalog: Jika terdeteksi bukan buku, tombol sewa katalog dinonaktifkan.
+// ============================================================================
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -45,6 +61,12 @@ class _AiVisionPageState extends State<AiVisionPage> {
     } catch (_) {}
   }
 
+  // =========================================================================
+  // LOGIKA 1: PENGAMBILAN & OPTIMASI GAMBAR (KAMERA / GALERI)
+  // =========================================================================
+  // 1. Membuka native camera atau galeri via ImagePicker
+  // 2. Mengompres resolusi ke maksimal 1024x1024 dan kualitas 85% untuk menghemat kuota data
+  // 3. Setelah gambar terpilih, langsung memicu fungsi _analyzeImageWithGemini()
   Future<void> _pickImage(ImageSource source) async {
     // Gambar dibatasi 1024 px dan kualitas 85 agar request lebih ringan.
     final prefs = await SharedPreferences.getInstance();
@@ -82,6 +104,17 @@ class _AiVisionPageState extends State<AiVisionPage> {
     }
   }
 
+  // =========================================================================
+  // LOGIKA 2: ANALISIS CITRA BUKU DENGAN GOOGLE GEMINI VISION
+  // =========================================================================
+  // Alur Kerja:
+  // 1. Gambar dibaca sebagai byte array lalu dienkode ke string Base64.
+  // 2. Disusun payload HTTP POST JSON dengan part 'inlineData' (mimeType: image/jpeg).
+  // 3. Prompt khusus memerintahkan AI menganalisis sampul buku dan mengembalikan JSON:
+  //    - is_book (boolean): apakah gambar tersebut benar sampul buku bacaan.
+  //    - title, author, genre, summary, why_read.
+  // 4. Cascade fallback: Mencoba daftar model Gemini dengan timeout 25 detik.
+  // 5. Response diparsing dari JSON dan ditampilkan ke UI state.
   Future<void> _analyzeImageWithGemini(File imageFile) async {
     // Kirim gambar sebagai Base64 bersama instruksi analisis ke Gemini Vision.
     setState(() => _analyzing = true);
@@ -179,6 +212,11 @@ class _AiVisionPageState extends State<AiVisionPage> {
     }
   }
 
+  // =========================================================================
+  // LOGIKA 3: FALLBACK ANALYSIS (MODE CADANGAN / OFFLINE)
+  // =========================================================================
+  // Jika kuota API Gemini habis atau koneksi terputus saat presentasi,
+  // sistem tidak akan crash melainkan menampilkan hasil analisis cadangan
   void _fallbackAnalysis() {
     setState(() {
       _analysisResult = {

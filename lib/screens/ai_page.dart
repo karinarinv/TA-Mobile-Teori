@@ -1,3 +1,21 @@
+// ============================================================================
+// FITUR CHATBOT AI (ASISTEN KURATOR BUKU PINTAR RENTBOOK)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Integrasi Google Gemini Generative AI:
+//    - Menggunakan model gemini-2.5-flash / gemini-flash-lite via REST API.
+//    - Mengirim prompt percakapan interaktif (multi-turn chat) dengan konteks utuh.
+// 2. System Instruction / Persona:
+//    - Memprogram asisten sebagai Kurator Buku Pintar ramah khas RentBook.
+//    - Menghasilkan rekomendasi buku berbobot (Judul, Penulis, Sinopsis, & Alasan Rekomendasi).
+// 3. Rekayasa Prompt Cepat (Quick Prompt Chips):
+//    - Tombol shortcut untuk pertanyaan umum (Best Seller, Self Improvement, Fiksi Ilmiah, dsb).
+// 4. Mekanisme Multi-Model Fallback:
+//    - Cascade otomatis beralih ke model flash cadangan jika API utama sibuk/limit.
+// 5. Scroll & Layout Management:
+//    - Auto-scroll ke pesan terbaru dengan animasi halus (Curves.easeOut).
+// ============================================================================
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -34,6 +52,11 @@ class _AiPageState extends State<AiPage> {
     super.dispose();
   }
 
+  // =========================================================================
+  // LOGIKA 1: AUTO-SCROLL KE PESAN TERBARU
+  // =========================================================================
+  // Memanfaatkan addPostFrameCallback agar scroll dilakukan tepat setelah
+  // widget tree selesai dirender, mencegah scroll macet di tengah
   void _scrollToBottom() {
     // Tunggu layout selesai agar posisi scroll sudah mencakup pesan terbaru.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -47,6 +70,19 @@ class _AiPageState extends State<AiPage> {
     });
   }
 
+  // =========================================================================
+  // LOGIKA 2: PENGIRIMAN PESAN & GENERASI JAWABAN GEMINI API
+  // =========================================================================
+  // Alur Kerja:
+  // 1. Validasi input: Cegah teks kosong atau pengiriman beruntun saat AI masih berpikir (_busy).
+  // 2. Tambahkan pesan user ke list `_msgs` dengan role `user` dan trigger re-render UI.
+  // 3. Bangun payload 'contents' berformat multi-turn chat:
+  //    - Pesan awal (system prompt) mendikte karakter asisten kurator buku.
+  //    - Seluruh riwayat percakapan sebelumnya disertakan agar AI memahami konteks dialog.
+  // 4. Request ke REST API Gemini:
+  //    - Dicoba berurutan pada daftar model cadangan (Cascade Fallback).
+  //    - Timeout 25 detik per model untuk menjamin kestabilan.
+  // 5. Ekstrak teks balasan dari candidates[0].content.parts[0].text dan tampilkan ke layar.
   Future<void> _send([String? customText]) async {
     // Ambil teks dari tombol prompt atau kolom input, lalu cegah request kosong/ganda.
     final q = (customText ?? _c.text).trim();

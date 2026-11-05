@@ -1,3 +1,14 @@
+// ============================================================================
+// HALAMAN RIWAYAT & EXPLORER BLOCKCHAIN
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Tampilan Buku Besar (Ledger): Tiap kartu merepresentasikan 1 blok data sewa.
+// 2. Tombol "Verifikasi Rantai": Memeriksa konsistensi seluruh blok SHA-256.
+// 3. Tombol "Simulasi Rusak": Mengubah isi blok di memori untuk membuktikan bahwa
+//    perubahan 1 karakter akan merusak hash dan langsung terdeteksi oleh sistem.
+// 4. Explorer Sepolia: Membuka transaksi langsung di Etherscan Testnet.
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,6 +33,12 @@ class _BlockchainPageState extends State<BlockchainPage> {
   String _filter = '';
   final TextEditingController _searchCtrl = TextEditingController();
 
+  // =========================================================================
+  // LOGIKA 1: INTEGRASI EXPLORER ETHERSCAN SEPOLIA
+  // =========================================================================
+  // Membuka halaman transaksi publik di jaringan Ethereum Sepolia
+  // Jika ada txHash -> buka https://sepolia.etherscan.io/tx/<txHash>
+  // Jika tidak -> buka alamat smart wallet pemilik aplikasi
   Future<void> _openEtherscan([String? txHash]) async {
     // Buka transaksi Sepolia jika punya txHash; jika tidak, buka alamat wallet.
     final String url = (txHash != null && txHash.isNotEmpty)
@@ -51,12 +68,19 @@ class _BlockchainPageState extends State<BlockchainPage> {
     super.dispose();
   }
 
+  // Memuat riwayat blok yang tersimpan di SQLite lokal
   Future<void> _load() async {
     // Ambil riwayat yang sudah disimpan BlockchainService di database lokal.
     final r = await BlockchainService.all();
     if (mounted) setState(() => _rows = r);
   }
 
+  // =========================================================================
+  // LOGIKA 2: VERIFIKASI KEASLIAN SELURUH BLOK (SHA-256)
+  // =========================================================================
+  // Memeriksa bahwa:
+  // 1. prev_hash blok N == hash blok N-1
+  // 2. hash blok N == SHA-256(data + prev_hash + timestamp)
   Future<void> _verify() async {
     // Periksa urutan prev_hash dan hitung ulang hash untuk semua catatan.
     final ok = await BlockchainService.verify();
@@ -68,6 +92,12 @@ class _BlockchainPageState extends State<BlockchainPage> {
     });
   }
 
+  // =========================================================================
+  // LOGIKA 3: DEMO PRESENTASI - SIMULASI MANIPULASI DATA
+  // =========================================================================
+  // Mendemonstrasikan sifat anti-tamper (kebal manipulasi) blockchain:
+  // Data blok diubah sedikit di memori, lalu fungsi verifyRows dijalankan.
+  // Hasilnya rantai langsung terdeteksi RUSAK karena hash tidak lagi cocok!
   void _simulate() {
     // Ubah salinan data di memori untuk demo deteksi manipulasi; database asli tidak diubah.
     if (_rows.isEmpty) return;
@@ -100,6 +130,11 @@ class _BlockchainPageState extends State<BlockchainPage> {
     return t.length > 20 ? '${t.substring(0, 20)}...' : t;
   }
 
+  // =========================================================================
+  // LOGIKA 4: PARSING AGREGASI BIAYA DARI DATA BLOK TRANSAKSI
+  // =========================================================================
+  // Membaca string payload transaksi (misal: "... | Biaya: Rp 15.000 | ...")
+  // mengekstrak digit angka, dan menjumlahkan total pengeluaran sewa buku
   int _calculateTotalExpense() {
     // Jumlahkan nilai setelah teks 'Biaya:' dari catatan sewa yang tersimpan.
     int total = 0;
@@ -292,6 +327,14 @@ class _BlockchainPageState extends State<BlockchainPage> {
     );
   }
 
+  // =========================================================================
+  // LOGIKA 5: KARTU BLOK KRIPTOGRAFIS (VISUALISASI LEDGER)
+  // =========================================================================
+  // Menampilkan komponen setiap blok:
+  // - Blok ID & Status Keterhubungan Hash
+  // - Payload Data: Judul buku, biaya, durasi, jatuh tempo sewa
+  // - Timestamp, Previous Hash (prev_hash), dan Current Hash (SHA-256)
+  // - Tombol Cek Transaksi di Etherscan (jika tersimpan di testnet Sepolia)
   Widget _buildBlockCard(Map<String, Object?> r, int i) {
     final dataStr = (r['data'] as String?) ?? '';
     final blockId = (r['id'] as num?)?.toInt() ?? (i + 1);

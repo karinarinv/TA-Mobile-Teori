@@ -1,3 +1,21 @@
+// ============================================================================
+// FITUR KONVERSI KURS MATA UANG & JAM OPERASIONAL DUNIA
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. TAB 1 - Kurs Mata Uang Dunia:
+//    - Mengambil nilai tukar mata uang realtime dari Frankfurter Public API
+//      (endpoint: api.frankfurter.app/latest?from=IDR).
+//    - Mengonversi nominal Rupiah ke 7 mata uang global (USD, EUR, SGD, JPY, GBP, AUD, MYR).
+//    - Fallback Offline: Jika internet lambat (>5 detik) atau offline, sistem
+//      menggunakan kurs referensi standar agar aplikasi tidak error saat demo/presentasi.
+// 2. TAB 2 - Jam Dunia & Status Operasional:
+//    - Timer realtime setiap 1 detik memperbarui DateTime.now().
+//    - Menormalisasi waktu lokal ke UTC dasar (_now.toUtc()).
+//    - Menghitung offset zona waktu: WIB (UTC+7), WITA (UTC+8), WIT (UTC+9), Tokyo (UTC+9), London (GMT/BST).
+//    - Deteksi BST (British Summer Time) otomatis untuk zona waktu London.
+//    - Validasi jam operasional: Menampilkan indikator BUKA jika 08:00 - 16:00 waktu setempat.
+// ============================================================================
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -64,6 +82,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     super.dispose();
   }
 
+  // =========================================================================
+  // LOGIKA 1: MENGAMBIL DATA KURS MATA UANG DARI FRANKFURTER API
+  // =========================================================================
+  // 1. Mengirim request HTTP GET ke Frankfurter API dengan base currency IDR (Rupiah).
+  // 2. Timeout 5 detik untuk mencegah loading tak berujung jika koneksi terganggu.
+  // 3. Response diparsing ke Map<String, double> nilai kurs.
+  // 4. Jika gagal/offline -> Menggunakan nilai default di _rates dengan pesan edukatif.
   Future<void> _fetchRates() async {
     // Ambil kurs dari Frankfurter; nilai awal di _rates dipakai saat offline.
     setState(() => _loadingRates = true);
@@ -98,6 +123,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     }
   }
 
+  // =========================================================================
+  // LOGIKA 2: PERHITUNGAN DAYLIGHT SAVING TIME (BRITISH SUMMER TIME - BST)
+  // =========================================================================
+  // Di Inggris (London), waktu bergeser antara GMT (UTC+0) dan BST (UTC+1):
+  // - Dimulai pada hari Minggu terakhir bulan Maret.
+  // - Berakhir pada hari Minggu terakhir bulan Oktober.
+  // Fungsi ini menghitung secara matematis tanggal Minggu terakhir tersebut.
   bool _bst(DateTime u) {
     // Tentukan periode British Summer Time dari hari Minggu terakhir Mar-Okt.
     DateTime lastSun(int m) {
@@ -142,6 +174,11 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     final utc = _now.toUtc();
     final fTime = DateFormat('HH:mm:ss');
 
+    // =======================================================================
+    // LOGIKA 3: PERHITUNGAN ZONA WAKTU INTERNASIONAL BERBASIS UTC OFFSET
+    // =======================================================================
+    // Menggunakan DateTime.toUtc() sebagai acuan waktu universal 0,
+    // lalu menambahkan Duration jam sesuai standar zona waktu masing-masing negara.
     final zones = <Map<String, dynamic>>[
       {
         'name': 'WIB (Waktu Indonesia Barat)',

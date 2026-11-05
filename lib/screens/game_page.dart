@@ -1,3 +1,27 @@
+// ============================================================================
+// FITUR MINI GAME (LABIRIN PERPUSTAKAAN & MONSTER WIKWOK)
+// ----------------------------------------------------------------------------
+// Logika Utama:
+// 1. Matriks Grid 11x15 & Tile Map:
+//    - '0' = Dinding / Rak Buku (Wall Collision)
+//    - '1' = Lorong Jalan (Pathway)
+//    - '2' = Titik Mulai (Start Tile)
+//    - '3' = Pintu Keluar / Rak Buku Emas (Goal Tile)
+// 2. Kontrol Gerak (D-Pad) & Corner Alignment:
+//    - Menghitung koordinat target dengan deteksi sudut (corner straightening)
+//      agar karakter tidak tersangkut di lekukan belokan dinding.
+// 3. Sistem Koleksi Buku (Pac-Man Style):
+//    - Setiap level memiliki 3 buku koleksi yang tersebar.
+//    - Saat diambil, buku membentuk barisan gerbong di belakang pemain (trail train).
+// 4. AI Pengejar Monster Wikwok (Level 3):
+//    - Menggunakan algoritma Breadth-First Search (BFS) Pathfinding untuk
+//      mencari rute terpendek mengejar pemain secara realtime.
+// 5. Jumpscare 2 Detik & Status Defeat:
+//    - Animasi CRT scanlines, getaran layar, rahang bergerak, dan efek audio menegangkan.
+// 6. Reward Voucher Diskon: Menyelesaikan level 3 memberikan voucher "DISKON10"
+//    yang tersimpan di SharedPreferences untuk potongan sewa buku.
+// ============================================================================
+
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -337,6 +361,15 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     }
   }
 
+  // =========================================================================
+  // LOGIKA AI: ALGORITMA BREADTH-FIRST SEARCH (BFS) PATHFINDING
+  // =========================================================================
+  // Algoritma ini mencari rute terpendek di dalam labirin dari posisi Wikwok
+  // menuju posisi koordinat pemain:
+  // 1. Antrean (Queue) mengecek tile tetangga (Atas, Bawah, Kiri, Kanan).
+  // 2. Set 'visited' mencegah siklus tak terhingga.
+  // 3. Map 'parent' melacak langkah terbaik berikutnya (next step).
+  // 4. Mengembalikan koordinat 1 langkah paling optimal mendekati pemain.
   (double, double) _getNextChaserStep(int chaserR, int chaserC, int playerR, int playerC) {
     final queue = <(int, int)>[(playerR, playerC)];
     final visited = <(int, int)>{(playerR, playerC)};
@@ -423,6 +456,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     return int.tryParse(rowStr[c]) ?? 0;
   }
 
+  // =========================================================================
+  // LOGIKA TABRAKAN DINDING (8-POINT RADIAL COLLISION DETECTION)
+  // =========================================================================
+  // Memeriksa 8 titik koordinat di sekeliling radius pemain (radius 0.28 tile):
+  // 4 arah mata angin (atas, bawah, kiri, kanan) + 4 sudut diagonal.
+  // Jika salah satu titik menyentuh tile '0' (dinding), maka bernilai true (menabrak).
   bool _isWall(double col, double row) {
     const double radius = 0.28;
     final testPoints = [
@@ -661,6 +700,14 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     }
   }
 
+  // =========================================================================
+  // LOGIKA KONTROL D-PAD & CORNER ALIGNMENT
+  // =========================================================================
+  // Menerima input arah dari tombol D-Pad (dx, dy):
+  // 1. Fitur Corner Alignment: Jika berbelok, koordinat tegak lurus otomatis
+  //    disejajarkan ke tengah lorong (floor + 0.5) agar karakter mulus melewati belokan.
+  // 2. Micro-Step Fallback: Jika langkah 1 tile menabrak, sistem mencoba setengah jarak
+  //    (0.5 tile) agar gerakan tetap lincah dan tidak terasa kaku/macet.
   void _moveDpad(double dCol, double dRow) {
     double targetCol = _playerCol + dCol;
     double targetRow = _playerRow + dRow;

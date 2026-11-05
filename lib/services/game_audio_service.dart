@@ -1,3 +1,17 @@
+// ============================================================================
+// AUDIO SERVICE MINI GAME & SISTEM (METHOD CHANNEL NATIVE)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// Menggunakan MethodChannel Flutter ke platform native (Android Java/Kotlin)
+// untuk memutar audio instan dengan latensi sangat rendah:
+// - playBgm() / stopBgm(): Musik latar eksplorasi labirin santai.
+// - playChase() / stopChase(): Audio tegang saat Wikwok mengejar di Level 3.
+// - playTing(): Efek suara saat mengambil buku koleksi di labirin.
+// - playJumpscare() / stopJumpscare(): Audio jumpscare saat tertangkap Wikwok.
+// - playWin(): Efek suara kemenangan (mencapai pintu keluar / aktivasi VIP).
+// - playLose(): Efek suara kekalahan saat tertangkap Wikwok.
+// ============================================================================
+
 import 'package:flutter/services.dart';
 
 /// Jembatan dari Flutter ke pemutar suara native melalui MethodChannel.
