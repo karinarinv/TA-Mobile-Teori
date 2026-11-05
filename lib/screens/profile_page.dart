@@ -378,8 +378,11 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     if (yes == true) {
+      // 1. Bersihkan session_user dan session_last_active_ms di SharedPreferences
       await AuthService.logout();
       if (!mounted) return;
+      // 2. Navigasi ke LoginPage sambil menghapus seluruh riwayat stack rute (route => false)
+      //    agar setelah keluar, tombol 'Back' fisik perangkat tidak dapat masuk kembali.
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),
