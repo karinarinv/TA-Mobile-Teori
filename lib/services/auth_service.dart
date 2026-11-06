@@ -319,7 +319,15 @@ class AuthService {
     }
   }
 
-  // Hapus sesi aktif; identitas login biometrik terakhir tetap tersimpan.
+  // =========================================================================
+  // LOGIKA FITUR LOGOUT (PENGHAPUSAN SESI PENGGUNA)
+  // =========================================================================
+  // Alur Kerja:
+  // 1. Mengakses SharedPreferences penyimpanan lokal perangkat.
+  // 2. Menghapus key 'session_user' (username aktif yang sedang login).
+  // 3. Menghapus key 'session_last_active_ms' (timestamp aktivitas sesi).
+  // Catatan: Kunci 'last_user' tetap dipertahankan di penyimpanan lokal agar
+  // pengguna tetap dapat login kembali dengan cepat menggunakan Biometrik (Sidik Jari / Wajah).
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('session_user');

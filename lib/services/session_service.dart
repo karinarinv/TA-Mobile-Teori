@@ -1,3 +1,16 @@
+// ============================================================================
+// FITUR SESSION TIMEOUT & AUTO-LOGOUT (KEAMANAN SESI OTOMATIS)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Durasi Timeout: Sesi dibatasi maksimal 15 menit (timeoutDuration = 15 menit).
+// 2. Monitoring Aktivitas: Setiap sentuhan, scroll, atau interaksi pengguna memanggil
+//    recordActivity() untuk memperbarui timestamp terakhir (_lastActivityMs).
+// 3. Periodic Background Checker: Timer berjalan tiap 10 detik memanggil checkTimeout():
+//    - Menghitung elapsed time = waktu sekarang - waktu aktivitas terakhir.
+//    - Jika elapsed >= 15 menit -> Memanggil AuthService.logout() secara otomatis,
+//      membersihkan rute ke LoginPage, dan menampilkan pesan "Sesi telah berakhir".
+// ============================================================================
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -73,7 +86,17 @@ class SessionService {
     }
   }
 
-  /// Evaluasi timeout saat aplikasi berjalan atau di-resume dari background
+  // =========================================================================
+  // LOGIKA AUTO-LOGOUT KARENA INAKTIF (SESSION TIMEOUT 15 MENIT)
+  // =========================================================================
+  // Alur Kerja:
+  // 1. Cek apakah pengguna saat ini sedang login.
+  // 2. Bandingkan selisih waktu (elapsed) antara in-memory timestamp dan storage SharedPreferences.
+  // 3. Jika inaktif >= 15 menit:
+  //    - Panggil AuthService.logout() untuk menghapus sesi pengguna.
+  //    - Hapus storage timestamp aktivitas (_keyLastActive).
+  //    - Navigasi paksa (pushAndRemoveUntil) ke LoginPage sehingga user tidak bisa tombol 'Back'.
+  //    - Munculkan SnackBar menginfokan bahwa sesi telah berakhir demi keamanan akun.
   static Future<void> checkTimeout() async {
     if (_isHandlingTimeout) return;
 

@@ -1,3 +1,14 @@
+// ============================================================================
+// FITUR LBS (LOCATION BASED SERVICE) - RENTBOOK
+// ----------------------------------------------------------------------------
+// Logika Utama:
+// 1. Geolocator: Mendapatkan izin lokasi & koordinat GPS realtime perangkat user.
+// 2. Haversine Distance: Menghitung jarak linear antara user dan perpustakaan.
+// 3. Cloud Database (Supabase): Memuat data lokasi & koordinat cabang perpustakaan.
+// 4. OSRM API Routing: Menghitung rute navigasi jalan raya nyata, durasi, dan polyline.
+// 5. FlutterMap (OpenStreetMap): Visualisasi peta interaktif, marker, dan rute.
+// ============================================================================
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -38,20 +49,18 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  // MapController menggerakkan kamera peta, misalnya saat memilih lokasi/rute.
   final MapController _mapController = MapController();
-  // Koordinat pengguna didapat dari GPS setelah izin lokasi diberikan.
+  // LatLng _me: Menyimpan titik koordinat GPS posisi pengguna saat ini
   LatLng? _me;
   bool _loadingLocation = true;
   LibraryItem? _selectedLib;
 
-  // State untuk Rute Navigasi
-  List<LatLng> _routePoints = [];
-  // State rute dipakai untuk menggambar garis dan menampilkan jarak/waktu.
-  bool _isRouting = false;
-  LibraryItem? _navigatingLib;
-  String _routeDistance = '';
-  String _routeDuration = '';
+  // State untuk Rute Navigasi LBS (Polyline & Estimasi Jalan Raya)
+  List<LatLng> _routePoints = []; // Titik koordinat pembentuk garis rute (Polyline)
+  bool _isRouting = false;        // Status loading saat request rute jalan ke OSRM API
+  LibraryItem? _navigatingLib;    // Cabang perpustakaan tujuan navigasi
+  String _routeDistance = '';     // Jarak rute jalan raya (contoh: "2.5 km")
+  String _routeDuration = '';     // Estimasi durasi berkendara (contoh: "~6 menit")
 
   List<LibraryItem> _libraries = [];
   bool _loadingLibraries = true;
@@ -60,11 +69,17 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    // ALUR PRESENTASI:
+    // 1. Ambil data cabang perpustakaan dari Supabase (_loadCloud)
+    // 2. Deteksi lokasi GPS pengguna saat ini secara realtime (_locate)
     _loadCloud().then((_) {
       if (mounted && _libraries.isNotEmpty) _locate();
     });
   }
 
+  // =========================================================================
+  // LOGIKA 1: MENGAMBIL DATA CABANG PERPUSTAKAAN DARI CLOUD DB (SUPABASE)
+  // =========================================================================
   Future<void> _loadCloud() async {
     // Ambil baris tabel libraries, validasi koordinat, lalu gabungkan duplikat cabang.
     if (mounted) {
@@ -161,8 +176,13 @@ class _MapPageState extends State<MapPage> {
     if (mounted && _libraries.isNotEmpty) await _locate();
   }
 
+  // =========================================================================
+  // LOGIKA 2: DETEKSI POSISI GPS REALTIME PENGGUNA (GEOLOCATOR)
+  // =========================================================================
   Future<void> _locate() async {
-    // Minta izin lokasi bila perlu, lalu baca koordinat GPS perangkat.
+    // 1. Cek permission akses lokasi dari sistem operasi (Android/iOS)
+    // 2. Jika belum diizinkan, minta izin (requestPermission)
+    // 3. Jika diizinkan, panggil getCurrentPosition() untuk membaca koordinat GPS
     setState(() => _loadingLocation = true);
     try {
       var p = await Geolocator.checkPermission();
@@ -189,6 +209,10 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  // =========================================================================
+  // LOGIKA 3: PERHITUNGAN JARAK SPASIAL LINEAR (HAVERSINE DISTANCE)
+  // =========================================================================
+  // Menghitung jarak lurus (garis lintang/bujur bumi) dari GPS user ke perpustakaan
   double _getDistanceInKm(LatLng target) {
     if (_me == null) return 0.0;
     final meters = Geolocator.distanceBetween(
@@ -200,7 +224,12 @@ class _MapPageState extends State<MapPage> {
     return meters / 1000.0;
   }
 
-  // Menghasilkan dan memunculkan rute navigasi nyata dari GPS ke perpustakaan
+  // =========================================================================
+  // LOGIKA 4: NAVIGASI JALAN RAYA & ESTIMASI WAKTU (OSRM ROUTING API)
+  // =========================================================================
+  // Query ke Open Source Routing Machine (OSRM) HTTP API:
+  // - Input: Longitude & Latitude User -> Longitude & Latitude Perpustakaan Tujuan
+  // - Output: Array koordinat polyline (geometries), jarak jalan (km), dan durasi (menit)
   Future<void> _fetchAndShowRoute(LibraryItem lib) async {
     // Buat rute jalan dari posisi pengguna ke cabang; request OSRM dibatasi 8 detik.
     if (_me == null) {
@@ -284,6 +313,11 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
+  // =========================================================================
+  // LOGIKA 5: VALIDASI JADWAL OPERASIONAL PERPUSTAKAAN REALTIME
+  // =========================================================================
+  // Membandingkan hari saat ini (DateTime.now().weekday) dan rentang jam menit
+  // dengan format jadwal teks yang tersimpan di database perpustakaan.
   bool _isLibraryOpen(String hoursStr) {
     if (hoursStr.trim().isEmpty) return false;
     final now = DateTime.now();
@@ -647,6 +681,9 @@ class _MapPageState extends State<MapPage> {
             )
           : Stack(
               children: [
+                // ===================================================================
+                // KOMPONEN VISUALISASI PETA LBS (FLUTTER MAP)
+                // ===================================================================
                 FlutterMap(
                   mapController: _mapController,
                   options: MapOptions(
@@ -654,12 +691,13 @@ class _MapPageState extends State<MapPage> {
                     initialZoom: 13.5,
                   ),
                   children: [
+                    // 1. TILE LAYER: Mengunduh citra peta OpenStreetMap secara gratis & open source
                     TileLayer(
                       urlTemplate:
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       userAgentPackageName: 'com.example.rentbook',
                     ),
-                    // Garis Rute Navigasi Nyata (Polyline)
+                    // 2. POLYLINE LAYER: Garis rute navigasi jalan raya dari GPS user ke tujuan (OSRM)
                     if (_routePoints.isNotEmpty)
                       PolylineLayer(
                         polylines: [
@@ -674,10 +712,10 @@ class _MapPageState extends State<MapPage> {
                           ),
                         ],
                       ),
-                    // Marker Layer
+                    // 3. MARKER LAYER: Menandai pin GPS Pengguna dan pin semua Cabang Perpustakaan
                     MarkerLayer(
                       markers: [
-                        // Posisi Pengguna (GPS)
+                        // MARKER A: Posisi Pengguna Saat Ini (Pin GPS Berwarna Maroon & Ikon Person)
                         if (_me != null)
                           Marker(
                             point: _me!,
@@ -716,7 +754,7 @@ class _MapPageState extends State<MapPage> {
                               ),
                             ),
                           ),
-                        // Titik-titik Perpustakaan
+                        // MARKER B: Titik-titik Perpustakaan (Pin Library dengan Status Warna Dinamis)
                         for (final lib in sortedLibs)
                           Marker(
                             point: lib.location,
