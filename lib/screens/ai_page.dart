@@ -32,9 +32,13 @@ class AiPage extends StatefulWidget {
 }
 
 class _AiPageState extends State<AiPage> {
+  // Controller membaca kolom input dan menghapus teks setelah pertanyaan dikirim.
   final TextEditingController _c = TextEditingController();
+  // ScrollController dipakai untuk menggulir daftar chat ke pesan terbaru.
   final ScrollController _scrollController = ScrollController();
+  // Tuple berisi penanda pengirim (true=user) dan isi pesan.
   final List<(bool, String)> _msgs = []; // (isUser, text)
+  // Mencegah request ganda selama Gemini belum memberi jawaban.
   bool _busy = false;
 
   final List<String> _quickPrompts = [
@@ -61,6 +65,7 @@ class _AiPageState extends State<AiPage> {
     // Tunggu layout selesai agar posisi scroll sudah mencakup pesan terbaru.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
+        // Gulir 300 ms setelah layout selesai agar pesan baru sudah masuk daftar.
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
@@ -86,7 +91,9 @@ class _AiPageState extends State<AiPage> {
   Future<void> _send([String? customText]) async {
     // Ambil teks dari tombol prompt atau kolom input, lalu cegah request kosong/ganda.
     final q = (customText ?? _c.text).trim();
+    // Hentikan proses bila pertanyaan kosong atau request sebelumnya masih berjalan.
     if (q.isEmpty || _busy) return;
+    // Input sudah disalin ke variabel q, jadi field bisa langsung dikosongkan.
     _c.clear();
 
     setState(() {
@@ -100,6 +107,7 @@ class _AiPageState extends State<AiPage> {
 
     // System instruction awal
     contents.add({
+      // Instruksi awal menetapkan peran AI dan bahasa jawaban.
       'role': 'user',
       'parts': [
         {
@@ -115,6 +123,7 @@ class _AiPageState extends State<AiPage> {
     });
 
     for (final m in _msgs) {
+      // Sertakan percakapan lama agar pertanyaan lanjutan tetap punya konteks.
       contents.add({
         'role': m.$1 ? 'user' : 'model',
         'parts': [{'text': m.$2}]
@@ -132,6 +141,7 @@ class _AiPageState extends State<AiPage> {
 
     for (final model in modelsToTry) {
       try {
+        // Kirim prompt ke endpoint Gemini; timeout 25 detik memicu model cadangan.
         final r = await http
             .post(
               Uri.parse('https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$geminiKey'),
@@ -143,6 +153,7 @@ class _AiPageState extends State<AiPage> {
         if (!mounted) return;
 
         if (r.statusCode == 200) {
+          // Ambil teks kandidat pertama dari struktur respons Gemini.
           final j = jsonDecode(r.body);
           final text = j['candidates']?[0]?['content']?['parts']?[0]?['text'] as String?;
           if (text != null && text.trim().isNotEmpty) {
@@ -161,6 +172,7 @@ class _AiPageState extends State<AiPage> {
     }
 
     if (!mounted) return;
+    // Simpan jawaban dan matikan status loading sebelum daftar chat digambar ulang.
     setState(() {
       _msgs.add((false, ans));
       _busy = false;

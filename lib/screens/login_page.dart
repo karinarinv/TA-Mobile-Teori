@@ -13,10 +13,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // Controller membaca username dan password dari form.
   final _u = TextEditingController();
   final _p = TextEditingController();
+  // Mode form: false untuk masuk, true untuk membuat akun.
   bool _isRegister = false;
+  // Mengatur apakah isi password disembunyikan dengan titik.
   bool _obscure = true;
+  // Menonaktifkan tombol dan menampilkan indikator selama autentikasi.
   bool _loading = false;
 
   // Palet Warna
@@ -79,6 +83,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _submit() async {
     // Validasi input, lalu jalankan cabang registrasi atau login.
     final username = _u.text.trim();
+    // Password tidak di-trim supaya spasi yang diketik pengguna tetap dihitung.
     final password = _p.text;
 
     if (username.isEmpty || password.isEmpty) {
@@ -95,12 +100,14 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       if (_isRegister) {
+        // Cek bentrok lebih dulu agar pengguna mendapat pesan yang jelas.
         final conflict = await AuthService.registrationConflict(username);
         if (conflict != null) {
           _msg(conflict, isError: true);
           return;
         }
         final result = await AuthService.register(username, password);
+        // Registrasi lokal tetap berhasil meski sinkronisasi cloud gagal.
         if (result.localSuccess) {
           _msg(
             result.cloudSynced
@@ -116,6 +123,7 @@ class _LoginPageState extends State<LoginPage> {
           _msg('Username sudah dipakai, gunakan username lain', isError: true);
         }
       } else {
+        // Login memeriksa hash password lokal dan membuat sesi jika cocok.
         final ok = await AuthService.login(username, password);
         if (ok) {
           _goHome();
@@ -124,6 +132,7 @@ class _LoginPageState extends State<LoginPage> {
         }
       }
     } finally {
+      // Pastikan spinner berhenti juga saat operasi melempar error atau gagal.
       if (mounted) setState(() => _loading = false);
     }
   }

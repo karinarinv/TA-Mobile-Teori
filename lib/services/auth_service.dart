@@ -47,7 +47,7 @@ class AuthService {
   static String _hash(String pass, String salt) {
     List<int> h = utf8.encode(salt + pass);
     for (var i = 0; i < 1000; i++) {
-      h = sha256.convert(h).bytes; // key stretching
+      h = sha256.convert(h).bytes; // key stretching //sha256
     }
     return base64Encode(h);
   }

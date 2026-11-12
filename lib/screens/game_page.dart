@@ -56,6 +56,7 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
+  // State ini menentukan level aktif, kontrol gerak, dan tampilan kondisi permainan.
   int _currentLevel = 0; // 0 = Level 1, 1 = Level 2, 2 = Level 3
   int _wallHits = 0;
   bool _useDpad = true; // D-Pad aktif secara default
@@ -87,6 +88,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   Future<void> _checkVoucherStatus() async {
     try {
       final user = await AuthService.currentSession() ?? 'guest';
+      // Status voucher dibaca per username dari penyimpanan lokal perangkat.
       final prefs = await SharedPreferences.getInstance();
       final used = prefs.getBool('voucher_diskon10_used_$user') ?? false;
       if (mounted) setState(() => _isVoucherUsed = used);
@@ -216,6 +218,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     );
 
     // Progress jumpscare berjalan tepat 2 detik.
+    // Controller ini menggerakkan indikator animasi jumpscare.
     _jumpscareProgressController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2), // Jumpscare tepat 2 detik
@@ -239,6 +242,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    // Semua timer/controller harus dihentikan agar tidak memanggil setState setelah halaman ditutup.
     // Batalkan timer/audio dan lepaskan controller saat keluar dari game.
     _stopLevelTimers();
     _jumpscareTimer?.cancel();
@@ -268,6 +272,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   }
 
   void _resetToLevelStart() {
+    // Reset koordinat dan state pengejar sebelum pemain mengulang level.
     // Bersihkan timer dan kembalikan pemain/pengejar ke posisi awal level.
     _stopLevelTimers();
     _jumpscareTimer?.cancel();
@@ -303,6 +308,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     _hasStartedMoving = true;
 
     _countdownTimer?.cancel();
+    // Hitung mundur 5 detik satu per satu sebelum pengejar mulai bergerak.
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) return;
       if (_countdown > 1) {
@@ -333,6 +339,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
 
     _chaserTimer?.cancel();
     // Perbarui posisi Wikwok tiap 360 ms agar bergerak mengejar pemain.
+    // Perbarui pengejar setiap 360 ms agar ia mendekati posisi pemain.
     _chaserTimer = Timer.periodic(const Duration(milliseconds: 360), (timer) {
       if (!mounted || !_isChaserActive || _isGameOver || _isJumpscareActive || _isDefeatActive) {
         timer.cancel();
@@ -417,6 +424,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
     });
 
     _jumpscareTimer?.cancel();
+    // Durasi jumpscare 2 detik, lalu game berpindah ke kondisi kalah.
     _jumpscareTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (!mounted) {
         timer.cancel();

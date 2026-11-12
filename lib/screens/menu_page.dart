@@ -34,6 +34,7 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
+  // Data akun yang dipakai di sapaan, avatar, badge VIP, dan rekomendasi.
   String _user = 'rahma';
   String? _userPhoto;
   bool _isVip = false;
@@ -178,6 +179,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   void _startBannerAutoSlide() {
+    // Ganti banner otomatis setiap 4 detik dan hentikan timer saat halaman ditutup.
     // Geser ke banner berikutnya setiap 4 detik; perpindahannya berlangsung 450 ms.
     _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (_bannerController.hasClients) {
@@ -192,6 +194,7 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> _loadUser() async {
+    // Ambil username, foto, dan status VIP untuk mengisi bagian header.
     // Muat username/foto lokal dan status VIP untuk bagian header beranda.
     final u = await AuthService.currentSession();
     String? photo;

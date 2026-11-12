@@ -31,8 +31,11 @@ class ConverterPage extends StatefulWidget {
 }
 
 class _ConverterPageState extends State<ConverterPage> with SingleTickerProviderStateMixin {
+  // TabController berpindah antara konversi kurs dan tampilan waktu dunia.
   late TabController _tabController;
+  // Nominal rupiah sumber yang dibaca dari kolom input.
   final TextEditingController _amt = TextEditingController(text: '50000');
+  // Timer satu detik memperbarui jam dunia selama halaman aktif.
   Timer? _timer;
   DateTime _now = DateTime.now();
   bool _loadingRates = false;
@@ -90,6 +93,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
   // 3. Response diparsing ke Map<String, double> nilai kurs.
   // 4. Jika gagal/offline -> Menggunakan nilai default di _rates dengan pesan edukatif.
   Future<void> _fetchRates() async {
+    // Request kurs terbaru; timeout dan fallback ditangani agar UI tetap terisi.
     // Ambil kurs dari Frankfurter; nilai awal di _rates dipakai saat offline.
     setState(() => _loadingRates = true);
     try {

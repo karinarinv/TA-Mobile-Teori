@@ -13,6 +13,7 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  // Daftar dari penyimpanan lokal yang sedang ditampilkan pada halaman.
   List<AppNotificationItem> _notifications = [];
   bool _isLoading = true;
   bool _promoEnabled = true;
@@ -38,6 +39,7 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   Future<void> _togglePromo(bool value) async {
+    // Perubahan switch memperbarui preferensi dan jadwal notifikasi harian.
     // Simpan pilihan pengguna dan jadwalkan/batalkan promo pada layanan lokal.
     await NotificationService.setDailyPromoEnabled(value);
     setState(() => _promoEnabled = value);
