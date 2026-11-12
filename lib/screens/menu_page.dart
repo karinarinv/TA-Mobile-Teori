@@ -1,3 +1,22 @@
+// ============================================================================
+// FITUR BERANDA & PANDUAN APLIKASI INTERAKTIF (MENU PAGE)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. DASHBOARD BERANDA UTAMA:
+//    - Header Sapaan: Menampilkan nama pengguna aktif, foto profil dari SQLite,
+//      badge member VIP, serta ikon notifikasi dengan badge pesan belum dibaca.
+//    - Banner Carousel Otomatis: Timer periodik berganti setiap 4 detik untuk
+//      menyorot buku unggulan & promo membership.
+//    - Grid Menu Pintasan Layanan: Akses cepat ke Katalog Buku, Scan AI Vision,
+//      Peta Cabang LBS, Chatbot AI, Labirin Wikwok, Konversi Kurs & Jam, serta Blockchain.
+//    - Buku Rekomendasi Terkurasi: Menampilkan kartu buku terlaris dengan rating,
+//      kategori, dan harga sewa per hari.
+// 2. FITUR PANDUAN APLIKASI INTERAKTIF (_LibraryBookGuideDialog):
+//    - Dialog berbentuk buku virtual interaktif 5 lembaran (halaman) yang dapat dibalik.
+//    - Menjelaskan panduan langkah demi langkah cara mencari buku, menyewa, melakukan
+//      pembayaran, aktivasi VIP, dan menggunakan fitur cerdas AI & LBS.
+// ============================================================================
+
 import 'dart:io';
 
 import 'package:intl/intl.dart';
@@ -1359,8 +1378,17 @@ class _ServiceItem {
 }
 
 // =========================================================================
-// DIALOG BUKU PANDUAN PERPUSTAKAAN INTERAKTIF (LEMBARAN DAPAT DIBALIK)
+// LOGIKA FITUR PANDUAN APLIKASI (INTERACTIVE GUIDE BOOK DIALOG)
 // =========================================================================
+// Dialog berbentuk buku interaktif beranimasi lembaran halaman:
+// - PageController: Mengatur perpindahan lembaran buku dengan animasi 'easeInOutCubic'.
+// - 5 Halaman Panduan Lengkap:
+//   * Hal 1: Konsep & Pengenalan RentBook.
+//   * Hal 2: Cara Mencari & Menjelajahi Katalog Buku Fisik.
+//   * Hal 3: Alur Peminjaman, Durasi Sewa, & Pembayaran Digital.
+//   * Hal 4: Hak Istimewa & Aktivasi Member VIP.
+//   * Hal 5: Panduan Fitur Tambahan (AI Vision, Chatbot, Peta LBS).
+// - Memiliki tombol navigasi 'Sebelumnya', 'Halaman Berikutnya', dan 'Tutup Panduan'.
 class _LibraryBookGuideDialog extends StatefulWidget {
   const _LibraryBookGuideDialog();
 

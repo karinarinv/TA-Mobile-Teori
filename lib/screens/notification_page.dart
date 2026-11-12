@@ -1,3 +1,17 @@
+// ============================================================================
+// FITUR NOTIFIKASI: HALAMAN PEMBERITAHUAN (NOTIFICATION PAGE)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Tampilan Riwayat Notifikasi:
+//    - Memuat daftar notifikasi per akun pengguna dari SharedPreferences.
+//    - Filter Tab ('Semua', 'Aktivitas', 'Promo') untuk menyaring jenis pesan.
+// 2. Status 'Sudah Dibaca' (Mark as Read):
+//    - Mengetuk item notifikasi mengubah status isRead = true dan memperbarui counter.
+//    - Tombol 'Tandai Semua Dibaca' untuk menandai seluruh pesan sekaligus.
+// 3. Switch Pengaturan Promo Harian:
+//    - Pengguna dapat mengaktifkan atau mematikan jadwal push notification harian (09.00 WIB).
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';

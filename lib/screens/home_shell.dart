@@ -1,3 +1,17 @@
+// ============================================================================
+// FITUR BERANDA: HOME SHELL (NAVIGASI UTAMA APLIKASI)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. BottomNavigationBar Controller:
+//    - Mengelola perpindahan 3 tab utama:
+//      * Index 0: Beranda / Dashboard (MenuPage)
+//      * Index 1: Profil Pengguna (ProfilePage)
+//      * Index 2: Evaluasi & Saran (FeedbackPage)
+// 2. State Retention: Menyimpan index halaman aktif menggunakan setState(_i = n).
+// 3. Pending Camera Recovery: Memeriksa flag SharedPreferences jika kamera AI Vision
+//    sempat dijeda oleh siklus hidup Android saat mengambil gambar.
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -1,3 +1,22 @@
+// ============================================================================
+// FITUR REGISTRASI & LOGIN (HALAMAN OTENTIKASI PENGGUNA)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Dual-Mode Form: Satu halaman dapat beralih antara Mode Masuk (Login) dan
+//    Mode Buat Akun (Registrasi) melalui toggle state `_isRegister`.
+// 2. Validasi Input: Memastikan username & password tidak kosong, serta password
+//    minimal 6 karakter pada mode registrasi sebelum dikirim ke AuthService.
+// 3. Alur Registrasi:
+//    - Cek bentrok username di SQLite & Supabase via AuthService.registrationConflict().
+//    - Password di-hash dengan Salt (SHA-256) sebelum disimpan ke SQLite lokal.
+//    - Sinkronisasi instan ke cloud database Supabase.
+// 4. Alur Login:
+//    - Verifikasi kredensial: mencocokkan hash password yang dimasukkan dengan hash di database.
+//    - Jika cocok, buat sesi login dan arahkan pengguna ke Beranda (HomeShell).
+// 5. Login Biometrik (Fingerprint / Face ID):
+//    - Menggunakan sensor biometrik perangkat via `AuthService.loginBiometric()`.
+// ============================================================================
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -80,6 +99,18 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // =========================================================================
+  // LOGIKA 1: SUBMIT FORM (REGISTRASI ATAU LOGIN)
+  // =========================================================================
+  // Alur Kerja:
+  // 1. Validasi teks username dan password.
+  // 2. Jika mode registrasi (_isRegister == true):
+  //    - Cek apakah username sudah dipakai di database lokal/cloud.
+  //    - Panggil AuthService.register(): enkripsi password & simpan ke SQLite + Supabase.
+  //    - Jika sukses, arahkan user ke mode login.
+  // 3. Jika mode login (_isRegister == false):
+  //    - Panggil AuthService.login(): cocokkan hash password dan buat sesi.
+  //    - Jika cocok, navigasi ke Beranda via _goHome().
   Future<void> _submit() async {
     // Validasi input, lalu jalankan cabang registrasi atau login.
     final username = _u.text.trim();
@@ -137,8 +168,15 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // =========================================================================
+  // LOGIKA 2: LOGIN BIOMETRIK (SIDIK JARI)
+  // =========================================================================
+  // Memanfaatkan sensor biometrik ponsel pengguna yang terhubung via local_auth:
+  // - Mengecek apakah ada riwayat username login sebelumnya ('last_user').
+  // - Meminta otentikasi sensor biometrik ke hardware OS.
+  // - Jika berhasil terverifikasi, langsung mengaktifkan sesi login tanpa ketik password.
   Future<void> _bio() async {
-    // Delegasikan pemeriksaan sidik jari/wajah ke AuthService perangkat.
+    // Delegasikan pemeriksaan sidik jari ke AuthService perangkat.
     setState(() => _loading = true);
     try {
       if (await AuthService.loginBiometric()) {

@@ -1,3 +1,21 @@
+// ============================================================================
+// FITUR CARI DAN KATALOG BUKU (BOOKS PAGE)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Google Books API Integration:
+//    - Mengirim query pencarian judul/topik ke Google Books API endpoint (/volumes).
+//    - Meminta hingga 30 item buku terpopuler dengan detail judul, penulis, rating, deskripsi, dan cover.
+// 2. Offline Fallback Curated Catalog:
+//    - Jika kuota API habis atau jaringan offline, sistem menampilkan koleksi buku lokal
+//      terkurasi agar aplikasi tetap dapat didemokan tanpa kendala koneksi.
+// 3. Sensor Accelerometer (Shake to Discover):
+//    - Saat HP digoyang dengan akselerasi > 16 m/s², genre buku akan diacak otomatis.
+// 4. Filter Kategori Genre:
+//    - Tombol filter horizontal (Fiksi, Sejarah, Sains, Bisnis, Seni, Filosofi, Teknologi).
+// 5. Navigasi Detail & Sewa:
+//    - Mengetuk kartu buku membawa pengguna ke halaman BookDetailPage untuk proses sewa.
+// ============================================================================
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
@@ -100,6 +118,13 @@ class _BooksPageState extends State<BooksPage> {
     return htmlString.replaceAll(exp, '').trim();
   }
 
+  // =========================================================================
+  // LOGIKA PENCARIAN BUKU (GOOGLE BOOKS REST API & FALLBACK OFFLINE)
+  // =========================================================================
+  // 1. Mengirim HTTP GET request ke 'www.googleapis.com/books/v1/volumes'.
+  // 2. Timeout 8 detik: jika koneksi internet lambat/gagal, sistem otomatis
+  //    mengambil daftar buku cadangan terkurasi (curated offline list).
+  // 3. Membersihkan tag HTML dari sinopsis buku menggunakan Regex _cleanHtml().
   Future<void> _search() async {
     // Tutup keyboard sebelum mengubah tampilan hasil.
     FocusManager.instance.primaryFocus?.unfocus();

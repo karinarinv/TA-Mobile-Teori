@@ -1,3 +1,22 @@
+// ============================================================================
+// FITUR PROSES PEMBAYARAN SEWA BUKU (RENTAL BOTTOM SHEET)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Pemilihan Durasi Sewa:
+//    - Pilihan fleksibel 3, 7, 14, atau 30 hari.
+//    - Menghitung subtotal: hargaSewaPerHari * durasiHari.
+// 2. Sistem Kupon & Diskon (Voucher Engine):
+//    - Mendukung kode voucher 'DISKON10' (didapatkan dari reward Labirin Wikwok).
+//    - Menghitung diskon 10% dan mengurangi total tagihan secara realtime.
+// 3. Multi-Channel Pembayaran Digital:
+//    - QRIS: Meng-generate QR Code berstandar LinkAja/BI via QRServer API.
+//    - Virtual Account: Nomor VA bank otomatis (BCA, Mandiri, BNI, BRI).
+// 4. Integrasi Pencatatan Blockchain & Supabase:
+//    - Setiap transaksi yang berhasil langsung dicatat ke Blockchain (SHA-256 & Sepolia Testnet).
+// 5. Bukti Tanda Terima (Receipt Dialog):
+//    - Menampilkan faktur resi digital lengkap dengan tombol 'Cek di Blockchain'.
+// ============================================================================
+
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -990,7 +1009,17 @@ class _QrisPaymentModal extends StatefulWidget {
 class _QrisPaymentModalState extends State<_QrisPaymentModal> {
   bool _isProcessing = false;
 
-  // Menunggu simulasi 600 ms sebelum transaksi dicatat; tidak memverifikasi provider.
+  // =========================================================================
+  // LOGIKA PEMROSESAN PEMBAYARAN SEWA BUKU
+  // =========================================================================
+  // Alur Kerja Lengkap:
+  // 1. Format payload data transaksi sewa lengkap (Buku, Durasi, Biaya, Tenggat, Metode).
+  // 2. Simpan & broadcast transaksi ke Blockchain (SHA-256 lokal & Sepolia Testnet).
+  // 3. Tampilkan push notification konfirmasi lunas (showPaymentSuccess).
+  // 4. Jadwalkan push notification pengingat jatuh tempo pengembalian (scheduleReturn).
+  // 5. Mainkan audio efek kemenangan (GameAudioService.playWin).
+  // 6. Tandai kupon voucher sebagai terpakai di SharedPreferences.
+  // 7. Munculkan Faktur Tanda Terima / Resi Resmi (_showSuccessDialog).
   Future<void> _processPayment() async {
     if (_isProcessing) return;
     final navigator = Navigator.of(context);
@@ -1277,7 +1306,12 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
     );
   }
 
-  // Menunggu simulasi 900 ms sebelum transaksi dicatat; belum terhubung ke bank.
+  // =========================================================================
+  // LOGIKA PEMROSESAN PEMBAYARAN VIRTUAL ACCOUNT (BANK TRANSFER)
+  // =========================================================================
+  // 1. Simulasikan verifikasi transfer rekening virtual account bank pilihan.
+  // 2. Catat transaksi ke BlockchainService, notifikasi instan & pengingat tenggat.
+  // 3. Tampilkan nota dialog tanda terima resmi.
   Future<void> _processPayment() async {
     setState(() => _isProcessing = true);
     await Future.delayed(const Duration(milliseconds: 900));

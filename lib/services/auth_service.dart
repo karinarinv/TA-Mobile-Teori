@@ -1,3 +1,23 @@
+// ============================================================================
+// FITUR OTENTIKASI: AUTH SERVICE (REGISTRASI, LOGIN, ENKRIPSI, & BIOMETRIK)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Keamanan Password (Key Stretching & Salt):
+//    - Menggunakan Random.secure() untuk menghasilkan Salt acak 16-byte per akun.
+//    - Algoritma SHA-256 diulang sebanyak 1.000 kali (Key Stretching) untuk mencegah
+//      serangan Brute-Force dan Rainbow Table.
+// 2. Registrasi Akun:
+//    - Validasi bentrok username secara case-insensitive (LOWER(username)).
+//    - Simpan data (username, salt, hash) ke SQLite lokal lebih dulu (Local-First).
+//    - Sinkronisasi data akun ke Supabase Cloud DB.
+// 3. Login Akun:
+//    - Mengambil salt milik user dari database, lalu menghitung _hash(inputPass, salt).
+//    - Membandingkan hash hasil kalkulasi dengan hash yang tersimpan di database.
+//    - Jika cocok, simpan 'session_user', 'last_user', dan 'session_last_active_ms'.
+// 4. Biometrik:
+//    - Menggunakan local_auth untuk otentikasi hardware (Fingerprint / Face Unlock).
+// ============================================================================
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -43,7 +63,12 @@ class AuthService {
   // Username baru bisa dipakai setelah jeda 30 hari sejak perubahan terakhir.
   static const usernameChangeCooldown = Duration(days: 30);
 
-  // Hash berulang membuat tebakan password lebih mahal; salt disimpan per akun.
+  // =========================================================================
+  // LOGIKA 1: ENKRIPSI PASSWORD DENGAN SALT & 1000x ITERASI SHA-256
+  // =========================================================================
+  // Formula: Base64(SHA256^(1000)(salt + password))
+  // Key Stretching membuat kalkulasi tebakan kata sandi ribuan kali lebih mahal
+  // sehingga kebal dari serangan dictionary attack.
   static String _hash(String pass, String salt) {
     List<int> h = utf8.encode(salt + pass);
     for (var i = 0; i < 1000; i++) {
@@ -52,13 +77,19 @@ class AuthService {
     return base64Encode(h);
   }
 
-  // Buat salt acak 16 byte agar hash setiap pengguna berbeda.
+  // Menghasilkan 16-byte random salt unik menggunakan cryptographically secure PRNG
   static String _newSalt() {
     final r = Random.secure();
     return base64Encode(List<int>.generate(16, (_) => r.nextInt(256)));
   }
 
-  // Simpan akun di SQLite terlebih dahulu, lalu coba sinkronkan ke Supabase.
+  // =========================================================================
+  // LOGIKA 2: REGISTRASI PENGGUNA BARU (SQLITE & SUPABASE SYNC)
+  // =========================================================================
+  // 1. Buat salt unik baru untuk pengguna.
+  // 2. Hash password bersama salt dengan 1000x SHA-256.
+  // 3. Simpan row ke tabel 'users' di SQLite lokal.
+  // 4. Kirim salinan ke tabel 'users' Supabase Cloud.
   static Future<RegistrationResult> register(String user, String pass) async {
     final db = await DbHelper.db;
     final salt = _newSalt();
@@ -100,7 +131,13 @@ class AuthService {
     return null;
   }
 
-  // Login membandingkan hash lokal; sesi baru disimpan jika password cocok.
+  // =========================================================================
+  // LOGIKA 3: VERIFIKASI LOGIN PENGGUNA
+  // =========================================================================
+  // 1. Ambil data akun berdasarkan username dari tabel 'users' SQLite lokal.
+  // 2. Ambil salt pengguna dari baris database.
+  // 3. Hitung _hash(pass, salt) dan bandingkan dengan hash tersimpan di database.
+  // 4. Jika cocok (true), panggil _setSession(user) untuk membuat sesi aktif.
   static Future<bool> login(String user, String pass) async {
     final db = await DbHelper.db;
     final rows = await db.query(
@@ -334,7 +371,13 @@ class AuthService {
     await prefs.remove('session_last_active_ms');
   }
 
-  // Minta sistem operasi memverifikasi wajah/sidik jari sebelum membuka sesi.
+  // =========================================================================
+  // LOGIKA 4: AUTENTIKASI BIOMETRIK (LOCAL AUTH)
+  // =========================================================================
+  // 1. Cek apakah ada riwayat username 'last_user' di SharedPreferences.
+  // 2. Cek apakah sensor biometrik tersedia dan aktif di hardware perangkat.
+  // 3. Panggil auth.authenticate(): sistem operasi menampilkan prompt sensor sidik jari/wajah.
+  // 4. Jika berhasil, aktifkan sesi baru untuk username tersebut.
   static Future<bool> loginBiometric() async {
     final p = await SharedPreferences.getInstance();
     final last = p.getString('last_user');

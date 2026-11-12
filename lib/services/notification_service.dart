@@ -1,3 +1,20 @@
+// ============================================================================
+// FITUR NOTIFIKASI: NOTIFICATION SERVICE (PUSH & LOCAL NOTIFICATIONS)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Inisialisasi Plugin Android:
+//    - Menggunakan flutter_local_notifications dengan channel ID 'rentbook_channel'.
+//    - Prioritas tinggi (Importance.high & Priority.high) agar pop-up banner muncul di status bar.
+// 2. Notifikasi Terjadwal Harian (Daily Promo 09.00 WIB):
+//    - Menggunakan package timezone (Asia/Jakarta / WIB) via zonedSchedule.
+//    - Menjadwalkan pengingat promo otomatis setiap jam 09.00 pagi.
+// 3. Notifikasi Instan Transaksi (showPaymentSuccess):
+//    - Dipicu seketika saat pembayaran sewa buku atau membership VIP berhasil.
+// 4. Persistence Riwayat Notifikasi:
+//    - Riwayat notifikasi disimpan per akun di SharedPreferences dengan format JSON.
+//    - Menghitung counter 'unread' untuk lencana di ikon lonceng Beranda.
+// ============================================================================
+
 import 'dart:convert';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -116,9 +133,11 @@ class NotificationService {
   }
 
   // ============================================================
-  // PENJADWALAN NOTIFIKASI PROMO HARIAN (PUKUL 09.00)
+  // LOGIKA 1: PENJADWALAN NOTIFIKASI PROMO HARIAN (09.00 WIB)
   // ============================================================
-  // Jadwalkan promo pukul 09.00 WIB setiap hari; fallback memakai jadwal tak presisi.
+  // 1. Menentukan waktu jam 09.00 pagi berdasarkan zona waktu lokal (Asia/Jakarta).
+  // 2. Menggunakan zonedSchedule() dengan konfigurasi 'matchDateTimeComponents: DateTimeComponents.time'
+  //    agar notifikasi berulang setiap hari pada jam yang sama secara otomatis.
   static Future<void> scheduleDailyPromoNotifications() async {
     try {
       final now = tz.TZDateTime.now(tz.local);
@@ -259,7 +278,12 @@ class NotificationService {
   // PEMICU NOTIFIKASI SISTEM (AKTIVITAS SEWA, VIP, & JATUH TEMPO)
   // ============================================================
 
-  /// Notifikasi pembayaran sewa berhasil
+  // ============================================================
+  // LOGIKA 2: NOTIFIKASI INSTAN PEMBAYARAN SUKSES
+  // ============================================================
+  // Dipanggil langsung saat sewa buku / membership VIP berhasil dibayar:
+  // 1. Munculkan push notification di status bar ponsel (_n.show).
+  // 2. Simpan pesan notifikasi ke riwayat lokal SharedPreferences via addNotification().
   static Future<void> showPaymentSuccess(
     String title,
     String amount,

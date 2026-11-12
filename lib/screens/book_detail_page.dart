@@ -1,3 +1,23 @@
+// ============================================================================
+// FITUR DETAIL BUKU (BOOK DETAIL PAGE)
+// ----------------------------------------------------------------------------
+// Logika Presentasi:
+// 1. Cover Interaktif Gyroscope 3D:
+//    - Menggunakan widget TiltCover yang merespons sensor giroskop ponsel
+//      sehingga sampul buku miring 3D saat HP digerakkan.
+// 2. Metadata Buku Lengkap:
+//    - Menampilkan Judul, Penulis, Rating, Jumlah Halaman, Penerbit, Tahun Terbit,
+//      dan Biaya Sewa per hari.
+// 3. Fallback Sinopsis Open Library API:
+//    - Jika buku tidak memiliki sinopsis dari katalog lokal, aplikasi memanggil
+//      Open Library API (openlibrary.org/works/...) untuk mengambil deskripsi cerita.
+// 4. Sistem Bookmark (Buku Tersimpan):
+//    - Pengguna dapat menyimpan buku ke daftar favorit (BookmarkService) per akun.
+// 5. Pemicu Form Sewa Buku:
+//    - Tombol 'Sewa Buku Ini' langsung membuka form RentalBottomSheet untuk
+//      pemilihan durasi, voucher diskon, dan metode pembayaran.
+// ============================================================================
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -32,6 +52,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
     _loadOpenLibraryDescription();
   }
 
+  // =========================================================================
+  // LOGIKA 1: SINOPSIS CADANGAN DARI OPEN LIBRARY API
+  // =========================================================================
+  // Jika sinopsis belum tersedia di data awal, sistem mengirim query HTTP GET
+  // ke Open Library API berdasarkan 'openLibraryKey' buku dengan timeout 6 detik.
   Future<void> _loadOpenLibraryDescription() async {
     // Ambil sinopsis cadangan hanya jika katalog utama tidak menyediakannya.
     final currentDescription = widget.book['description']?.toString().trim() ?? '';
@@ -66,6 +91,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
     if (mounted) setState(() => _isBookmarked = b);
   }
 
+  // =========================================================================
+  // LOGIKA 2: MANAJEMEN FAVORIT / BOOKMARK BUKU
+  // =========================================================================
+  // Menyimpan atau menghapus buku dari daftar favorit SharedPreferences lokal.
+  // Menyediakan SnackBar dengan tombol 'Lihat' yang langsung membuka SavedBooksPage.
   Future<void> _toggleBookmark() async {
     // Bookmark tersimpan lokal; Snackbar menawarkan pintasan ke daftar tersimpan.
     final title = widget.book['title']?.toString() ?? 'Buku';
