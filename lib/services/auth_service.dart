@@ -327,7 +327,7 @@ class AuthService {
   // 2. Menghapus key 'session_user' (username aktif yang sedang login).
   // 3. Menghapus key 'session_last_active_ms' (timestamp aktivitas sesi).
   // Catatan: Kunci 'last_user' tetap dipertahankan di penyimpanan lokal agar
-  // pengguna tetap dapat login kembali dengan cepat menggunakan Biometrik (Sidik Jari / Wajah).
+  // pengguna tetap dapat login kembali dengan cepat menggunakan Biometrik (Sidik Jari).
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('session_user');
