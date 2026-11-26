@@ -6,32 +6,66 @@
 //    - Pilihan fleksibel 3, 7, 14, atau 30 hari.
 //    - Menghitung subtotal: hargaSewaPerHari * durasiHari.
 // 2. Sistem Kupon & Diskon (Voucher Engine):
-//    - Mendukung kode voucher 'DISKON10' (didapatkan dari reward Labirin Wikwok).
+//    - Mendukung kode voucher 'DISKON10'.
 //    - Menghitung diskon 10% dan mengurangi total tagihan secara realtime.
 // 3. Multi-Channel Pembayaran Digital:
 //    - QRIS: Meng-generate QR Code berstandar LinkAja/BI via QRServer API.
 //    - Virtual Account: Nomor VA bank otomatis (BCA, Mandiri, BNI, BRI).
-// 4. Integrasi Pencatatan Blockchain & Supabase:
-//    - Setiap transaksi yang berhasil langsung dicatat ke Blockchain (SHA-256 & Sepolia Testnet).
-// 5. Bukti Tanda Terima (Receipt Dialog):
-//    - Menampilkan faktur resi digital lengkap dengan tombol 'Cek di Blockchain'.
+// 4. Bukti Tanda Terima (Receipt Dialog):
+//    - Menampilkan faktur resi digital tanda terima penyewaan buku.
 // ============================================================================
 
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
-import '../services/game_audio_service.dart';
+import '../services/db_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../services/blockchain_service.dart';
 import '../services/notification_service.dart';
-import '../services/subscription_service.dart';
-import '../screens/blockchain_page.dart';
 import '../main.dart';
 
 /// Form durasi, voucher, dan pilihan pembayaran saat pengguna menyewa buku.
 class RentalBottomSheet extends StatefulWidget {
+  /// Notifier reaktif agar kartu aktivitas di ProfilePage langsung terupdate seketika
+  static final ValueNotifier<int> rentalUpdateNotifier = ValueNotifier<int>(0);
+
+  /// Menyimpan transaksi sewa buku ke SQLite lokal (tabel riwayat_transaksi)
+  static Future<void> _recordRentalTransaction({
+    required String title,
+    required int duration,
+    required String totalFormatted,
+    required String dueDateStr,
+    required String paymentMethod,
+    String? appliedVoucher,
+    String? category,
+  }) async {
+    final username = await AuthService.currentSession() ?? 'guest';
+    final db = await DbHelper.db;
+    final now = DateTime.now().toIso8601String();
+    final voucherNote = appliedVoucher != null ? ' | Voucher: $appliedVoucher (-10%)' : '';
+    final ledgerData = 'SEWA: $title | Durasi: $duration Hari | Biaya: $totalFormatted$voucherNote | Batas: $dueDateStr | Bayar: $paymentMethod';
+    await db.insert('riwayat_transaksi', {
+      'data': ledgerData,
+      'prev_hash': '0',
+      'hash': 'tx_${DateTime.now().millisecondsSinceEpoch}',
+      'ts': now,
+      'tx_hash': '',
+      'username': username,
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    if (appliedVoucher == 'DISKON10') {
+      await prefs.setBool('voucher_diskon10_used_$username', true);
+    }
+    if (category != null && category.isNotEmpty) {
+      await prefs.setString('last_rented_genre_$username', category);
+    }
+
+    // Trigger reactive listener
+    rentalUpdateNotifier.value++;
+  }
+
   final Map<String, dynamic> book;
 
   const RentalBottomSheet({super.key, required this.book});
@@ -62,7 +96,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   String? _voucherMessage;
   bool _isVoucherValid = false;
   bool _hasAvailableVoucher = false;
-  bool _isVipUser = false;
 
   final List<String> _paymentOptions = [
     'QRIS (GoPay/OVO/Dana)',
@@ -77,24 +110,18 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
 
   Future<void> _loadVoucherAvailability() async {
     final username = await AuthService.currentSession() ?? 'guest';
-    final isVip = await SubscriptionService.isVip();
     final prefs = await SharedPreferences.getInstance();
     final used = prefs.getBool('voucher_diskon10_used_$username') ?? false;
     if (mounted) {
       setState(() {
-        _isVipUser = isVip;
-        _hasAvailableVoucher = isVip && !used;
-        if (!isVip) {
-          _appliedVoucher = null;
-          _isVoucherValid = false;
-        }
+        _hasAvailableVoucher = !used;
       });
     }
   }
 
   Future<void> _showVoucherPicker() async {
     await _loadVoucherAvailability();
-    if (!mounted || !_isVipUser) return;
+    if (!mounted) return;
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -155,14 +182,6 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
   }
 
   Future<void> _applyVoucher() async {
-    final isVip = await SubscriptionService.isVip();
-    if (!isVip) {
-      setState(() {
-        _isVoucherValid = false;
-        _voucherMessage = 'Voucher diskon hanya tersedia untuk Member VIP.';
-      });
-      return;
-    }
     final code = _voucherController.text.trim().toUpperCase();
     if (code.isEmpty) return;
 
@@ -514,66 +533,10 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                   'Punya Voucher Diskon?',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
-                if (_isVipUser) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      // WARNA: latar kartu/komponen.
-                      color: const Color(0xFFFEF3C7),
-                      borderRadius: BorderRadius.circular(6),
-                      // WARNA: latar kartu/komponen.
-                      border: Border.all(color: const Color(0xFFF59E0B)),
-                    ),
-                    child: const Text(
-                      'VIP',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        // WARNA: teks 'VIP'.
-                        color: Color(0xFFB45309),
-                      ),
-                    ),
-                  ),
-                ],
               ],
             ),
             const SizedBox(height: 8),
-            if (!_isVipUser)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  // WARNA: latar kartu/komponen.
-                  color: const Color(0xFFFAF7F2),
-                  borderRadius: BorderRadius.circular(12),
-                  // WARNA: latar kartu/komponen.
-                  border: Border.all(color: const Color(0xFFEADBCE)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.workspace_premium_rounded,
-                      size: 20,
-                      // WARNA: garis tepi kartu/komponen.
-                      color: Color(0xFFB45309),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Voucher diskon hanya tersedia untuk Member VIP.',
-                        style: TextStyle(
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w600,
-                          // WARNA: teks 'Voucher diskon hanya tersedia untuk Member VIP.'.
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            else if (_appliedVoucher != null)
+            if (_appliedVoucher != null)
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
@@ -768,21 +731,17 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
       // Bayar Tunai langsung proses
       setState(() => _isProcessing = true);
       try {
-        final voucherNote = _appliedVoucher != null ? ' | Voucher: $_appliedVoucher (-10%)' : '';
-        final ledgerData = 'SEWA: $title | Durasi: $_duration Hari | Biaya: $totalFormatted$voucherNote | Batas: $dueDateStr | Bayar: $_paymentMethod';
-        await BlockchainService.addTransaction(ledgerData);
         await NotificationService.scheduleReturn(title, days: _duration);
-        GameAudioService.playWin();
 
-        final username = await AuthService.currentSession() ?? 'guest';
-        final prefs = await SharedPreferences.getInstance();
-        if (_appliedVoucher == 'DISKON10') {
-          await prefs.setBool('voucher_diskon10_used_$username', true);
-        }
-        final cat = widget.book['category']?.toString();
-        if (cat != null && cat.isNotEmpty) {
-          await prefs.setString('last_rented_genre_$username', cat);
-        }
+        await RentalBottomSheet._recordRentalTransaction(
+          title: title,
+          duration: _duration,
+          totalFormatted: totalFormatted,
+          dueDateStr: dueDateStr,
+          paymentMethod: _paymentMethod,
+          appliedVoucher: _appliedVoucher,
+          category: widget.book['category']?.toString(),
+        );
 
         if (!mounted) return;
         navigator.pop();
@@ -894,7 +853,7 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Buku telah berhasil disewa dan tercatat di Blockchain.',
+              'Buku telah berhasil disewa.',
               // WARNA: teks 'Penyewaan Berhasil!'.
               style: TextStyle(fontSize: 13, color: Colors.grey[700]),
               textAlign: TextAlign.center,
@@ -920,55 +879,21 @@ class _RentalBottomSheetState extends State<RentalBottomSheet> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Row(
-              children: const [
-                // WARNA: teks 'Judul: $title'.
-                Icon(Icons.shield_outlined, size: 16, color: Color(0xFF67343A)),
-                SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    'Transaksi terlindungi & tercatat abadi di ledger blockchain.',
-                    // WARNA: ikon shield_outlined.
-                    style: TextStyle(fontSize: 11, color: Colors.grey),
-                  ),
-                ),
-              ],
-            ),
           ],
         ),
         actionsAlignment: MainAxisAlignment.center,
         actions: [
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
-              // WARNA: teks/ikon tombol 'Tutup'.
-              foregroundColor: const Color(0xFF67343A),
-              // WARNA: warna komponen.
-              side: const BorderSide(color: Color(0xFF67343A)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            ),
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Tutup'),
-          ),
-          const SizedBox(width: 8),
-          FilledButton.icon(
+          FilledButton(
             style: FilledButton.styleFrom(
               // WARNA: latar tombol.
               backgroundColor: const Color(0xFF67343A),
-              // WARNA: teks/ikon tombol 'Cek Blockchain'.
+              // WARNA: teks tombol.
               foregroundColor: const Color(0xFFEDE2CF),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 11),
             ),
-            onPressed: () {
-              Navigator.pop(ctx);
-              rootNavigatorKey.currentState?.push(
-                MaterialPageRoute(builder: (_) => const BlockchainPage()),
-              );
-            },
-            icon: const Icon(Icons.verified, size: 18),
-            label: const Text('Cek Blockchain'),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Selesai'),
           ),
         ],
       ),
@@ -1013,13 +938,11 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
   // LOGIKA PEMROSESAN PEMBAYARAN SEWA BUKU
   // =========================================================================
   // Alur Kerja Lengkap:
-  // 1. Format payload data transaksi sewa lengkap (Buku, Durasi, Biaya, Tenggat, Metode).
-  // 2. Simpan & broadcast transaksi ke Blockchain (SHA-256 lokal & Sepolia Testnet).
-  // 3. Tampilkan push notification konfirmasi lunas (showPaymentSuccess).
-  // 4. Jadwalkan push notification pengingat jatuh tempo pengembalian (scheduleReturn).
-  // 5. Mainkan audio efek kemenangan (GameAudioService.playWin).
-  // 6. Tandai kupon voucher sebagai terpakai di SharedPreferences.
-  // 7. Munculkan Faktur Tanda Terima / Resi Resmi (_showSuccessDialog).
+  // 1. Format payload data transaksi sewa lengkap.
+  // 2. Tampilkan push notification konfirmasi lunas (showPaymentSuccess).
+  // 3. Jadwalkan push notification pengingat jatuh tempo pengembalian (scheduleReturn).
+  // 4. Tandai kupon voucher sebagai terpakai di SharedPreferences.
+  // 5. Munculkan Faktur Tanda Terima / Resi Resmi (_showSuccessDialog).
   Future<void> _processPayment() async {
     if (_isProcessing) return;
     final navigator = Navigator.of(context);
@@ -1027,29 +950,18 @@ class _QrisPaymentModalState extends State<_QrisPaymentModal> {
     await Future.delayed(const Duration(milliseconds: 600));
 
     try {
-      final voucherNote = widget.appliedVoucher != null ? ' | Voucher: ${widget.appliedVoucher} (-10%)' : '';
-      final ledgerData = 'SEWA: ${widget.title} | Durasi: ${widget.duration} Hari | Biaya: ${widget.totalFormatted}$voucherNote | Batas: ${widget.dueDateStr} | Bayar: QRIS (GoPay/OVO/Dana)';
-      
-      // Catat ke Blockchain
-      await BlockchainService.addTransaction(ledgerData);
-
-      // Notifikasi lunas seketika
       await NotificationService.showPaymentSuccess(widget.title, widget.totalFormatted, 'QRIS');
-
-      // Jadwal jatuh tempo
       await NotificationService.scheduleReturn(widget.title, days: widget.duration);
 
-      // Suara berhasil
-      GameAudioService.playWin();
-
-      final username = await AuthService.currentSession() ?? 'guest';
-      final prefs = await SharedPreferences.getInstance();
-      if (widget.appliedVoucher == 'DISKON10') {
-        await prefs.setBool('voucher_diskon10_used_$username', true);
-      }
-      if (widget.category != null && widget.category!.isNotEmpty) {
-        await prefs.setString('last_rented_genre_$username', widget.category!);
-      }
+      await RentalBottomSheet._recordRentalTransaction(
+        title: widget.title,
+        duration: widget.duration,
+        totalFormatted: widget.totalFormatted,
+        dueDateStr: widget.dueDateStr,
+        paymentMethod: 'QRIS',
+        appliedVoucher: widget.appliedVoucher,
+        category: widget.category,
+      );
 
       if (!mounted) return;
       navigator.pop(); // Tutup QR sheet
@@ -1310,30 +1222,25 @@ class _VaPaymentModalState extends State<_VaPaymentModal> {
   // LOGIKA PEMROSESAN PEMBAYARAN VIRTUAL ACCOUNT (BANK TRANSFER)
   // =========================================================================
   // 1. Simulasikan verifikasi transfer rekening virtual account bank pilihan.
-  // 2. Catat transaksi ke BlockchainService, notifikasi instan & pengingat tenggat.
+  // 2. Notifikasi instan konfirmasi lunas & pengingat tenggat.
   // 3. Tampilkan nota dialog tanda terima resmi.
   Future<void> _processPayment() async {
     setState(() => _isProcessing = true);
     await Future.delayed(const Duration(milliseconds: 900));
 
     try {
-      final voucherNote = widget.appliedVoucher != null ? ' | Voucher: ${widget.appliedVoucher} (-10%)' : '';
-      final ledgerData = 'SEWA: ${widget.title} | Durasi: ${widget.duration} Hari | Biaya: ${widget.totalFormatted}$voucherNote | Batas: ${widget.dueDateStr} | Bayar: Virtual Account ($_selectedBank)';
-
-      await BlockchainService.addTransaction(ledgerData);
       await NotificationService.showPaymentSuccess(widget.title, widget.totalFormatted, 'VA $_selectedBank');
       await NotificationService.scheduleReturn(widget.title, days: widget.duration);
 
-      GameAudioService.playWin();
-
-      final username = await AuthService.currentSession() ?? 'guest';
-      final prefs = await SharedPreferences.getInstance();
-      if (widget.appliedVoucher == 'DISKON10') {
-        await prefs.setBool('voucher_diskon10_used_$username', true);
-      }
-      if (widget.category != null && widget.category!.isNotEmpty) {
-        await prefs.setString('last_rented_genre_$username', widget.category!);
-      }
+      await RentalBottomSheet._recordRentalTransaction(
+        title: widget.title,
+        duration: widget.duration,
+        totalFormatted: widget.totalFormatted,
+        dueDateStr: widget.dueDateStr,
+        paymentMethod: 'VA $_selectedBank',
+        appliedVoucher: widget.appliedVoucher,
+        category: widget.category,
+      );
 
       if (!mounted) return;
       Navigator.pop(context); // Tutup VA sheet

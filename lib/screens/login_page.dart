@@ -169,28 +169,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // =========================================================================
-  // LOGIKA 2: LOGIN BIOMETRIK (SIDIK JARI)
+  // LOGIKA SUBMIT FORM (LOGIN / REGISTER)
   // =========================================================================
-  // Memanfaatkan sensor biometrik ponsel pengguna yang terhubung via local_auth:
-  // - Mengecek apakah ada riwayat username login sebelumnya ('last_user').
-  // - Meminta otentikasi sensor biometrik ke hardware OS.
-  // - Jika berhasil terverifikasi, langsung mengaktifkan sesi login tanpa ketik password.
-  Future<void> _bio() async {
-    // Delegasikan pemeriksaan sidik jari ke AuthService perangkat.
-    setState(() => _loading = true);
-    try {
-      if (await AuthService.loginBiometric()) {
-        _goHome();
-      } else {
-        _msg(
-          'Biometrik gagal atau belum ada sesi login tersimpan',
-          isError: true,
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -534,86 +514,6 @@ class _LoginPageState extends State<LoginPage> {
                                         letterSpacing: 0.3,
                                       ),
                                     ),
-                            ),
-                          ),
-                          const SizedBox(height: 18),
-
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Divider(
-                                  // WARNA: warna komponen.
-                                  color: _cTobacco.withValues(alpha: 0.5),
-                                  thickness: 0.9,
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                ),
-                                child: Text(
-                                  'atau',
-                                  style: GoogleFonts.poppins(
-                                    // WARNA: teks 'atau'.
-                                    color: _cWalnut.withValues(alpha: 0.7),
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Divider(
-                                  // WARNA: teks 'atau'.
-                                  color: _cTobacco.withValues(alpha: 0.5),
-                                  thickness: 0.9,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-
-                          Material(
-                            // WARNA: warna komponen.
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(14),
-                              onTap: _loading ? null : _bio,
-                              child: Container(
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  // WARNA: garis tepi komponen.
-                                  border: Border.all(
-                                    // WARNA: garis tepi kartu/komponen.
-                                    color: _cTobacco,
-                                    width: 1.1,
-                                  ),
-                                  // WARNA: garis tepi kartu/komponen.
-                                  color: _cAgedPaper.withValues(alpha: 0.3),
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.fingerprint,
-                                      size: 24,
-                                      // WARNA: ikon fingerprint.
-                                      color: _cWalnut,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      'Masuk dengan Biometrik',
-                                      style: GoogleFonts.poppins(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13.5,
-                                        // WARNA: teks 'Masuk dengan Biometrik'.
-                                        color: _cWalnut,
-                                        letterSpacing: 0.2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ),
                           ),
                         ],

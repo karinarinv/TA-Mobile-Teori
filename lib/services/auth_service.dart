@@ -14,15 +14,12 @@
 //    - Mengambil salt milik user dari database, lalu menghitung _hash(inputPass, salt).
 //    - Membandingkan hash hasil kalkulasi dengan hash yang tersimpan di database.
 //    - Jika cocok, simpan 'session_user', 'last_user', dan 'session_last_active_ms'.
-// 4. Biometrik:
-//    - Menggunakan local_auth untuk otentikasi hardware (Fingerprint / Face Unlock).
 // ============================================================================
 
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'db_helper.dart';
@@ -369,23 +366,5 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('session_user');
     await prefs.remove('session_last_active_ms');
-  }
-
-  // =========================================================================
-  // LOGIKA 4: AUTENTIKASI BIOMETRIK (LOCAL AUTH)
-  // =========================================================================
-  // 1. Cek apakah ada riwayat username 'last_user' di SharedPreferences.
-  // 2. Cek apakah sensor biometrik tersedia dan aktif di hardware perangkat.
-  // 3. Panggil auth.authenticate(): sistem operasi menampilkan prompt sensor sidik jari/wajah.
-  // 4. Jika berhasil, aktifkan sesi baru untuk username tersebut.
-  static Future<bool> loginBiometric() async {
-    final p = await SharedPreferences.getInstance();
-    final last = p.getString('last_user');
-    if (last == null) return false;
-    final auth = LocalAuthentication();
-    if (!await auth.isDeviceSupported()) return false;
-    final ok = await auth.authenticate(localizedReason: 'Masuk ke RentBook');
-    if (ok) await _setSession(last);
-    return ok;
   }
 }

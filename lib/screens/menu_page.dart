@@ -1,21 +1,3 @@
-// ============================================================================
-// FITUR BERANDA & PANDUAN APLIKASI INTERAKTIF (MENU PAGE)
-// ----------------------------------------------------------------------------
-// Logika Presentasi:
-// 1. DASHBOARD BERANDA UTAMA:
-//    - Header Sapaan: Menampilkan nama pengguna aktif, foto profil dari SQLite,
-//      badge member VIP, serta ikon notifikasi dengan badge pesan belum dibaca.
-//    - Banner Carousel Otomatis: Timer periodik berganti setiap 4 detik untuk
-//      menyorot buku unggulan & promo membership.
-//    - Grid Menu Pintasan Layanan: Akses cepat ke Katalog Buku, Scan AI Vision,
-//      Peta Cabang LBS, Chatbot AI, Labirin Wikwok, Konversi Kurs & Jam, serta Blockchain.
-//    - Buku Rekomendasi Terkurasi: Menampilkan kartu buku terlaris dengan rating,
-//      kategori, dan harga sewa per hari.
-// 2. FITUR PANDUAN APLIKASI INTERAKTIF (_LibraryBookGuideDialog):
-//    - Dialog berbentuk buku virtual interaktif 5 lembaran (halaman) yang dapat dibalik.
-//    - Menjelaskan panduan langkah demi langkah cara mencari buku, menyewa, melakukan
-//      pembayaran, aktivasi VIP, dan menggunakan fitur cerdas AI & LBS.
-// ============================================================================
 
 import 'dart:io';
 
@@ -32,17 +14,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import '../services/auth_service.dart';
 import '../services/notification_service.dart';
-import '../services/subscription_service.dart';
-import 'ai_page.dart';
-import 'ai_vision_page.dart';
-import 'blockchain_page.dart';
 import 'book_detail_page.dart';
 import 'books_page.dart';
 import 'converter_page.dart';
-import 'game_page.dart';
 import 'map_page.dart';
 import 'notification_page.dart';
 import 'profile_page.dart';
+import 'rental_history_page.dart';
+import '../widgets/rental_bottom_sheet.dart';
 
 /// Beranda: profil singkat, notifikasi, banner, buku rekomendasi, dan pintasan fitur.
 class MenuPage extends StatefulWidget {
@@ -53,11 +32,11 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
-  // Data akun yang dipakai di sapaan, avatar, badge VIP, dan rekomendasi.
+  // Data akun yang dipakai di sapaan, avatar, dan rekomendasi.
   String _user = 'rahma';
   String? _userPhoto;
-  bool _isVip = false;
   int _unreadNotifications = 0;
+  int _rentalCount = 0;
   String? _lastRentedGenre;
 
   // Banner Carousel
@@ -185,6 +164,7 @@ class _MenuPageState extends State<MenuPage> {
   void initState() {
     super.initState();
     _loadUser();
+    RentalBottomSheet.rentalUpdateNotifier.addListener(_loadUser);
     _loadNotificationsCount();
     _loadLastRentedGenre();
     _startBannerAutoSlide();
@@ -192,6 +172,7 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   void dispose() {
+    RentalBottomSheet.rentalUpdateNotifier.removeListener(_loadUser);
     _bannerTimer?.cancel();
     _bannerController.dispose();
     super.dispose();
@@ -202,7 +183,7 @@ class _MenuPageState extends State<MenuPage> {
     // Geser ke banner berikutnya setiap 4 detik; perpindahannya berlangsung 450 ms.
     _bannerTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (_bannerController.hasClients) {
-        final next = (_currentBannerIndex + 1) % 4;
+        final next = (_currentBannerIndex + 1) % 2;
         _bannerController.animateToPage(
           next,
           duration: const Duration(milliseconds: 450),
@@ -213,13 +194,14 @@ class _MenuPageState extends State<MenuPage> {
   }
 
   Future<void> _loadUser() async {
-    // Ambil username, foto, dan status VIP untuk mengisi bagian header.
-    // Muat username/foto lokal dan status VIP untuk bagian header beranda.
+    // Ambil username, foto, dan total transaksi sewa aktif dari SQLite.
     final u = await AuthService.currentSession();
     String? photo;
+    int rentalCount = 0;
     if (u != null && u.isNotEmpty) {
       try {
-        final rows = await (await DbHelper.db).query(
+        final db = await DbHelper.db;
+        final rows = await db.query(
           'users',
           where: 'username=?',
           whereArgs: [u],
@@ -227,14 +209,19 @@ class _MenuPageState extends State<MenuPage> {
         if (rows.isNotEmpty) {
           photo = rows.first['photo'] as String?;
         }
+        final txRows = await db.query(
+          'riwayat_transaksi',
+          where: 'username=?',
+          whereArgs: [u],
+        );
+        rentalCount = txRows.length;
       } catch (_) {}
     }
-    final isVip = await SubscriptionService.isVip();
     if (mounted) {
       setState(() {
         if (u != null && u.isNotEmpty) _user = u;
         _userPhoto = photo;
-        _isVip = isVip;
+        _rentalCount = rentalCount;
       });
     }
   }
@@ -473,7 +460,7 @@ class _MenuPageState extends State<MenuPage> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        _isVip ? 'VIP Member' : 'Anggota',
+                                        'Anggota Perpustakaan',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.plusJakartaSans(
@@ -623,21 +610,7 @@ class _MenuPageState extends State<MenuPage> {
                                         onTap: () => go(const BooksPage()),
                                       ),
 
-                                      // Banner 2: Game Labirin (Arahkan ke Menu Game / Cek VIP)
-                                      _buildImageBanner(
-                                        imagePath:
-                                            'assets/images/banner_game.png',
-                                        onTap: () {
-                                          SubscriptionService.checkAccess(
-                                            context,
-                                            featureName: 'Labirin Perpustakaan',
-                                            onAllowed: () =>
-                                                go(const GamePage()),
-                                          );
-                                        },
-                                      ),
-
-                                      // Banner 3: Buku Project Hail Mary (Arahkan ke Detail Hail Mary)
+                                      // Banner 2: Buku Project Hail Mary (Arahkan ke Detail Hail Mary)
                                       _buildImageBanner(
                                         imagePath: 'assets/images/banner_hail_mary.png',
                                         onTap: () {
@@ -651,18 +624,6 @@ class _MenuPageState extends State<MenuPage> {
                                           );
                                         },
                                       ),
-
-                                      // Banner 4: VIP Membership (Langsung Pop up Upgrade VIP)
-                                      _buildImageBanner(
-                                        imagePath:
-                                            'assets/images/banner_vip.png',
-                                        onTap: () {
-                                          SubscriptionService.showPaywallDialog(
-                                            context,
-                                            featureName: 'Membership VIP',
-                                          );
-                                        },
-                                      ),
                                     ],
                                   ),
                                 ),
@@ -673,7 +634,7 @@ class _MenuPageState extends State<MenuPage> {
                             // Indikator Titik-Titik (...)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(4, (index) {
+                              children: List.generate(2, (index) {
                                 final isCur = _currentBannerIndex == index;
                                 return AnimatedContainer(
                                   duration: const Duration(milliseconds: 300),
@@ -726,43 +687,47 @@ class _MenuPageState extends State<MenuPage> {
                   child: _buildServicesGrid(go),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
 
-                // ============================================================
-                // 4. CHATBOT KURATOR BUKU AI (LANGSUNG SETELAH EKSPLOR FITUR)
-                // ============================================================
+                // Kartu Ringkasan Total Sewa Buku
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18),
                   child: Material(
-                    // WARNA: warna elemen beranda.
                     color: Colors.transparent,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () => go(const AiPage()),
+                      onTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const RentalHistoryPage(),
+                          ),
+                        );
+                        _loadUser();
+                      },
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 14,
+                          horizontal: 14,
+                          vertical: 12,
                         ),
                         decoration: BoxDecoration(
+                          // WARNA: gradasi latar kartu riwayat sewa.
                           gradient: const LinearGradient(
-                            // WARNA: latar kartu fitur beranda.
                             colors: [Color(0xFF67343A), Color(0xFF4C272C)],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16),
-                          // WARNA: garis tepi kartu fitur beranda.
+                          // WARNA: garis tepi kartu riwayat sewa.
                           border: Border.all(
-                            // WARNA: garis tepi kartu/komponen.
-                            color: const Color(0xFFD4AF37),
+                            color: const Color(0xFFD4BE9D).withValues(alpha: 0.35),
                             width: 1.2,
                           ),
                           boxShadow: [
                             BoxShadow(
-                              // WARNA: bayangan kartu beranda.
+                              // WARNA: bayangan kartu riwayat sewa.
                               color: const Color(0xFF67343A)
-                                  .withValues(alpha: 0.25),
+                                  .withValues(alpha: 0.22),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -771,43 +736,51 @@ class _MenuPageState extends State<MenuPage> {
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                // WARNA: latar elemen beranda.
-                                color: Color(0xFFFAF7F2),
+                              padding: const EdgeInsets.all(9),
+                              decoration: BoxDecoration(
+                                // WARNA: lingkaran latar ikon riwayat sewa.
+                                color: const Color(0xFFFAF7F2),
                                 shape: BoxShape.circle,
+                                // WARNA: garis tepi lingkaran ikon riwayat sewa.
+                                border: Border.all(
+                                  color: const Color(0xFFEDE2CF),
+                                  width: 1.5,
+                                ),
                               ),
+                              // WARNA: ikon riwayat sewa pada kartu beranda.
                               child: const Icon(
-                                Icons.auto_stories_rounded,
-                                // WARNA: latar elemen beranda.
+                                Icons.receipt_long_rounded,
                                 color: Color(0xFF67343A),
-                                size: 22,
+                                size: 20,
                               ),
                             ),
-                            const SizedBox(width: 14),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Asisten Buku AI',
+                                    'Riwayat Sewa',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 14.5,
+                                    style: GoogleFonts.playfairDisplay(
+                                      fontSize: 15,
                                       fontWeight: FontWeight.bold,
-                                      // WARNA: teks 'Asisten Buku AI'.
+                                      // WARNA: teks judul kartu riwayat sewa.
                                       color: const Color(0xFFEDE2CF),
+                                      letterSpacing: 0.2,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Cari rekomendasi bacaan dan tanya sinopsis.',
+                                    'Pantau buku & batas pengembalian',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.plusJakartaSans(
                                       fontSize: 11,
-                                      // WARNA: teks 'Asisten Buku AI'.
-                                      color: const Color(0xFFEDE2CF)
-                                          .withValues(alpha: 0.9),
+                                      // WARNA: subteks deskripsi kartu riwayat sewa.
+                                      color: const Color(0xFFD4BE9D),
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ],
@@ -816,22 +789,34 @@ class _MenuPageState extends State<MenuPage> {
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
+                                horizontal: 9,
+                                vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                // WARNA: latar elemen beranda.
+                                // WARNA: latar tombol pil 'Lihat'.
                                 color: const Color(0xFFEDE2CF),
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text(
-                                'Tanya AI',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  // WARNA: teks 'Tanya AI'.
-                                  color: const Color(0xFF67343A),
-                                ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Lihat',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      // WARNA: teks tombol pil 'Lihat'.
+                                      color: const Color(0xFF67343A),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  // WARNA: ikon panah tombol pil 'Lihat'.
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Color(0xFF67343A),
+                                    size: 15,
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -841,7 +826,7 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                 ),
 
-                const SizedBox(height: 26),
+                const SizedBox(height: 24),
 
                 // ============================================================
                 // 5. PILIHAN UNTUKMU (BUKU-BUKU REKOMENDASI SETELAH CHATBOT)
@@ -1138,33 +1123,16 @@ class _MenuPageState extends State<MenuPage> {
 
   // 1. Gambar untuk Fitur Cari & Sewa Buku:
   static const String pathGambarCariBuku = 'assets/images/cari dan sewa.png';
-
-  // 2. Gambar untuk Fitur Kenali Buku (Pindai Cover):
-  static const String pathGambarKenaliBuku = 'assets/images/kenali buku.png';
-
-  // 3. Gambar untuk Fitur Labirin Game:
-  static const String? pathGambarLabirinGame = 'assets/images/labirin.png';
-
-  // 4. Gambar untuk Fitur Perpustakaan GPS:
   static const String? pathGambarPerpustakaanGps = 'assets/images/gps.png';
-
-  // 5. Gambar untuk Fitur Riwayat Blockchain:
-  static const String? pathGambarRiwayatBlockchain =
-      'assets/images/blockchain.png';
-
-  // 6. Gambar untuk Fitur Konversi Kurs:
   static const String? pathGambarKonversiKurs = 'assets/images/konversi.png';
 
-  // =========================================================================
-  // WIDGET: EKSPLOR FITUR RENTBOOK
-  // =========================================================================
   Widget _buildServicesGrid(void Function(Widget) go) {
     final services = [
       _ServiceItem(
         title: 'Cari Buku',
         imageAsset: pathGambarCariBuku,
         fallbackIcon: Icons.menu_book_rounded,
-        // WARNA: fallback ikon fitur 'Cari Buku'.
+        // WARNA: warna ilustrasi fallback layanan Cari Buku.
         fallbackColor: const Color(0xFF67343A),
         onTap: () => go(const BooksPage()),
       ),
@@ -1172,59 +1140,17 @@ class _MenuPageState extends State<MenuPage> {
         title: 'Perpustakaan GPS',
         imageAsset: pathGambarPerpustakaanGps,
         fallbackIcon: Icons.location_on_rounded,
-        // WARNA: fallback ikon fitur 'Cari Buku'.
+        // WARNA: warna ilustrasi fallback layanan Perpustakaan GPS.
         fallbackColor: const Color(0xFF43634B),
         onTap: () => go(const MapPage()),
-      ),
-      _ServiceItem(
-        title: 'Riwayat Blockchain',
-        imageAsset: pathGambarRiwayatBlockchain,
-        fallbackIcon: Icons.lock_clock_rounded,
-        // WARNA: fallback ikon fitur 'Perpustakaan GPS'.
-        fallbackColor: const Color(0xFF7C3F2B),
-        onTap: () => go(const BlockchainPage()),
-      ),
-      _ServiceItem(
-        title: 'Kenali Buku',
-        imageAsset: pathGambarKenaliBuku,
-        fallbackIcon: Icons.camera_enhance_rounded,
-        // WARNA: fallback ikon fitur 'Riwayat Blockchain'.
-        fallbackColor: const Color(0xFF4C3B71),
-        requiresVip: true,
-        onTap: () => SubscriptionService.checkAccess(
-          context,
-          featureName: 'Kenali Buku',
-          onAllowed: () => go(const AiVisionPage()),
-          onSubscribed: () => _loadUser(),
-        ),
-      ),
-      _ServiceItem(
-        title: 'Labirin Game',
-        imageAsset: pathGambarLabirinGame,
-        fallbackIcon: Icons.sports_esports_rounded,
-        // WARNA: fallback ikon fitur 'Labirin Game'.
-        fallbackColor: const Color(0xFFB45309),
-        requiresVip: true,
-        onTap: () => SubscriptionService.checkAccess(
-          context,
-          featureName: 'Labirin Perpustakaan',
-          onAllowed: () => go(const GamePage()),
-          onSubscribed: () => _loadUser(),
-        ),
       ),
       _ServiceItem(
         title: 'Konversi Kurs & Jam',
         imageAsset: pathGambarKonversiKurs,
         fallbackIcon: Icons.currency_exchange_rounded,
-        // WARNA: fallback ikon fitur 'Konversi Kurs & Jam'.
+        // WARNA: warna ilustrasi fallback layanan Konversi Kurs.
         fallbackColor: const Color(0xFF3B506B),
-        requiresVip: true,
-        onTap: () => SubscriptionService.checkAccess(
-          context,
-          featureName: 'Konversi Kurs & Jam',
-          onAllowed: () => go(const ConverterPage()),
-          onSubscribed: () => _loadUser(),
-        ),
+        onTap: () => go(const ConverterPage()),
       ),
     ];
 
@@ -1234,14 +1160,13 @@ class _MenuPageState extends State<MenuPage> {
       itemCount: services.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
-        crossAxisSpacing: 8,
+        crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        mainAxisExtent: 104,
+        mainAxisExtent: 106,
       ),
       itemBuilder: (context, i) {
         final s = services[i];
         return Material(
-          // WARNA: warna elemen beranda.
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(14),
@@ -1252,57 +1177,22 @@ class _MenuPageState extends State<MenuPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 62,
+                    height: 62,
                     decoration: BoxDecoration(
-                      // WARNA: latar elemen beranda.
+                      // WARNA: latar belakang wadah ikon layanan beranda.
                       color: const Color(0xFFF1EAE1),
-                      borderRadius: BorderRadius.circular(15),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        s.imageAsset != null
-                            ? Image.asset(
-                                s.imageAsset!,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) =>
-                                    _buildFallbackServiceIllustration(s),
-                              )
-                            : _buildFallbackServiceIllustration(s),
-                        if (s.requiresVip && !_isVip)
-                          Container(
-                            decoration: BoxDecoration(
-                              // WARNA: latar elemen beranda.
-                              color: const Color(0xCC302622),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.lock_rounded,
-                                  // WARNA: latar elemen beranda.
-                                  color: Color(0xFFEDE2CF),
-                                  size: 22,
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'VIP',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    // WARNA: teks 'VIP'.
-                                    color: const Color(0xFFD4AF37),
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
+                    child: s.imageAsset != null
+                        ? Image.asset(
+                            s.imageAsset!,
+                            fit: BoxFit.contain,
+                            errorBuilder: (_, __, ___) =>
+                                _buildFallbackServiceIllustration(s),
+                          )
+                        : _buildFallbackServiceIllustration(s),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -1314,7 +1204,7 @@ class _MenuPageState extends State<MenuPage> {
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       height: 1.15,
-                      // WARNA: teks 's.title'.
+                      // WARNA: teks judul layanan di beranda.
                       color: const Color(0xFF302622),
                     ),
                   ),
@@ -1330,7 +1220,6 @@ class _MenuPageState extends State<MenuPage> {
   Widget _buildFallbackServiceIllustration(_ServiceItem s) {
     return Container(
       decoration: BoxDecoration(
-        // WARNA: latar elemen beranda.
         color: s.fallbackColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -1339,19 +1228,17 @@ class _MenuPageState extends State<MenuPage> {
           width: 52,
           height: 52,
           decoration: BoxDecoration(
-            // WARNA: latar elemen beranda.
+            // WARNA: lingkaran latar ilustrasi fallback.
             color: Colors.white,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                // WARNA: bayangan kartu beranda.
                 color: s.fallbackColor.withValues(alpha: 0.2),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
             ],
           ),
-          // WARNA: bayangan kartu beranda.
           child: Icon(s.fallbackIcon, size: 26, color: s.fallbackColor),
         ),
       ),
@@ -1365,7 +1252,6 @@ class _ServiceItem {
   final IconData fallbackIcon;
   final Color fallbackColor;
   final VoidCallback onTap;
-  final bool requiresVip;
 
   _ServiceItem({
     required this.title,
@@ -1373,11 +1259,9 @@ class _ServiceItem {
     required this.fallbackIcon,
     required this.fallbackColor,
     required this.onTap,
-    this.requiresVip = false,
   });
 }
 
-// =========================================================================
 // LOGIKA FITUR PANDUAN APLIKASI (INTERACTIVE GUIDE BOOK DIALOG)
 // =========================================================================
 // Dialog berbentuk buku interaktif beranimasi lembaran halaman:
@@ -1400,7 +1284,7 @@ class _LibraryBookGuideDialog extends StatefulWidget {
 class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  static const int _totalPages = 5;
+  static const int _totalPages = 3;
 
   @override
   void dispose() {
@@ -1568,8 +1452,6 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
                           _buildPageOne(),
                           _buildPageTwo(),
                           _buildPageThree(),
-                          _buildPageFour(),
-                          _buildPageFive(),
                         ],
                       ),
                     ),
@@ -1726,7 +1608,7 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
         ),
         _buildSectionItem(
           title: 'Pembayaran QRIS Cepat',
-          desc: 'Pindai kode QRIS menggunakan e-Wallet (GoPay, OVO, Dana) atau Mobile Banking. Pembayaran terverifikasi aman dan dapat dicek langsung ke buku besar blockchain.',
+          desc: 'Pindai kode QRIS menggunakan e-Wallet (GoPay, OVO, Dana) atau Mobile Banking. Pembayaran terverifikasi otomatis secara instan.',
         ),
         _buildSectionItem(
           title: 'Virtual Account & Voucher Diskon',
@@ -1739,60 +1621,20 @@ class _LibraryBookGuideDialogState extends State<_LibraryBookGuideDialog> {
   Widget _buildPageThree() {
     return _buildPageContainer(
       chapter: 'BAB III',
-      title: 'Integritas Blockchain SHA-256',
-      icon: Icons.lock_clock_rounded,
+      title: 'Perpustakaan GPS & Konversi Kurs',
+      icon: Icons.explore_rounded,
       sections: [
         _buildSectionItem(
-          title: 'Buku Besar Digital Abadi',
-          desc: 'Setiap transaksi sewa dan aktivasi VIP dicatat ke dalam buku besar lokal terenkripsi SHA-256 yang saling terhubung secara berantai.',
+          title: 'Perpustakaan GPS (LBS)',
+          desc: 'Temukan perpustakaan terdekat dengan rute navigasi interaktif OpenStreetMap, penghitungan jarak langsung, serta informasi jam operasional.',
         ),
         _buildSectionItem(
-          title: 'Kekebalan dari Manipulasi',
-          desc: 'Setiap blok menyimpan hash blok sebelumnya. Apabila terdapat perubahan data ilegal, rantai blok akan mendeteksi inkonsistensi secara otomatis.',
+          title: 'Konversi Kurs Mata Uang & Waktu',
+          desc: 'Akses konversi nilai tukar mata uang global realtime melalui REST API serta konverter zona waktu dunia untuk kebutuhan referensi internasional Anda.',
         ),
         _buildSectionItem(
-          title: 'Audit Keaslian Mandiri',
-          desc: 'Buka fitur "Riwayat Blockchain" untuk memverifikasi keaslian transaksi, waktu simpan, dan tanda tangan hash kriptografis Anda.',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPageFour() {
-    return _buildPageContainer(
-      chapter: 'BAB IV',
-      title: 'Fitur Cerdas AI Gemini & Vision',
-      icon: Icons.auto_awesome_rounded,
-      sections: [
-        _buildSectionItem(
-          title: 'Asisten AI Kurator (LLM Gemini)',
-          desc: 'Konsultasikan bacaan Anda dengan AI Kurator. AI dapat merangkum sinopsis, menganalisis tokoh buku, dan memberikan saran bacaan sesuai minat Anda.',
-        ),
-        _buildSectionItem(
-          title: 'AI Vision Scanner (Kamera & Galeri)',
-          desc: 'Arahkan kamera ke sampul buku fisik atau unggah dari galeri foto. Model AI Vision akan menganalisis sampul dan mencari informasinya di perpustakaan secara otomatis.',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPageFive() {
-    return _buildPageContainer(
-      chapter: 'BAB V',
-      title: 'Labirin & Keanggotaan VIP',
-      icon: Icons.workspace_premium_rounded,
-      sections: [
-        _buildSectionItem(
-          title: 'Labirin Perpustakaan & Hadiah Voucher',
-          desc: 'Taklukkan labirin 3 lantai, kumpulkan buku-buku di lorong, dan raih Buku Emas beserta voucher diskon spesial.',
-        ),
-        _buildSectionItem(
-          title: 'VIP 1 Bulan Rp29.000 • 1 Tahun Rp299.000 promo',
-          desc: 'Dapatkan akses eksklusif untuk 3 fitur utama: Minigame Labirin Perpustakaan, Konversi Kurs & Jam Dunia, serta AI Vision Scanner.',
-        ),
-        _buildSectionItem(
-          title: 'Masa Aktif Natural Tanpa Jebakan',
-          desc: 'Paket VIP 1 bulan berlaku 30 hari, sedangkan paket 1 tahun berlaku 365 hari sejak aktivasi. Setelah masa aktif berakhir, akun Anda otomatis kembali menjadi Reguler.',
+          title: 'Koleksi & Penyimpanan Lokal',
+          desc: 'Simpan buku favorit Anda ke dalam memori lokal perangkat untuk dibaca sewaktu-waktu tanpa memerlukan koneksi internet.',
         ),
       ],
     );

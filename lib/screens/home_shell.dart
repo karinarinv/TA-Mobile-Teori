@@ -8,14 +8,10 @@
 //      * Index 1: Profil Pengguna (ProfilePage)
 //      * Index 2: Evaluasi & Saran (FeedbackPage)
 // 2. State Retention: Menyimpan index halaman aktif menggunakan setState(_i = n).
-// 3. Pending Camera Recovery: Memeriksa flag SharedPreferences jika kamera AI Vision
-//    sempat dijeda oleh siklus hidup Android saat mengambil gambar.
 // ============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'ai_vision_page.dart';
 import 'menu_page.dart';
 import 'profile_page.dart';
 import 'feedback_page.dart';
@@ -30,30 +26,6 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _i = 0;
   final _pages = const [MenuPage(), ProfilePage(), FeedbackPage()];
-
-  @override
-  void initState() {
-    super.initState();
-    _checkPendingCamera();
-  }
-
-  Future<void> _checkPendingCamera() async {
-    // Pulihkan halaman pemindai jika aplikasi sempat dijeda saat membuka kamera.
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool('ai_vision_camera_pending') == true) {
-        await prefs.remove('ai_vision_camera_pending');
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AiVisionPage()),
-            );
-          }
-        });
-      }
-    } catch (_) {}
-  }
 
   // WARNA: palet _cOxblood ().
   static const Color _cOxblood = Color(0xFF67343A);

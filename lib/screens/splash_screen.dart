@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-
-import '../services/game_audio_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -35,7 +33,6 @@ class _SplashScreenState extends State<SplashScreen>
   late final Animation<double> _pageTurn;
   // Opacity lapisan putih untuk menyamarkan perpindahan halaman.
   late final Animation<double> _whiteFade;
-  Timer? _pageSound;
 
   @override
   void initState() {
@@ -85,10 +82,6 @@ class _SplashScreenState extends State<SplashScreen>
       // Lapisan putih muncul dari sekitar detik 2,35 sampai 2,8.
       curve: const Interval(.84, 1, curve: Curves.easeIn),
     );
-    // Efek suara membalik halaman diputar 0,7 detik setelah splash mulai.
-    _pageSound = Timer(const Duration(milliseconds: 700), () {
-      if (mounted) unawaited(GameAudioService.playPageTurn());
-    });
     // Setelah controller mencapai akhir, lanjut ke halaman tujuan.
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) _openApp();
@@ -177,8 +170,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
-    // Hentikan timer dan animasi agar tidak berjalan setelah halaman ditutup.
-    _pageSound?.cancel();
+    // Hentikan animasi agar tidak berjalan setelah halaman ditutup.
     _controller.dispose();
     super.dispose();
   }

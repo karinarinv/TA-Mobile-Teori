@@ -1,5 +1,5 @@
 // ============================================================================
-// FITUR FEEDBACK (KESAN & PESAN MATA KULIAH PEMROGRAMAN APLIKASI MOBILE)
+// FITUR FEEDBACK (KESAN & PESAN MATA KULIAH PRAKTIKUM PEMROGRAMAN APLIKASI MOBILE)
 // ----------------------------------------------------------------------------
 // Logika Presentasi:
 // 1. Evaluasi Interaktif Perkuliahan:
@@ -249,7 +249,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Bagikan kesan dan pesan Anda selama mengikuti perkuliahan Pemrograman Aplikasi Mobile.',
+                      'Bagikan kesan dan pesan Anda selama mengikuti perkuliahan Praktikum Pemrograman Aplikasi Mobile.',
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         // WARNA: teks 'Evaluasi Mata Kuliah'.
@@ -280,7 +280,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Rating Mata Kuliah Pemrograman Aplikasi Mobile',
+                'Rating Mata Kuliah Praktikum Pemrograman Aplikasi Mobile',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 13.5,
@@ -330,11 +330,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
         const SizedBox(height: 18),
 
         Text(
-          'Kesan untuk Mata Kuliah PAM',
+          'Kesan untuk Mata Kuliah Praktikum PAM',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            // WARNA: teks 'Kesan untuk Mata Kuliah PAM'.
+            // WARNA: teks 'Kesan untuk Mata Kuliah Praktikum PAM'.
             color: AppColors.walnut,
           ),
         ),
@@ -345,8 +345,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
           // WARNA: warna komponen.
           style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Tuliskan kesan dan pengalaman Anda selama mengikuti mata kuliah Pemrograman Aplikasi Mobile...',
-            // WARNA: teks 'Kesan untuk Mata Kuliah PAM'.
+            hintText: 'Tuliskan kesan dan pengalaman Anda selama mengikuti mata kuliah Praktikum Pemrograman Aplikasi Mobile...',
+            // WARNA: teks 'Kesan untuk Mata Kuliah Praktikum PAM'.
             hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: Colors.grey.shade400),
             filled: true,
             // WARNA: teks judul/isi pada bagian ini.
@@ -374,11 +374,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
         // Input Saran
         Text(
-          'Pesan & Saran untuk Mata Kuliah PAM',
+          'Pesan & Saran untuk Mata Kuliah Praktikum PAM',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
             fontSize: 14,
-            // WARNA: teks 'Pesan & Saran untuk Mata Kuliah PAM'.
+            // WARNA: teks 'Pesan & Saran untuk Mata Kuliah Praktikum PAM'.
             color: AppColors.walnut,
           ),
         ),
@@ -389,8 +389,8 @@ class _FeedbackPageState extends State<FeedbackPage> {
           // WARNA: warna komponen.
           style: GoogleFonts.poppins(fontSize: 13, color: AppColors.textPrimary),
           decoration: InputDecoration(
-            hintText: 'Tuliskan kritik, pesan, atau saran membangun untuk mata kuliah Pemrograman Aplikasi Mobile ke depannya...',
-            // WARNA: teks 'Pesan & Saran untuk Mata Kuliah PAM'.
+            hintText: 'Tuliskan kritik, pesan, atau saran membangun untuk mata kuliah Praktikum Pemrograman Aplikasi Mobile ke depannya...',
+            // WARNA: teks 'Pesan & Saran untuk Mata Kuliah Praktikum PAM'.
             hintStyle: GoogleFonts.poppins(fontSize: 12.5, color: Colors.grey.shade400),
             filled: true,
             // WARNA: teks judul/isi pada bagian ini.

@@ -5,8 +5,7 @@
 // 1. Data Agregasi Akun:
 //    - Mengambil data sesi pengguna aktif (AuthService.currentSession()).
 //    - Membaca foto profil & timestamp ganti nama dari database lokal SQLite 'users'.
-//    - Menghitung statistik buku favorit (BookmarkService) & riwayat sewa (BlockchainService).
-//    - Memeriksa status keanggotaan VIP, nama paket, dan tanggal kedaluwarsa.
+//    - Menghitung statistik buku favorit (BookmarkService) & riwayat transaksi sewa dari SQLite.
 // 2. Cooldown Pergantian Username (30 Hari):
 //    - Mencegah spam pergantian username dengan membatasi perubahan hanya boleh
 //      dilakukan sekali setiap 30 hari (AuthService.usernameChangeCooldown).
@@ -19,7 +18,6 @@
 
 import 'package:google_fonts/google_fonts.dart';
 
-import '../services/subscription_service.dart';
 
 import 'dart:io';
 
@@ -30,9 +28,9 @@ import 'package:intl/intl.dart';
 import '../services/auth_service.dart';
 import '../services/db_helper.dart';
 import '../services/bookmark_service.dart';
-import '../services/blockchain_service.dart';
 import 'saved_books_page.dart';
-import 'blockchain_page.dart';
+import 'rental_history_page.dart';
+import '../widgets/rental_bottom_sheet.dart';
 import 'login_page.dart';
 
 /// Ringkasan akun: profil lokal, bookmark, riwayat sewa, dan membership.
@@ -49,14 +47,18 @@ class _ProfilePageState extends State<ProfilePage> {
   int _savedCount = 0;
   int _rentalCount = 0;
   bool _loading = true;
-  bool _isVip = false;
-  String _vipPlanName = '-';
-  String _vipExpiry = '';
 
   @override
   void initState() {
     super.initState();
     _load();
+    RentalBottomSheet.rentalUpdateNotifier.addListener(_load);
+  }
+
+  @override
+  void dispose() {
+    RentalBottomSheet.rentalUpdateNotifier.removeListener(_load);
+    super.dispose();
   }
 
   // =========================================================================
@@ -94,21 +96,30 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     final bookmarks = await BookmarkService.getBookmarks();
-    final rentals = await BlockchainService.all();
+    int rentalCount = 0;
+    try {
+      final db = await DbHelper.db;
+      final currentUser = username ?? await AuthService.currentSession();
+      List<Map<String, Object?>> rows;
+      if (currentUser != null && currentUser.isNotEmpty) {
+        rows = await db.query(
+          'riwayat_transaksi',
+          where: 'username=?',
+          whereArgs: [currentUser],
+        );
+      } else {
+        rows = await db.query('riwayat_transaksi');
+      }
+      rentalCount = rows.length;
+    } catch (_) {}
 
     if (mounted) {
-      final isVip = await SubscriptionService.isVip();
-      final vipPlanName = await SubscriptionService.getPlanName();
-      final expiry = await SubscriptionService.getExpiryDate();
       setState(() {
         _username = username;
         _photo = photo;
         _usernameChangeAvailableAt = usernameChangeAvailableAt;
         _savedCount = bookmarks.length;
-        _rentalCount = rentals.length;
-        _isVip = isVip;
-        _vipPlanName = vipPlanName;
-        _vipExpiry = expiry;
+        _rentalCount = rentalCount;
         _loading = false;
       });
     }
@@ -144,12 +155,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final currentUsername = _username;
     if (currentUsername == null) return;
 
-    final requestedUsername = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
-        builder: (_) => _ChangeUsernamePage(
+    final requestedUsername = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ChangeUsernameModal(
         initialUsername: currentUsername,
         availableAt: _usernameChangeAvailableAt,
-        ),
       ),
     );
 
@@ -481,20 +493,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       shape: BoxShape.circle,
                                       gradient: LinearGradient(
                                         // WARNA: gradasi komponen ini.
-                                        colors: _isVip
-                                            ? const [
-                                                Color(0xFFD4AF37),
-                                                // WARNA: bayangan kartu.
-                                                Color(0xFFB45309),
-                                                // WARNA: bayangan kartu.
-                                                Color(0xFF67343A),
-                                              ]
-                                            : const [
-                                                // WARNA: bayangan kartu.
-                                                Color(0xFFEADBCE),
-                                                // WARNA: bayangan kartu.
-                                                Color(0xFFEDE2CF),
-                                              ],
+                                        colors: const [
+                                            Color(0xFF67343A),
+                                            Color(0xFF9A704F),
+                                            Color(0xFFD4BE9D),
+                                          ],
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                       ),
@@ -617,69 +620,36 @@ class _ProfilePageState extends State<ProfilePage> {
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
-                              vertical: 4.5,
+                              vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              gradient: _isVip
-                                  ? const LinearGradient(
-                                      // WARNA: gradasi komponen ini.
-                                      colors: [
-                                        Color(0xFF67343A),
-                                        Color(0xFF4A1F25),
-                                      ],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                    )
-                                  : null,
-                              // WARNA: latar kartu/komponen ini.
-                              color: _isVip ? null : const Color(0xFFEDE2CF),
+                              // WARNA: latar lencana anggota perpustakaan.
+                              color: const Color(0xFFEDE2CF),
                               borderRadius: BorderRadius.circular(20),
-                              // WARNA: garis tepi komponen.
+                              // WARNA: garis tepi lencana anggota perpustakaan.
                               border: Border.all(
-                                // WARNA: garis tepi kartu/komponen.
-                                color: _isVip
-                                    ? const Color(0xFFD4AF37)
-                                    : const Color(0xFFEADBCE),
+                                color: const Color(0xFF9A704F).withValues(alpha: 0.35),
                                 width: 1.2,
                               ),
-                              boxShadow: _isVip
-                                  ? [
-                                      BoxShadow(
-                                        // WARNA: bayangan kartu.
-                                        color: const Color(0xFF67343A)
-                                            .withValues(alpha: 0.25),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ]
-                                  : null,
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  _isVip
-                                      ? Icons.stars_rounded
-                                      : Icons.person_outline_rounded,
+                                // WARNA: ikon centang lencana keanggotaan.
+                                const Icon(
+                                  Icons.verified_user_rounded,
                                   size: 14,
-                                  // WARNA: ikon stars_rounded.
-                                  color: _isVip
-                                      ? const Color(0xFFD4AF37)
-                                      : const Color(0xFF67343A),
+                                  color: Color(0xFF67343A),
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  _isVip
-                                      ? 'MEMBER VIP • $_vipPlanName'
-                                      : 'MEMBER REGULER',
+                                  'ANGGOTA PERPUSTAKAAN',
                                   style: GoogleFonts.plusJakartaSans(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.8,
-                                    // WARNA: teks status VIP/anggota.
-                                    color: _isVip
-                                        ? const Color(0xFFEDE2CF)
-                                        : const Color(0xFF67343A),
+                                    // WARNA: teks status anggota perpustakaan.
+                                    color: const Color(0xFF67343A),
                                   ),
                                 ),
                               ],
@@ -689,320 +659,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16),
-
-                    // 2. KARTU HERO: KEANGGOTAAN VIP SESUAI COLOR PALETTE
-                    if (_isVip)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            // WARNA: gradasi komponen ini.
-                            colors: [
-                              Color(0xFF5E2B31),
-                              Color(0xFF4A1F25),
-                              // WARNA: latar kartu.
-                              Color(0xFF302622),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          // WARNA: garis tepi komponen.
-                          border: Border.all(
-                            // WARNA: garis tepi kartu/komponen.
-                            color: const Color(0xFFD4AF37)
-                                .withValues(alpha: 0.65),
-                            width: 1.4,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              // WARNA: bayangan kartu.
-                              color: const Color(0xFF302622)
-                                  .withValues(alpha: 0.22),
-                              blurRadius: 14,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Wrap(
-                              alignment: WrapAlignment.spaceBetween,
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 8,
-                              runSpacing: 10,
-                              children: [
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        // WARNA: latar kartu/komponen.
-                                        color: const Color(0xFFEDE2CF)
-                                            .withValues(alpha: 0.15),
-                                        shape: BoxShape.circle,
-                                        // WARNA: bayangan kartu/panel.
-                                        border: Border.all(
-                                          // WARNA: garis tepi kartu/komponen.
-                                          color: const Color(0xFFD4AF37)
-                                              .withValues(alpha: 0.6),
-                                          width: 1.2,
-                                        ),
-                                      ),
-                                      child: const Icon(
-                                        Icons.workspace_premium_rounded,
-                                        // WARNA: garis tepi kartu/komponen.
-                                        color: Color(0xFFD4AF37),
-                                        size: 22,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          'Keanggotaan VIP Club',
-                                          style: GoogleFonts.playfairDisplay(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            // WARNA: teks 'Keanggotaan VIP Club'.
-                                            color: const Color(0xFFEDE2CF),
-                                            letterSpacing: 0.3,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          'Akses eksklusif fitur premium',
-                                          style: GoogleFonts.plusJakartaSans(
-                                            fontSize: 11,
-                                            // WARNA: teks 'Keanggotaan VIP Club'.
-                                            color: const Color(0xFFD4BE9D),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                // Badge VIP Aktif Eksklusif (Sesuai Color Palette)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4.5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    // WARNA: latar kartu/komponen.
-                                    color: const Color(0xFFEDE2CF),
-                                    borderRadius: BorderRadius.circular(20),
-                                    // WARNA: garis tepi komponen.
-                                    border: Border.all(
-                                      // WARNA: garis tepi kartu/komponen.
-                                      color: const Color(0xFFD4AF37),
-                                      width: 1.2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        // WARNA: bayangan kartu.
-                                        color: Colors.black.withValues(
-                                          alpha: 0.2,
-                                        ),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.verified_rounded,
-                                        size: 13,
-                                        // WARNA: ikon verified_rounded.
-                                        color: Color(0xFF67343A),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        _vipPlanName.isNotEmpty
-                                            ? 'VIP AKTIF • $_vipPlanName'
-                                            : 'VIP AKTIF',
-                                        style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 10.5,
-                                          fontWeight: FontWeight.w800,
-                                          // WARNA: teks '_vipPlanName.isNotEmpty'.
-                                          color: const Color(0xFF67343A),
-                                          letterSpacing: 0.6,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 14),
-                            Container(
-                              height: 1,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  // WARNA: gradasi komponen ini.
-                                  colors: [
-                                    const Color(0xFFD4AF37)
-                                        .withValues(alpha: 0.45),
-                                    // WARNA: latar kartu 'Paket $_vipPlanName • aktif hingga $_vipExpiry'.
-                                    Colors.transparent,
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.event_available_rounded,
-                                  size: 16,
-                                  // WARNA: ikon event_available_rounded.
-                                  color: Color(0xFFD4BE9D),
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Paket $_vipPlanName • aktif hingga $_vipExpiry',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 11.5,
-                                      fontWeight: FontWeight.w600,
-                                      // WARNA: teks 'Paket $_vipPlanName • aktif hingga $_vipExpiry'.
-                                      color: const Color(0xFFEDE2CF),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 24),
-                              child: Text(
-                                'Akses tak terbatas: Labirin Perpustakaan, Konversi Kurs & Scan Cover AI.',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 10.5,
-                                  // WARNA: teks judul/isi pada bagian ini.
-                                  color: const Color(0xFFD4BE9D)
-                                      .withValues(alpha: 0.85),
-                                  height: 1.3,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    else
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            // WARNA: gradasi komponen ini.
-                            colors: [Color(0xFFFAF2E6), Color(0xFFF1E6D4)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(18),
-                          // WARNA: garis tepi komponen.
-                          border: Border.all(
-                            // WARNA: garis tepi kartu/komponen.
-                            color: const Color(0xFFD4BE9D),
-                            width: 1.3,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              // WARNA: bayangan kartu.
-                              color: const Color(0xFF302622)
-                                  .withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: const BoxDecoration(
-                                // WARNA: latar kartu/komponen.
-                                color: Color(0xFFEDE2CF),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.workspace_premium_outlined,
-                                // WARNA: latar kartu/komponen.
-                                color: Color(0xFF67343A),
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Tingkatkan ke VIP Club',
-                                    style: GoogleFonts.playfairDisplay(
-                                      fontSize: 14.5,
-                                      fontWeight: FontWeight.bold,
-                                      // WARNA: teks 'Tingkatkan ke VIP Club'.
-                                      color: const Color(0xFF302622),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Akses Labirin Game, Konversi Kurs & AI Vision Scanner.',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 11,
-                                      // WARNA: teks 'Tingkatkan ke VIP Club'.
-                                      color: const Color(0xFF7A4B3A),
-                                      height: 1.3,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            FilledButton(
-                              style: FilledButton.styleFrom(
-                                // WARNA: latar tombol.
-                                backgroundColor: const Color(0xFF67343A),
-                                // WARNA: teks/ikon tombol 'Upgrade'.
-                                foregroundColor: const Color(0xFFEDE2CF),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 14,
-                                  vertical: 8,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: () {
-                                SubscriptionService.showPaywallDialog(
-                                  context,
-                                  featureName: 'Membership VIP',
-                                  onSubscribed: _load,
-                                );
-                              },
-                              child: Text(
-                                'Upgrade',
-                                style: GoogleFonts.plusJakartaSans(
-                                  fontSize: 11.5,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     const SizedBox(height: 16),
 
                     // 3. KARTU MENU NAVIGASI & PENGATURAN AKUN
@@ -1097,61 +753,60 @@ class _ProfilePageState extends State<ProfilePage> {
                               _load();
                             },
                           ),
+                          // WARNA: garis pemisah menu riwayat peminjaman.
                           const Divider(
                             height: 1,
                             indent: 16,
                             endIndent: 16,
-                            // WARNA: warna komponen.
                             color: Color(0xFFEADBCE),
                           ),
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                // WARNA: latar kartu/komponen.
+                                // WARNA: latar kotak ikon menu riwayat peminjaman.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                // WARNA: garis tepi komponen.
+                                // WARNA: garis tepi kotak ikon riwayat.
                                 border: Border.all(
-                                  // WARNA: garis tepi kartu/komponen.
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
+                              // WARNA: ikon struk riwayat peminjaman.
                               child: const Icon(
-                                Icons.lock_clock_rounded,
-                                // WARNA: garis tepi kartu/komponen.
+                                Icons.receipt_long_rounded,
                                 color: Color(0xFF67343A),
                                 size: 19,
                               ),
                             ),
                             title: Text(
-                              'Riwayat Sewa (Blockchain)',
+                              'Riwayat Peminjaman',
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
-                                // WARNA: teks 'Riwayat Sewa (Blockchain)'.
+                                // WARNA: teks judul menu riwayat peminjaman.
                                 color: const Color(0xFF302622),
                               ),
                             ),
                             subtitle: Text(
-                              '$_rentalCount transaksi sewa tercatat di blockchain',
+                              '$_rentalCount riwayat transaksi sewa buku',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
-                                // WARNA: teks 'Riwayat Sewa (Blockchain)'.
+                                // WARNA: subteks informasi menu riwayat peminjaman.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
-                              // WARNA: teks 'Riwayat Sewa (Blockchain)'.
+                              // WARNA: ikon panah menu riwayat.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: () async {
                               await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const BlockchainPage(),
+                                  builder: (_) => const RentalHistoryPage(),
                                 ),
                               );
                               _load();
@@ -1279,30 +934,44 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class _ChangeUsernamePage extends StatefulWidget {
+class _ChangeUsernameModal extends StatefulWidget {
   final String initialUsername;
   final DateTime? availableAt;
 
-  const _ChangeUsernamePage({
+  const _ChangeUsernameModal({
     required this.initialUsername,
     required this.availableAt,
   });
 
   @override
-  State<_ChangeUsernamePage> createState() => _ChangeUsernamePageState();
+  State<_ChangeUsernameModal> createState() => _ChangeUsernameModalState();
 }
 
-class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
+class _ChangeUsernameModalState extends State<_ChangeUsernameModal> {
   late final TextEditingController _controller;
+  bool _canSubmit = false;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.initialUsername);
+    _controller.addListener(_validate);
+  }
+
+  void _validate() {
+    final text = _controller.text.trim();
+    final isValid = text.isNotEmpty &&
+        text != widget.initialUsername &&
+        text.length >= 3 &&
+        text.length <= 20;
+    if (isValid != _canSubmit) {
+      setState(() => _canSubmit = isValid);
+    }
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_validate);
     _controller.dispose();
     super.dispose();
   }
@@ -1310,84 +979,311 @@ class _ChangeUsernamePageState extends State<_ChangeUsernamePage> {
   @override
   Widget build(BuildContext context) {
     final locked = widget.availableAt != null;
-    // WARNA: warna elemen.
-    const background = Color(0xFFEDE2CF);
-    // WARNA: warna elemen.
-    const fieldBackground = Color(0xFFD4BE9D);
-    // WARNA: warna elemen.
     const walnut = Color(0xFF302622);
-    // WARNA: warna elemen.
     const oxblood = Color(0xFF67343A);
-    return Scaffold(
-      // WARNA: latar halaman.
-      backgroundColor: background,
-      appBar: AppBar(
-        // WARNA: latar AppBar.
-        backgroundColor: background,
-        // WARNA: teks/ikon tombol 'Batal'.
-        foregroundColor: walnut,
-        elevation: 0,
-        // WARNA: warna komponen.
-        title: const Text('Ubah nama', style: TextStyle(color: walnut, fontSize: 18, fontWeight: FontWeight.w600)),
-        // WARNA: teks judul/isi pada bagian ini.
-        leading: TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal', style: TextStyle(color: walnut, fontSize: 14))),
-        leadingWidth: 72,
-        actions: [
-          TextButton(
-            onPressed: locked ? null : () => Navigator.pop(context, _controller.text.trim()),
-            // WARNA: teks 'Ubah nama'.
-            child: Text('Simpan', style: TextStyle(color: locked ? walnut.withValues(alpha: 0.4) : oxblood, fontSize: 14, fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(width: 8),
-        ],
+    const parchment = Color(0xFFEDE2CF);
+    const surfaceBg = Color(0xFFFAF7F2);
+    const borderColor = Color(0xFFD4BE9D);
+    const tobacco = Color(0xFF9A704F);
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: surfaceBg,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      body: SafeArea(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: SafeArea(
         top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // WARNA: teks 'Ubah nama'.
-            const Text('Nama pengguna', style: TextStyle(color: walnut, fontSize: 23, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 12),
-            Text(
-              locked
-                  ? 'Nama pengguna hanya dapat diubah setiap 30 hari. Kamu bisa mengubahnya lagi pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.'
-                  : 'Pilih nama pengguna yang mudah dikenali. Nama pengguna hanya dapat diubah setiap 30 hari.',
-              // WARNA: teks 'Simpan'.
-              style: const TextStyle(color: walnut, fontSize: 14, height: 1.45),
-            ),
-            const SizedBox(height: 28),
-            TextField(
-              controller: _controller,
-              autofocus: !locked,
-              readOnly: locked,
-              enabled: !locked,
-              maxLength: 20,
-              textCapitalization: TextCapitalization.none,
-              // WARNA: teks 'Nama pengguna'.
-              style: const TextStyle(color: walnut, fontSize: 16),
-              decoration: InputDecoration(
-                // WARNA: teks judul/isi pada bagian ini.
-                prefixText: '@', prefixStyle: const TextStyle(color: walnut, fontSize: 16),
-                // WARNA: teks judul/isi pada bagian ini.
-                counterStyle: TextStyle(color: walnut.withValues(alpha: 0.65)),
-                // WARNA: teks judul/isi pada bagian ini.
-                filled: true, fillColor: fieldBackground,
-                // WARNA: teks judul/isi pada bagian ini.
-                hintText: 'nama_pengguna', hintStyle: TextStyle(color: walnut.withValues(alpha: 0.55)),
-                helperText: '3–20 karakter: huruf, angka, atau garis bawah',
-                // WARNA: teks judul/isi pada bagian ini.
-                helperStyle: TextStyle(color: walnut.withValues(alpha: 0.75), fontSize: 12),
-                // WARNA: garis tepi komponen.
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                // WARNA: teks judul/isi pada bagian ini.
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: oxblood, width: 1.5)),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle Bar
+              Center(
+                child: Container(
+                  width: 44,
+                  height: 4.5,
+                  decoration: BoxDecoration(
+                    color: borderColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
               ),
-            ),
-          ]),
+              const SizedBox(height: 16),
+
+              // Header Bar (Ikon, Judul & Tombol Tutup)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(
+                      color: parchment,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: borderColor, width: 1.2),
+                    ),
+                    child: const Icon(
+                      Icons.badge_outlined,
+                      color: oxblood,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ganti Username',
+                          style: GoogleFonts.playfairDisplay(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                            color: walnut,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Sesuaikan identitas akun membaca Anda',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11.5,
+                            color: tobacco,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: parchment.withValues(alpha: 0.6),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: walnut,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1, thickness: 1, color: Color(0xFFEADBCE)),
+              const SizedBox(height: 16),
+
+              // Banner Informasi / Cooldown Card
+              if (locked)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFAF2E6),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFFD4AF37).withValues(alpha: 0.65),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.lock_clock_rounded,
+                        color: Color(0xFF9A704F),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Username hanya dapat diubah sekali setiap 30 hari. Anda dapat mengubahnya kembali pada ${DateFormat('dd MMMM yyyy', 'id_ID').format(widget.availableAt!)}.',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: walnut,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    color: parchment.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: borderColor, width: 1.1),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.info_outline_rounded,
+                        color: oxblood,
+                        size: 19,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'Pilih username yang unik dan mudah dikenali. Username dapat diganti kembali 30 hari setelah disimpan.',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: walnut,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 18),
+
+              // Input Username
+              Text(
+                'Username Baru',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: walnut,
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _controller,
+                autofocus: !locked,
+                readOnly: locked,
+                enabled: !locked,
+                maxLength: 20,
+                textCapitalization: TextCapitalization.none,
+                style: GoogleFonts.plusJakartaSans(
+                  color: walnut,
+                  fontSize: 14.5,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(left: 14, right: 8),
+                    child: Center(
+                      widthFactor: 0,
+                      child: Text(
+                        '@',
+                        style: GoogleFonts.plusJakartaSans(
+                          color: oxblood,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: parchment.withValues(alpha: 0.45),
+                  hintText: 'nama_pengguna',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: walnut.withValues(alpha: 0.45),
+                    fontSize: 14,
+                  ),
+                  helperText: '3–20 karakter: huruf, angka, atau garis bawah',
+                  helperStyle: GoogleFonts.plusJakartaSans(
+                    color: tobacco,
+                    fontSize: 11,
+                  ),
+                  counterStyle: GoogleFonts.plusJakartaSans(
+                    color: tobacco,
+                    fontSize: 11,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: borderColor, width: 1.1),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: borderColor, width: 1.1),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: oxblood, width: 1.8),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(
+                      color: borderColor.withValues(alpha: 0.5),
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              // Tombol Aksi
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        side: const BorderSide(color: borderColor, width: 1.2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Batal',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w600,
+                          color: walnut,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: locked ? 1 : 2,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: oxblood,
+                        disabledBackgroundColor: oxblood.withValues(alpha: 0.4),
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: (!locked && _canSubmit)
+                          ? () => Navigator.pop(context, _controller.text.trim())
+                          : null,
+                      child: Text(
+                        'Simpan Perubahan',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
+                          color: parchment,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+typedef _ChangeUsernamePage = _ChangeUsernameModal;
