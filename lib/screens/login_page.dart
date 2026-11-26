@@ -43,19 +43,19 @@ class _LoginPageState extends State<LoginPage> {
   bool _loading = false;
 
   // Palet Warna
-  // WARNA: palet _cWalnut ().
+  // WARNA: palet lokal _cWalnut — cokelat gelap untuk latar fallback halaman login, teks tab tidak aktif, dan teks input form.
   static const Color _cWalnut = Color(0xFF302622);
-  // WARNA: palet _cOxblood ().
+  // WARNA: palet lokal _cOxblood — merah marun untuk tab aktif ('Masuk'/'Daftar Baru'), tombol utama submit, garis fokus input, dan SnackBar error.
   static const Color _cOxblood = Color(0xFF67343A);
-  // WARNA: palet _cTobacco ().
+  // WARNA: palet lokal _cTobacco — cokelat sedang untuk garis tepi (border) kolom input Username & Password saat tidak fokus.
   static const Color _cTobacco = Color(0xFF9A704F);
-  // WARNA: palet _cAgedPaper ().
+  // WARNA: palet lokal _cAgedPaper — krem tua untuk latar tipis kolom isian (fillColor) Username & Password.
   static const Color _cAgedPaper = Color(0xFFD4BE9D);
-  // WARNA: palet _cParchment ().
+  // WARNA: palet lokal _cParchment — krem cerah untuk logo RentBook, teks tab aktif, teks tombol utama, dan teks SnackBar.
   static const Color _cParchment = Color(0xFFEDE2CF);
-  // WARNA: palet _cCardBg ().
+  // WARNA: palet lokal _cCardBg — krem hangat untuk latar belakang kartu utama formulir Login/Daftar di tengah layar.
   static const Color _cCardBg = Color(0xFFD8C7B0);
-  // WARNA: palet _cTabInactive ().
+  // WARNA: palet lokal _cTabInactive — cokelat muda untuk latar lintasan (track) switcher tab 'Masuk' / 'Daftar Baru'.
   static const Color _cTabInactive = Color(0xFFC7B197);
 
   @override
@@ -74,12 +74,12 @@ class _LoginPageState extends State<LoginPage> {
         content: Text(
           s,
           style: GoogleFonts.poppins(
-            // WARNA: teks 's'.
+            // WARNA: warna teks pesan di dalam SnackBar halaman login/registrasi.
             color: _cParchment,
             fontWeight: FontWeight.w500,
           ),
         ),
-        // WARNA: latar notifikasi.
+        // WARNA: latar belakang SnackBar halaman login (marun oxblood saat error, cokelat walnut saat info/sukses).
         backgroundColor: isError ? _cOxblood : _cWalnut,
         duration: Duration(seconds: isError ? 6 : 2),
         behavior: SnackBarBehavior.floating,
@@ -175,7 +175,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // WARNA: latar halaman.
+      // WARNA: latar belakang dasar halaman Login/Registrasi (terlihat jika gambar library_bg belum termuat).
       backgroundColor: _cWalnut,
       body: Stack(
         fit: StackFit.expand,
@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
           Image.asset(
             'assets/images/library_bg.jpg',
             fit: BoxFit.cover,
-            // WARNA: warna komponen.
+            // WARNA: warna fallback jika file gambar latar belakang library_bg.jpg gagal dimuat.
             errorBuilder: (_, __, ___) => Container(color: _cWalnut),
           ),
 
@@ -192,11 +192,11 @@ class _LoginPageState extends State<LoginPage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                // WARNA: gradasi komponen ini.
+                // WARNA: gradasi lapisan gelap (overlay) di atas foto perpustakaan agar logo dan kartu form login lebih kontras.
                 colors: [
                   Colors.black.withValues(alpha: 0.52),
                   Colors.black.withValues(alpha: 0.32),
-                  // WARNA: latar kartu 'RENT\nBOOK'.
+                  // WARNA: bagian bawah gradasi gelap (overlay) di atas foto latar belakang halaman login.
                   Colors.black.withValues(alpha: 0.68),
                 ],
               ),
@@ -216,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                     Image.asset(
                       'assets/images/rentbook_logo.png',
                       height: 85,
-                      // WARNA: warna komponen.
+                      // WARNA: warna tint logo gambar RentBook di atas kartu form login.
                       color: _cParchment,
                       colorBlendMode: BlendMode.srcIn,
                       errorBuilder: (_, __, ___) => Row(
@@ -224,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           const Icon(
                             Icons.menu_book_rounded,
-                            // WARNA: ikon menu_book_rounded.
+                            // WARNA: ikon buku fallback jika gambar rentbook_logo.png gagal dimuat di halaman login.
                             color: _cParchment,
                             size: 42,
                           ),
@@ -232,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
                           Text(
                             'RENT\nBOOK',
                             style: GoogleFonts.poppins(
-                              // WARNA: teks 'RENT\nBOOK'.
+                              // WARNA: teks fallback 'RENT\nBOOK' jika gambar logo gagal dimuat di halaman login.
                               color: _cParchment,
                               fontWeight: FontWeight.w900,
                               fontSize: 22,
@@ -247,12 +247,12 @@ class _LoginPageState extends State<LoginPage> {
                     Container(
                       padding: const EdgeInsets.all(22),
                       decoration: BoxDecoration(
-                        // WARNA: latar kartu/komponen.
+                        // WARNA: latar belakang kartu utama formulir Login / Daftar Baru di tengah layar.
                         color: _cCardBg,
                         borderRadius: BorderRadius.circular(26),
                         boxShadow: [
                           BoxShadow(
-                            // WARNA: bayangan kartu.
+                            // WARNA: bayangan di bawah kartu utama formulir Login / Daftar Baru.
                             color: Colors.black.withValues(alpha: 0.4),
                             blurRadius: 28,
                             spreadRadius: 2,
@@ -267,7 +267,7 @@ class _LoginPageState extends State<LoginPage> {
                             height: 44,
                             padding: const EdgeInsets.all(3.5),
                             decoration: BoxDecoration(
-                              // WARNA: latar kartu/komponen.
+                              // WARNA: latar lintasan wadah switcher dua tab ('Masuk' dan 'Daftar Baru') di dalam kartu login.
                               color: _cTabInactive,
                               borderRadius: BorderRadius.circular(22),
                             ),
@@ -282,7 +282,7 @@ class _LoginPageState extends State<LoginPage> {
                                         milliseconds: 200,
                                       ),
                                       decoration: BoxDecoration(
-                                        // WARNA: latar kartu/komponen.
+                                        // WARNA: latar tombol tab 'Masuk' (marun oxblood saat aktif, transparan saat mode Daftar Baru).
                                         color: !_isRegister
                                             ? _cOxblood
                                             : Colors.transparent,
@@ -290,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                                         boxShadow: !_isRegister
                                             ? [
                                                 BoxShadow(
-                                                  // WARNA: bayangan kartu.
+                                                  // WARNA: bayangan pil tab 'Masuk' saat sedang aktif.
                                                   color: Colors.black
                                                       .withValues(alpha: 0.18),
                                                   blurRadius: 4,
@@ -305,7 +305,7 @@ class _LoginPageState extends State<LoginPage> {
                                           style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 13.5,
-                                            // WARNA: teks 'Masuk'.
+                                            // WARNA: warna teks tab 'Masuk' (krem parchment saat aktif, cokelat walnut saat nonaktif).
                                             color: !_isRegister
                                                 ? _cParchment
                                                 : _cWalnut,
@@ -324,7 +324,7 @@ class _LoginPageState extends State<LoginPage> {
                                         milliseconds: 200,
                                       ),
                                       decoration: BoxDecoration(
-                                        // WARNA: latar kartu/komponen.
+                                        // WARNA: latar tombol tab 'Daftar Baru' (marun oxblood saat aktif, transparan saat mode Masuk).
                                         color: _isRegister
                                             ? _cOxblood
                                             : Colors.transparent,
@@ -332,7 +332,7 @@ class _LoginPageState extends State<LoginPage> {
                                         boxShadow: _isRegister
                                             ? [
                                                 BoxShadow(
-                                                  // WARNA: bayangan kartu.
+                                                  // WARNA: bayangan pil tab 'Daftar Baru' saat sedang aktif.
                                                   color: Colors.black
                                                       .withValues(alpha: 0.18),
                                                   blurRadius: 4,
@@ -347,7 +347,7 @@ class _LoginPageState extends State<LoginPage> {
                                           style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w700,
                                             fontSize: 13.5,
-                                            // WARNA: teks 'Daftar Baru'.
+                                            // WARNA: warna teks tab 'Daftar Baru' (krem parchment saat aktif, cokelat walnut saat nonaktif).
                                             color: _isRegister
                                                 ? _cParchment
                                                 : _cWalnut,
@@ -366,23 +366,23 @@ class _LoginPageState extends State<LoginPage> {
                           TextField(
                             controller: _u,
                             style: GoogleFonts.poppins(
-                              // WARNA: teks judul/isi pada bagian ini.
+                              // WARNA: warna teks ketikan pengguna di dalam kolom input Username.
                               color: _cWalnut,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
-                            // WARNA: teks judul/isi pada bagian ini.
+                            // WARNA: warna kursor ketik di kolom input Username.
                             cursorColor: _cOxblood,
                             decoration: InputDecoration(
                               hintText: 'Username',
                               hintStyle: GoogleFonts.poppins(
-                                // WARNA: teks judul/isi pada bagian ini.
+                                // WARNA: warna teks placeholder 'Username' saat kolom kosong.
                                 color: _cWalnut.withValues(alpha: 0.6),
                                 fontSize: 13.5,
                               ),
                               prefixIcon: const Icon(
                                 Icons.person_outline_rounded,
-                                // WARNA: teks judul/isi pada bagian ini.
+                                // WARNA: warna ikon orang di sebelah kiri kolom input Username.
                                 color: _cWalnut,
                                 size: 21,
                               ),
@@ -391,12 +391,12 @@ class _LoginPageState extends State<LoginPage> {
                                 vertical: 13,
                               ),
                               filled: true,
-                              // WARNA: warna komponen.
+                              // WARNA: warna latar dalam (fill) kotak input Username.
                               fillColor: _cAgedPaper.withValues(alpha: 0.35),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: warna garis tepi kotak input Username saat tidak sedang diklik/fokus.
                                   color: _cTobacco,
                                   width: 1.1,
                                 ),
@@ -404,7 +404,7 @@ class _LoginPageState extends State<LoginPage> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: warna garis tepi kotak input Username saat sedang aktif/fokus diketik.
                                   color: _cOxblood,
                                   width: 1.8,
                                 ),
@@ -418,23 +418,23 @@ class _LoginPageState extends State<LoginPage> {
                             controller: _p,
                             obscureText: _obscure,
                             style: GoogleFonts.poppins(
-                              // WARNA: teks judul/isi pada bagian ini.
+                              // WARNA: warna teks ketikan pengguna di dalam kolom input Password.
                               color: _cWalnut,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),
-                            // WARNA: teks judul/isi pada bagian ini.
+                            // WARNA: warna kursor ketik di kolom input Password.
                             cursorColor: _cOxblood,
                             decoration: InputDecoration(
                               hintText: 'Password',
                               hintStyle: GoogleFonts.poppins(
-                                // WARNA: teks judul/isi pada bagian ini.
+                                // WARNA: warna teks placeholder 'Password' saat kolom kosong.
                                 color: _cWalnut.withValues(alpha: 0.6),
                                 fontSize: 13.5,
                               ),
                               prefixIcon: const Icon(
                                 Icons.lock_outline_rounded,
-                                // WARNA: teks judul/isi pada bagian ini.
+                                // WARNA: warna ikon gembok di sebelah kiri kolom input Password.
                                 color: _cWalnut,
                                 size: 21,
                               ),
@@ -443,7 +443,7 @@ class _LoginPageState extends State<LoginPage> {
                                   _obscure
                                       ? Icons.visibility_outlined
                                       : Icons.visibility_off_outlined,
-                                  // WARNA: ikon visibility_outlined.
+                                  // WARNA: warna ikon mata (lihat/sembunyikan password) di kanan kolom Password.
                                   color: _cWalnut,
                                   size: 20,
                                 ),
@@ -455,12 +455,12 @@ class _LoginPageState extends State<LoginPage> {
                                 vertical: 13,
                               ),
                               filled: true,
-                              // WARNA: warna komponen.
+                              // WARNA: warna latar dalam (fill) kotak input Password.
                               fillColor: _cAgedPaper.withValues(alpha: 0.35),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: warna garis tepi kotak input Password saat tidak sedang diklik/fokus.
                                   color: _cTobacco,
                                   width: 1.1,
                                 ),
@@ -468,7 +468,7 @@ class _LoginPageState extends State<LoginPage> {
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
                                 borderSide: const BorderSide(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: warna garis tepi kotak input Password saat sedang aktif/fokus diketik.
                                   color: _cOxblood,
                                   width: 1.8,
                                 ),
@@ -482,12 +482,12 @@ class _LoginPageState extends State<LoginPage> {
                             height: 48,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                // WARNA: latar tombol.
+                                // WARNA: latar belakang tombol utama submit ('Masuk ke Aplikasi' / 'Daftar Akun Baru').
                                 backgroundColor: _cOxblood,
-                                // WARNA: teks/ikon tombol.
+                                // WARNA: warna teks dan efek ripple tombol utama submit login/registrasi.
                                 foregroundColor: _cParchment,
                                 elevation: 3,
-                                // WARNA: warna komponen.
+                                // WARNA: warna bayangan di bawah tombol utama submit login/registrasi.
                                 shadowColor: Colors.black26,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(14),
@@ -500,7 +500,7 @@ class _LoginPageState extends State<LoginPage> {
                                       width: 20,
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        // WARNA: warna komponen.
+                                        // WARNA: warna spinner loading di dalam tombol submit saat proses login/daftar berjalan.
                                         color: _cParchment,
                                       ),
                                     )

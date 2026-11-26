@@ -222,24 +222,24 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
     ];
 
     return Scaffold(
-      // WARNA: latar halaman.
+      // WARNA: latar belakang utama halaman Konversi Kurs & Jam Dunia.
       backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
         title: Text('Konversi Kurs & Jam', style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17)),
         elevation: 0,
-        // WARNA: latar AppBar.
+        // WARNA: latar belakang AppBar halaman Konversi Kurs & Jam Dunia.
         backgroundColor: const Color(0xFF67343A),
-        // WARNA: teks/ikon tombol.
+        // WARNA: warna teks judul 'Konversi Kurs & Jam' dan ikon di AppBar.
         foregroundColor: const Color(0xFFEDE2CF),
-        // WARNA: teks judul/isi pada bagian ini.
+        // WARNA: warna ikon tombol kembali (back) di kiri AppBar Konversi Kurs & Jam.
         iconTheme: const IconThemeData(color: Color(0xFFEDE2CF)),
         bottom: TabBar(
           controller: _tabController,
-          // WARNA: teks judul/isi pada bagian ini.
+          // WARNA: warna teks dan ikon tab ('Kurs Mata Uang' / 'Jam Dunia') yang sedang aktif dipilih.
           labelColor: const Color(0xFFEDE2CF),
-          // WARNA: teks 'Konversi Kurs & Jam'.
+          // WARNA: warna teks dan ikon tab ('Kurs Mata Uang' / 'Jam Dunia') yang sedang tidak aktif.
           unselectedLabelColor: const Color(0xFFD4BE9D),
-          // WARNA: warna komponen.
+          // WARNA: warna garis indikator di bawah tab yang sedang aktif pada AppBar.
           indicatorColor: const Color(0xFFEDE2CF),
           indicatorWeight: 3,
           tabs: const [
@@ -258,35 +258,35 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  // WARNA: gradasi komponen ini.
+                  // WARNA: gradasi latar belakang kartu banner header 'Jelajahi kurs dunia' di bagian atas tab Kurs Mata Uang.
                   gradient: const LinearGradient(colors: [Color(0xFF67343A), Color(0xFF92565A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(18),
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: bayangan di bawah kartu banner header 'Jelajahi kurs dunia' tab Kurs Mata Uang.
                   boxShadow: [BoxShadow(color: const Color(0xFF67343A).withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
                 ),
                 child: Row(children: [
-                  // WARNA: bayangan kartu.
+                  // WARNA: latar kotak transparan di belakang ikon tukar mata uang pada kartu banner 'Jelajahi kurs dunia'.
                   Container(width: 48, height: 48, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .15), borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.currency_exchange_rounded, color: Color(0xFFEDE2CF), size: 27)),
                   const SizedBox(width: 14),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    // WARNA: ikon currency_exchange_rounded.
+                    // WARNA: warna teks judul 'Jelajahi kurs dunia' pada kartu banner atas tab Kurs Mata Uang.
                     Text('Jelajahi kurs dunia', style: GoogleFonts.poppins(color: const Color(0xFFEDE2CF), fontSize: 16, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 3),
-                    // WARNA: teks judul/isi pada bagian ini.
+                    // WARNA: warna subteks deskripsi di dalam kartu banner 'Jelajahi kurs dunia' tab Kurs Mata Uang.
                     Text('Cek perkiraan harga buku impor dalam rupiah.', style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: .85), fontSize: 11, fontWeight: FontWeight.w500)),
                   ])),
                 ]),
               ),
               const SizedBox(height: 14),
               Card(
-                // WARNA: teks 'Jelajahi kurs dunia'.
+                // WARNA: latar belakang kartu input nominal 'Masukkan harga buku' di tab Kurs Mata Uang.
                 color: const Color(0xFFFAF7F2),
-                // WARNA: teks 'Jelajahi kurs dunia'.
+                // WARNA: tint elevasi kartu input nominal dibuat transparan agar warna krem tetap konsisten.
                 surfaceTintColor: Colors.transparent,
                 elevation: 1,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
-                  // WARNA: warna komponen.
+                  // WARNA: garis tepi kartu input nominal 'Masukkan harga buku' di tab Kurs Mata Uang.
                   side: const BorderSide(color: Color(0xFFEADBCE)),
                 ),
                 child: Padding(
@@ -296,7 +296,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                     children: [
                       Text(
                         'Masukkan harga buku',
-                        // WARNA: garis tepi kartu/komponen.
+                        // WARNA: warna teks judul 'Masukkan harga buku' di dalam kartu input nominal tab Kurs Mata Uang.
                         style: GoogleFonts.poppins(fontWeight: FontWeight.w700, fontSize: 14, color: const Color(0xFF302622)),
                       ),
                       const SizedBox(height: 8),
@@ -306,7 +306,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                         decoration: InputDecoration(
                           prefixText: 'Rp ',
                           hintText: '50.000',
-                          // WARNA: garis tepi komponen.
+                          // WARNA: garis tepi kotak ketik nominal Rupiah (mengikuti warna border default tema).
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                           suffixIcon: _loadingRates
@@ -334,7 +334,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               child: ActionChip(
                                 label: Text(_formatRupiah(val)),
                                 labelStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                                // WARNA: latar komponen.
+                                // WARNA: latar belakang chip pilihan cepat nominal (Rp 10.000, Rp 25.000, dll) di kartu input tab Kurs.
                                 backgroundColor: const Color(0xFFFAF7F2),
                                 onPressed: () {
                                   _amt.text = val.toString();
@@ -347,7 +347,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                       ),
                       if (_err.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        // WARNA: warna komponen.
+                        // WARNA: warna teks peringatan mode offline ('Mode offline: Menggunakan kurs referensi standar.') di kartu input tab Kurs.
                         Text(_err, style: TextStyle(color: Colors.orange.shade800, fontSize: 11)),
                       ],
                     ],
@@ -358,7 +358,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
 
               Text(
                 'Perkiraan harga di luar negeri',
-                // WARNA: teks judul/isi pada bagian ini.
+                // WARNA: warna teks judul bagian 'Perkiraan harga di luar negeri' di atas daftar kartu kurs mata uang.
                 style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF302622)),
               ),
               const SizedBox(height: 10),
@@ -370,18 +370,18 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                 final converted = amount * rate;
                 final info = _currencyInfo[code] ?? (code, code);
 
-                // WARNA: teks 'Perkiraan harga di luar negeri'.
+                // WARNA: warna aksen untuk garis tepi & kotak bendera tiap kartu mata uang (cokelat keemasan untuk JPY/SGD, marun lembut untuk mata uang lain).
                 final accent = code == 'JPY' || code == 'SGD' ? const Color(0xFFB9854D) : const Color(0xFF8B5555);
                 return Card(
-                  // WARNA: warna komponen.
+                  // WARNA: latar belakang tiap kartu hasil konversi mata uang asing (USD, EUR, JPY, dll) di tab Kurs Mata Uang.
                   color: const Color(0xFFFFFDF9),
-                  // WARNA: warna komponen.
+                  // WARNA: tint elevasi kartu mata uang asing dibuat transparan agar warna putih gading tetap bersih.
                   surfaceTintColor: Colors.transparent,
                   margin: const EdgeInsets.only(bottom: 10),
                   elevation: 1,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
-                    // WARNA: warna komponen.
+                    // WARNA: garis tepi tiap kartu hasil konversi mata uang asing (mengikuti warna accent dengan transparansi 35%).
                     side: BorderSide(color: accent.withValues(alpha: .35)),
                   ),
                   child: Padding(
@@ -393,7 +393,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                           children: [
                             Container(
                               width: 44, height: 44, alignment: Alignment.center,
-                              // WARNA: garis tepi komponen.
+                              // WARNA: latar kotak ikon bendera negara di sisi kiri kartu hasil konversi mata uang.
                               decoration: BoxDecoration(color: accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(13)),
                               child: Text(_flagFor(code), style: const TextStyle(fontSize: 25)),
                             ),
@@ -403,12 +403,12 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               children: [
                                 Text(
                                   code,
-                                  // WARNA: teks judul/isi pada bagian ini.
+                                  // WARNA: warna teks kode mata uang (USD, EUR, JPY, dll) pada kartu hasil konversi mata uang.
                                   style: GoogleFonts.poppins(fontWeight: FontWeight.w800, fontSize: 15, color: const Color(0xFF302622)),
                                 ),
                                 Text(
                                   info.$1,
-                                  // WARNA: teks '_flagFor'.
+                                  // WARNA: warna teks nama lengkap mata uang di bawah kode pada kartu hasil konversi mata uang.
                                   style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
                                 ),
                               ],
@@ -423,13 +423,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,
-                                // WARNA: teks 'info.'.
+                                // WARNA: warna angka hasil konversi nominal di sisi kanan kartu mata uang asing.
                                 color: Color(0xFF67343A),
                               ),
                             ),
                             Text(
                               '1 $code = ${_formatRupiah((1 / rate).round())}',
-                              // WARNA: teks 'info.'.
+                              // WARNA: warna teks kurs satuan (misal '1 USD = Rp ...') di pojok kanan bawah kartu mata uang asing.
                               style: GoogleFonts.poppins(fontSize: 9, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                             ),
                           ],
@@ -449,25 +449,25 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                 decoration: BoxDecoration(
-                  // WARNA: gradasi komponen ini.
+                  // WARNA: gradasi latar belakang kartu hero jam utama 'Waktu Indonesia Barat' di bagian atas tab Jam Dunia.
                   gradient: const LinearGradient(colors: [Color(0xFF67343A), Color(0xFF92565A)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(18),
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: bayangan di bawah kartu hero jam utama 'Waktu Indonesia Barat' tab Jam Dunia.
                   boxShadow: [BoxShadow(color: const Color(0xFF67343A).withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
                 ),
                 child: Row(children: [
-                  // WARNA: bayangan kartu.
+                  // WARNA: latar lingkaran transparan di belakang bendera Indonesia pada kartu hero 'Waktu Indonesia Barat'.
                   Container(width: 52, height: 52, alignment: Alignment.center, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .14), shape: BoxShape.circle), child: Text(_flagFor('ID'), style: const TextStyle(fontSize: 29))),
                   const SizedBox(width: 14),
                   Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    // WARNA: teks judul/isi pada bagian ini.
+                    // WARNA: warna teks label 'Waktu Indonesia Barat' di atas jam besar kartu hero tab Jam Dunia.
                     Text('Waktu Indonesia Barat', style: GoogleFonts.poppins(color: const Color(0xFFEDE2CF), fontSize: 12, fontWeight: FontWeight.w600)),
-                    // WARNA: teks '_flagFor'.
+                    // WARNA: warna angka jam digital realtime berukuran besar pada kartu hero 'Waktu Indonesia Barat'.
                     Text(fTime.format(utc.add(const Duration(hours: 7))), style: GoogleFonts.poppins(color: Colors.white, fontSize: 27, fontWeight: FontWeight.w800, height: 1.2)),
-                    // WARNA: teks 'Waktu Indonesia Barat'.
+                    // WARNA: warna teks hari dan tanggal di bawah jam digital pada kartu hero 'Waktu Indonesia Barat'.
                     Text(_formatDate(utc.add(const Duration(hours: 7))), style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: .8), fontSize: 10, fontWeight: FontWeight.w500)),
                   ])),
-                  // WARNA: teks 'Waktu Indonesia Barat'.
+                  // WARNA: warna ikon bola dunia di sebelah kanan kartu hero 'Waktu Indonesia Barat' tab Jam Dunia.
                   const Icon(Icons.public_rounded, color: Color(0xFFEDE2CF), size: 32),
                 ]),
               ),
@@ -475,21 +475,21 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: latar belakang kotak info aturan jam operasional ('Jam operasional perpustakaan acuan: 08:00 - 16:00') di tab Jam Dunia.
                   color: const Color(0xFFFAF7F2),
                   borderRadius: BorderRadius.circular(12),
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: garis tepi kotak info aturan jam operasional di tab Jam Dunia.
                   border: Border.all(color: const Color(0xFFD4BE9D)),
                 ),
                 child: Row(
                   children: [
-                    // WARNA: garis tepi kartu/komponen.
+                    // WARNA: warna ikon info (i) di kiri kotak informasi jam operasional tab Jam Dunia.
                     Icon(Icons.info_outline, color: const Color(0xFF67343A), size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Jam operasional perpustakaan acuan: 08:00 - 16:00 waktu setempat.',
-                        // WARNA: ikon info_outline.
+                        // WARNA: warna teks keterangan di dalam kotak informasi jam operasional tab Jam Dunia.
                         style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: const Color(0xFF302622)),
                       ),
                     ),
@@ -505,15 +505,15 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                 final isOpen = hour >= 8 && hour < 16;
 
                 return Card(
-                  // WARNA: warna komponen.
+                  // WARNA: latar belakang tiap kartu zona waktu (WIB, WITA, WIT, Tokyo, London) di tab Jam Dunia.
                   color: const Color(0xFFFAF7F2),
-                  // WARNA: warna komponen.
+                  // WARNA: tint elevasi kartu zona waktu dibuat transparan agar warna krem tetap bersih.
                   surfaceTintColor: Colors.transparent,
                   margin: const EdgeInsets.only(bottom: 12),
                   elevation: 1,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    // WARNA: warna komponen.
+                    // WARNA: garis tepi tiap kartu zona waktu di tab Jam Dunia.
                     side: const BorderSide(color: Color(0xFFEADBCE)),
                   ),
                   child: Padding(
@@ -532,7 +532,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 14,
-                                  // WARNA: teks '_flagFor'.
+                                  // WARNA: warna nama zona waktu pada kartu tab Jam Dunia (marun oxblood khusus untuk WIB, hitam untuk zona lainnya).
                                   color: isWib ? const Color(0xFF67343A) : Colors.black87,
                                 ),
                                 maxLines: 1,
@@ -543,12 +543,11 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
-                                // WARNA: latar kartu/komponen.
+                                // WARNA: latar lencana status operasional pada kartu zona waktu (hijau muda jika Buka, merah muda jika Tutup).
                                 color: isOpen ? Colors.green.shade50 : Colors.red.shade50,
                                 borderRadius: BorderRadius.circular(6),
-                                // WARNA: garis tepi komponen.
                                 border: Border.all(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: garis tepi lencana status operasional pada kartu zona waktu (hijau jika Buka, merah jika Tutup).
                                   color: isOpen ? Colors.green.shade200 : Colors.red.shade200,
                                 ),
                               ),
@@ -557,7 +556,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
-                                  // WARNA: teks 'isOpen'.
+                                  // WARNA: warna teks '● Buka' (hijau tua) atau '○ Tutup' (merah tua) di dalam lencana status kartu zona waktu.
                                   color: isOpen ? Colors.green.shade800 : Colors.red.shade800,
                                 ),
                               ),
@@ -567,7 +566,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                         const SizedBox(height: 4),
                         Text(
                           z['city'] as String,
-                          // WARNA: teks 'z'.
+                          // WARNA: warna teks daftar kota (misal 'Jakarta, Yogyakarta, Bandung') pada kartu zona waktu tab Jam Dunia.
                           style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
                         ),
                         const Divider(height: 18),
@@ -577,7 +576,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                             Expanded(
                               child: Text(
                                 _formatDate(t),
-                                // WARNA: teks 'z'.
+                                // WARNA: warna teks tanggal setempat di kiri bawah kartu zona waktu tab Jam Dunia.
                                 style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -591,13 +590,13 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   margin: const EdgeInsets.only(right: 6),
                                   decoration: BoxDecoration(
-                                    // WARNA: latar kartu/komponen.
+                                    // WARNA: latar lencana badge offset UTC (misal 'UTC+7', 'GMT') di sebelah jam pada kartu zona waktu.
                                     color: Colors.grey.shade200,
                                     borderRadius: BorderRadius.circular(4),
                                   ),
                                   child: Text(
                                     z['badge'] as String,
-                                    // WARNA: latar kartu/komponen.
+                                    // WARNA: warna teks offset UTC (misal 'UTC+7') di dalam lencana badge kartu zona waktu.
                                     style: TextStyle(fontSize: 10, color: Colors.grey.shade800, fontWeight: FontWeight.w600),
                                   ),
                                 ),
@@ -607,7 +606,7 @@ class _ConverterPageState extends State<ConverterPage> with SingleTickerProvider
                                     fontSize: 19,
                                     fontWeight: FontWeight.w800,
                                     fontFamily: 'monospace',
-                                    // WARNA: teks 'z'.
+                                    // WARNA: warna angka jam digital (monospace) di pojok kanan bawah tiap kartu zona waktu tab Jam Dunia.
                                     color: Color(0xFF67343A),
                                   ),
                                 ),

@@ -390,12 +390,12 @@ class _MapPageState extends State<MapPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      // WARNA: latar komponen.
+      // WARNA: latar belakang pembungkus modal bottom sheet Detail Perpustakaan dibuat transparan agar sudut melengkung kartu putih terlihat.
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
-          // WARNA: latar kartu/komponen.
+          // WARNA: latar belakang kartu modal bottom sheet Detail Perpustakaan (putih).
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
@@ -408,7 +408,7 @@ class _MapPageState extends State<MapPage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: warna garis pegangan (handle bar) abu-abu di bagian paling atas modal bottom sheet Detail Perpustakaan.
                   color: Colors.grey[300],
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -421,13 +421,13 @@ class _MapPageState extends State<MapPage> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    // WARNA: latar kartu/komponen.
+                    // WARNA: latar kotak kecil ikon gedung perpustakaan di header modal bottom sheet Detail Perpustakaan.
                     color: const Color(0xFFFAF7F2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
                     Icons.local_library,
-                    // WARNA: latar kartu/komponen.
+                    // WARNA: warna ikon gedung perpustakaan di header modal bottom sheet Detail Perpustakaan.
                     color: Color(0xFF67343A),
                     size: 32,
                   ),
@@ -450,7 +450,7 @@ class _MapPageState extends State<MapPage> {
                           Icon(
                             Icons.star,
                             size: 16,
-                            // WARNA: ikon star.
+                            // WARNA: warna ikon bintang rating perpustakaan pada modal bottom sheet Detail Perpustakaan.
                             color: Colors.amber.shade800,
                           ),
                           const SizedBox(width: 4),
@@ -468,14 +468,13 @@ class _MapPageState extends State<MapPage> {
                               vertical: 2.5,
                             ),
                             decoration: BoxDecoration(
-                              // WARNA: latar kartu/komponen.
+                              // WARNA: latar lencana status 'Buka Sekarang' / 'Tutup' pada modal bottom sheet Detail Perpustakaan (hijau muda jika buka, merah muda jika tutup).
                               color: isOpen
                                   ? Colors.green.shade50
                                   : Colors.red.shade50,
                               borderRadius: BorderRadius.circular(5),
-                              // WARNA: garis tepi komponen.
                               border: Border.all(
-                                // WARNA: garis tepi kartu/komponen.
+                                // WARNA: garis tepi lencana status 'Buka Sekarang' / 'Tutup' pada modal bottom sheet Detail Perpustakaan.
                                 color: isOpen
                                     ? Colors.green.shade200
                                     : Colors.red.shade200,
@@ -487,7 +486,7 @@ class _MapPageState extends State<MapPage> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                // WARNA: teks 'isOpen'.
+                                // WARNA: warna teks 'Buka Sekarang' (hijau tua) atau 'Tutup' (merah tua) pada modal bottom sheet Detail Perpustakaan.
                                 color: isOpen
                                     ? Colors.green.shade800
                                     : Colors.red.shade800,
@@ -528,7 +527,7 @@ class _MapPageState extends State<MapPage> {
                   .map(
                     (f) => Chip(
                       label: Text(f, style: const TextStyle(fontSize: 11)),
-                      // WARNA: latar komponen.
+                      // WARNA: latar chip fasilitas unggulan (misal Wi-Fi, Ruang Baca) di modal bottom sheet Detail Perpustakaan.
                       backgroundColor: Colors.grey.shade100,
                       padding: const EdgeInsets.all(2),
                       visualDensity: VisualDensity.compact,
@@ -559,7 +558,7 @@ class _MapPageState extends State<MapPage> {
                 Expanded(
                   child: FilledButton.icon(
                     style: FilledButton.styleFrom(
-                      // WARNA: latar tombol.
+                      // WARNA: latar tombol utama 'Tampilkan Rute' di bagian bawah modal bottom sheet Detail Perpustakaan.
                       backgroundColor: const Color(0xFF67343A),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -596,7 +595,7 @@ class _MapPageState extends State<MapPage> {
           Icon(
             icon,
             size: 18,
-            // WARNA: ikon pada komponen ini.
+            // WARNA: warna ikon baris info di modal Detail Perpustakaan (marun oxblood jika Jarak Tempuh / sorotan, abu-abu untuk Alamat/Jam/Kontak).
             color: isHighlight ? const Color(0xFF67343A) : Colors.grey[600],
           ),
           const SizedBox(width: 10),
@@ -604,7 +603,7 @@ class _MapPageState extends State<MapPage> {
             width: 90,
             child: Text(
               label,
-              // WARNA: teks 'label'.
+              // WARNA: warna teks label kiri ('Jarak Tempuh', 'Alamat Resmi', 'Jam Buka', 'Kontak') di modal Detail Perpustakaan.
               style: TextStyle(fontSize: 13, color: Colors.grey[600]),
             ),
           ),
@@ -614,7 +613,7 @@ class _MapPageState extends State<MapPage> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
-                // WARNA: teks 'label'.
+                // WARNA: warna teks isi nilai baris info di modal Detail Perpustakaan (cokelat gelap untuk Jarak Tempuh, hitam untuk lainnya).
                 color: isHighlight ? const Color(0xFF302622) : Colors.black87,
               ),
             ),
@@ -704,10 +703,10 @@ class _MapPageState extends State<MapPage> {
                           Polyline(
                             points: _routePoints,
                             strokeWidth: 5.5,
-                            // WARNA: warna komponen.
+                            // WARNA: warna garis utama jalur rute jalan raya (OSRM) di atas peta (merah marun oxblood).
                             color: const Color(0xFF67343A),
                             borderStrokeWidth: 2.5,
-                            // WARNA: warna komponen.
+                            // WARNA: warna garis tepi (outline) di sisi luar jalur rute jalan raya di atas peta (cokelat gelap).
                             borderColor: const Color(0xFF302622),
                           ),
                         ],
@@ -727,18 +726,17 @@ class _MapPageState extends State<MapPage> {
                                 width: 38,
                                 height: 38,
                                 decoration: BoxDecoration(
-                                  // WARNA: latar kartu/komponen.
+                                  // WARNA: latar lingkaran pin penanda lokasi GPS pengguna saat ini di atas peta.
                                   color: const Color(0xFF67343A),
                                   shape: BoxShape.circle,
-                                  // WARNA: garis tepi komponen.
                                   border: Border.all(
-                                    // WARNA: garis tepi kartu/komponen.
+                                    // WARNA: garis tepi putih melingkari pin lokasi GPS pengguna di atas peta.
                                     color: Colors.white,
                                     width: 2.5,
                                   ),
                                   boxShadow: const [
                                     BoxShadow(
-                                      // WARNA: bayangan kartu.
+                                      // WARNA: bayangan di bawah pin lokasi GPS pengguna di atas peta.
                                       color: Colors.black26,
                                       blurRadius: 6,
                                       offset: Offset(0, 2),
@@ -747,7 +745,7 @@ class _MapPageState extends State<MapPage> {
                                 ),
                                 child: const Icon(
                                   Icons.person_pin,
-                                  // WARNA: bayangan kartu.
+                                  // WARNA: warna ikon orang di dalam pin lokasi GPS pengguna di atas peta (putih).
                                   color: Colors.white,
                                   size: 24,
                                 ),
@@ -771,24 +769,21 @@ class _MapPageState extends State<MapPage> {
                                   width: 40,
                                   height: 40,
                                   decoration: BoxDecoration(
-                                    // WARNA: latar kartu/komponen.
+                                    // WARNA: latar pin penanda perpustakaan di peta (hijau jika sedang jadi tujuan rute aktif, oranye jika sedang dipilih, marun untuk cabang lainnya).
                                     color: _navigatingLib?.name == lib.name
                                         ? Colors.green.shade700
                                         : _selectedLib?.name == lib.name
-                                        // WARNA: latar kartu.
                                         ? Colors.deepOrange
-                                        // WARNA: latar kartu.
                                         : const Color(0xFF67343A),
                                     shape: BoxShape.circle,
-                                    // WARNA: garis tepi komponen.
                                     border: Border.all(
-                                      // WARNA: garis tepi kartu/komponen.
+                                      // WARNA: garis tepi putih melingkari pin cabang perpustakaan di atas peta.
                                       color: Colors.white,
                                       width: 2.2,
                                     ),
                                     boxShadow: const [
                                       BoxShadow(
-                                        // WARNA: bayangan kartu.
+                                        // WARNA: bayangan di bawah pin cabang perpustakaan di atas peta.
                                         color: Colors.black38,
                                         blurRadius: 6,
                                         offset: Offset(0, 2),
@@ -797,7 +792,7 @@ class _MapPageState extends State<MapPage> {
                                   ),
                                   child: const Icon(
                                     Icons.local_library,
-                                    // WARNA: bayangan kartu.
+                                    // WARNA: warna ikon buku/gedung di dalam pin cabang perpustakaan di atas peta (putih).
                                     color: Colors.white,
                                     size: 22,
                                   ),
@@ -820,7 +815,7 @@ class _MapPageState extends State<MapPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      // WARNA: warna komponen.
+                      // WARNA: latar belakang kartu melayang banner info rute aktif ('Rute Menuju: ...') di bagian atas peta.
                       color: const Color(0xFF302622),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -832,13 +827,13 @@ class _MapPageState extends State<MapPage> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                // WARNA: latar kartu/komponen.
+                                // WARNA: latar lingkaran transparan di belakang ikon navigasi pada kartu banner info rute aktif atas peta.
                                 color: Colors.white.withValues(alpha: 0.15),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(
                                 Icons.navigation,
-                                // WARNA: latar kartu/komponen.
+                                // WARNA: warna ikon panah navigasi pada kartu banner info rute aktif atas peta (kuning amber terang).
                                 color: Colors.amberAccent,
                                 size: 22,
                               ),
@@ -854,7 +849,7 @@ class _MapPageState extends State<MapPage> {
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                      // WARNA: teks 'Rute Menuju: ${_navigatingLib!.name}'.
+                                      // WARNA: warna teks judul 'Rute Menuju: ...' pada kartu banner info rute aktif atas peta (putih).
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
@@ -864,7 +859,7 @@ class _MapPageState extends State<MapPage> {
                                   Text(
                                     '$_routeDistance • $_routeDuration',
                                     style: const TextStyle(
-                                      // WARNA: teks 'Rute Menuju: ${_navigatingLib!.name}'.
+                                      // WARNA: warna teks jarak & estimasi durasi perjalanan pada kartu banner info rute aktif atas peta (kuning amber).
                                       color: Colors.amberAccent,
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12,
@@ -876,7 +871,7 @@ class _MapPageState extends State<MapPage> {
                             IconButton(
                               icon: const Icon(
                                 Icons.close,
-                                // WARNA: ikon close.
+                                // WARNA: warna ikon silang (tutup rute) di pojok kanan kartu banner info rute aktif atas peta.
                                 color: Colors.white70,
                                 size: 22,
                               ),
@@ -902,7 +897,7 @@ class _MapPageState extends State<MapPage> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          // WARNA: latar kartu/komponen.
+                          // WARNA: latar belakang pil loading melayang 'Menghitung rute navigasi jalan...' di atas peta.
                           color: Colors.black87,
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -913,7 +908,7 @@ class _MapPageState extends State<MapPage> {
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
-                                // WARNA: latar kartu/komponen ini.
+                                // WARNA: warna spinner loading di dalam pil melayang 'Menghitung rute navigasi jalan...'.
                                 color: Colors.white,
                                 strokeWidth: 2,
                               ),
@@ -922,7 +917,7 @@ class _MapPageState extends State<MapPage> {
                             Text(
                               'Menghitung rute navigasi jalan...',
                               style: TextStyle(
-                                // WARNA: teks 'Menghitung rute navigasi jalan...'.
+                                // WARNA: warna teks di dalam pil loading melayang 'Menghitung rute navigasi jalan...'.
                                 color: Colors.white,
                                 fontSize: 12,
                               ),
@@ -941,9 +936,9 @@ class _MapPageState extends State<MapPage> {
                     children: [
                       FloatingActionButton.small(
                         heroTag: 'my_loc',
-                        // WARNA: latar komponen.
+                        // WARNA: latar belakang tombol melayang 'Pusatkan ke Lokasi Saya' di kanan atas peta.
                         backgroundColor: Colors.white,
-                        // WARNA: teks/ikon tombol.
+                        // WARNA: warna ikon target GPS pada tombol 'Pusatkan ke Lokasi Saya' di kanan atas peta.
                         foregroundColor: const Color(0xFF67343A),
                         tooltip: 'Pusatkan ke Lokasi Saya',
                         onPressed: () {
@@ -966,9 +961,9 @@ class _MapPageState extends State<MapPage> {
                       const SizedBox(height: 8),
                       FloatingActionButton.small(
                         heroTag: 'zoom_in',
-                        // WARNA: latar komponen.
+                        // WARNA: latar belakang tombol melayang Zoom In (+) di kanan atas peta.
                         backgroundColor: Colors.white,
-                        // WARNA: teks/ikon tombol.
+                        // WARNA: warna ikon tambah (+) pada tombol Zoom In di kanan atas peta.
                         foregroundColor: Colors.black87,
                         tooltip: 'Perbesar Peta',
                         onPressed: () {
@@ -983,9 +978,9 @@ class _MapPageState extends State<MapPage> {
                       const SizedBox(height: 8),
                       FloatingActionButton.small(
                         heroTag: 'zoom_out',
-                        // WARNA: latar komponen.
+                        // WARNA: latar belakang tombol melayang Zoom Out (-) di kanan atas peta.
                         backgroundColor: Colors.white,
-                        // WARNA: teks/ikon tombol.
+                        // WARNA: warna ikon kurang (-) pada tombol Zoom Out di kanan atas peta.
                         foregroundColor: Colors.black87,
                         tooltip: 'Perkecil Peta',
                         onPressed: () {
@@ -1026,24 +1021,21 @@ class _MapPageState extends State<MapPage> {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            // WARNA: latar kartu/komponen.
+                            // WARNA: latar belakang kartu slider cabang perpustakaan di bagian bawah peta (putih).
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(18),
-                            // WARNA: garis tepi komponen.
                             border: Border.all(
-                              // WARNA: garis tepi kartu/komponen.
+                              // WARNA: garis tepi kartu slider cabang perpustakaan di bawah peta (hijau jika jadi tujuan rute aktif, marun jika dipilih, krem jika normal).
                               color: isNavigating
                                   ? Colors.green.shade600
                                   : isSelected
-                                  // WARNA: latar kartu.
                                   ? const Color(0xFF67343A)
-                                  // WARNA: latar kartu.
                                   : const Color(0xFFEADBCE),
                               width: isNavigating || isSelected ? 2.0 : 1.2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                // WARNA: bayangan kartu.
+                                // WARNA: bayangan di bawah kartu slider cabang perpustakaan pada bagian bawah peta.
                                 color: const Color(0xFF302622)
                                     .withValues(alpha: 0.08),
                                 blurRadius: 10,
@@ -1052,7 +1044,7 @@ class _MapPageState extends State<MapPage> {
                             ],
                           ),
                           child: Material(
-                            // WARNA: bayangan kartu.
+                            // WARNA: latar Material InkWell kartu slider peta dibuat transparan agar latar putih kartu tetap tampil.
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(18),
                             child: InkWell(
@@ -1076,7 +1068,7 @@ class _MapPageState extends State<MapPage> {
                                         Container(
                                           padding: const EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            // WARNA: latar kartu/komponen.
+                                            // WARNA: latar kotak kecil ikon gedung di kiri atas kartu slider perpustakaan (hijau muda jika rute aktif, krem parchment jika normal).
                                             color: isNavigating
                                                 ? Colors.green.shade50
                                                 : const Color(0xFFEDE2CF),
@@ -1087,7 +1079,7 @@ class _MapPageState extends State<MapPage> {
                                           child: Icon(
                                             Icons.local_library_rounded,
                                             size: 20,
-                                            // WARNA: ikon local_library_rounded.
+                                            // WARNA: warna ikon gedung perpustakaan di dalam kotak kiri atas kartu slider peta (hijau tua jika rute aktif, marun oxblood jika normal).
                                             color: isNavigating
                                                 ? Colors.green.shade700
                                                 : const Color(0xFF67343A),
@@ -1106,7 +1098,7 @@ class _MapPageState extends State<MapPage> {
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 13,
-                                                  // WARNA: teks 'lib.name'.
+                                                  // WARNA: warna teks nama cabang perpustakaan pada kartu slider di bagian bawah peta.
                                                   color: Color(0xFF302622),
                                                   height: 1.2,
                                                 ),
@@ -1117,7 +1109,7 @@ class _MapPageState extends State<MapPage> {
                                                   Icon(
                                                     Icons.star_rounded,
                                                     size: 14,
-                                                    // WARNA: ikon star_rounded.
+                                                    // WARNA: warna ikon bintang rating cabang perpustakaan pada kartu slider di bawah peta.
                                                     color:
                                                         Colors.amber.shade700,
                                                   ),
@@ -1128,7 +1120,7 @@ class _MapPageState extends State<MapPage> {
                                                       fontSize: 11,
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      // WARNA: rating buku.
+                                                      // WARNA: warna teks angka rating cabang perpustakaan pada kartu slider di bawah peta.
                                                       color:
                                                           Colors.grey.shade700,
                                                     ),
@@ -1141,7 +1133,7 @@ class _MapPageState extends State<MapPage> {
                                                           vertical: 1.5,
                                                         ),
                                                     decoration: BoxDecoration(
-                                                      // WARNA: latar kartu/komponen.
+                                                      // WARNA: latar lencana kecil 'Buka'/'Tutup' pada kartu slider perpustakaan di bawah peta (hijau muda jika buka, merah muda jika tutup).
                                                       color: isLibOpen
                                                           ? Colors
                                                               .green
@@ -1153,9 +1145,8 @@ class _MapPageState extends State<MapPage> {
                                                           BorderRadius.circular(
                                                             4,
                                                           ),
-                                                      // WARNA: garis tepi komponen.
                                                       border: Border.all(
-                                                        // WARNA: garis tepi kartu/komponen.
+                                                        // WARNA: garis tepi lencana kecil 'Buka'/'Tutup' pada kartu slider perpustakaan di bawah peta.
                                                         color: isLibOpen
                                                             ? Colors
                                                                 .green
@@ -1174,7 +1165,7 @@ class _MapPageState extends State<MapPage> {
                                                         fontSize: 10,
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        // WARNA: teks 'isLibOpen'.
+                                                        // WARNA: warna teks 'Buka' (hijau tua) atau 'Tutup' (merah tua) di lencana kartu slider perpustakaan di bawah peta.
                                                         color: isLibOpen
                                                             ? Colors
                                                                 .green
@@ -1202,14 +1193,13 @@ class _MapPageState extends State<MapPage> {
                                             vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                            // WARNA: latar kartu/komponen.
+                                            // WARNA: latar lencana jarak ('X.X km' / 'Mencari GPS...') di pojok kiri bawah kartu slider perpustakaan.
                                             color: const Color(0xFFFAF7F2),
                                             borderRadius: BorderRadius.circular(
                                               8,
                                             ),
-                                            // WARNA: garis tepi komponen.
                                             border: Border.all(
-                                              // WARNA: garis tepi kartu/komponen.
+                                              // WARNA: garis tepi lencana jarak di pojok kiri bawah kartu slider perpustakaan.
                                               color: const Color(0xFFEADBCE),
                                             ),
                                           ),
@@ -1219,7 +1209,7 @@ class _MapPageState extends State<MapPage> {
                                               const Icon(
                                                 Icons.near_me_rounded,
                                                 size: 13,
-                                                // WARNA: ikon near_me_rounded.
+                                                // WARNA: warna ikon panah jarak di dalam lencana jarak pojok kiri bawah kartu slider perpustakaan.
                                                 color: Color(0xFF9A704F),
                                               ),
                                               const SizedBox(width: 4),
@@ -1230,7 +1220,7 @@ class _MapPageState extends State<MapPage> {
                                                 style: const TextStyle(
                                                   fontSize: 11.5,
                                                   fontWeight: FontWeight.w600,
-                                                  // WARNA: teks '_me'.
+                                                  // WARNA: warna teks jarak km (atau 'Mencari GPS...') di pojok kiri bawah kartu slider perpustakaan.
                                                   color: Color(0xFF67343A),
                                                 ),
                                               ),
@@ -1239,11 +1229,11 @@ class _MapPageState extends State<MapPage> {
                                         ),
                                         FilledButton.icon(
                                           style: FilledButton.styleFrom(
-                                            // WARNA: latar tombol.
+                                            // WARNA: latar tombol 'Rute' / 'Aktif' di pojok kanan bawah kartu slider perpustakaan (hijau jika sedang rute aktif, marun jika belum).
                                             backgroundColor: isNavigating
                                                 ? Colors.green.shade700
                                                 : const Color(0xFF67343A),
-                                            // WARNA: teks/ikon tombol.
+                                            // WARNA: warna teks dan ikon tombol 'Rute' / 'Aktif' di pojok kanan bawah kartu slider perpustakaan (putih).
                                             foregroundColor: Colors.white,
                                             visualDensity:
                                                 VisualDensity.compact,

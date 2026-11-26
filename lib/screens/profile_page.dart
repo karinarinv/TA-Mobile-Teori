@@ -158,6 +158,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final requestedUsername = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
+      // WARNA: latar pembungkus modal bottom sheet Ganti Username dibuat transparan agar sudut melengkung kartu modal terlihat.
       backgroundColor: Colors.transparent,
       builder: (_) => _ChangeUsernameModal(
         initialUsername: currentUsername,
@@ -210,7 +211,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: warna garis pegangan (handle bar) abu-abu di bagian atas bottom sheet 'Ganti Foto Profil'.
                   color: Colors.grey.shade300,
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -225,11 +226,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    // WARNA: latar kartu/komponen.
+                    // WARNA: latar kotak ikon 'Ambil dari Kamera' di bottom sheet Ganti Foto Profil.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  // WARNA: latar kartu/komponen.
+                  // WARNA: warna ikon kamera pada pilihan 'Ambil dari Kamera' di bottom sheet Ganti Foto Profil.
                   child: const Icon(Icons.camera_alt, color: Color(0xFF67343A)),
                 ),
                 title: const Text('Ambil dari Kamera'),
@@ -242,13 +243,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    // WARNA: latar kartu/komponen.
+                    // WARNA: latar kotak ikon 'Pilih dari Galeri' di bottom sheet Ganti Foto Profil.
                     color: const Color(0xFFEDE2CF),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.photo_library,
-                    // WARNA: latar kartu/komponen.
+                    // WARNA: warna ikon galeri foto pada pilihan 'Pilih dari Galeri' di bottom sheet Ganti Foto Profil.
                     color: Color(0xFF67343A),
                   ),
                 ),
@@ -277,11 +278,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final yes = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        // WARNA: latar dialog.
+        // WARNA: latar belakang kotak dialog 'Konfirmasi Keluar' di halaman Profil.
         backgroundColor: const Color(0xFFFAF7F2),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          // WARNA: warna komponen.
+          // WARNA: garis tepi kotak dialog 'Konfirmasi Keluar' di halaman Profil.
           side: const BorderSide(color: Color(0xFFEADBCE), width: 1.2),
         ),
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
@@ -292,19 +293,18 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                // WARNA: latar kartu/komponen.
+                // WARNA: latar lingkaran ikon logout di bagian atas dialog 'Konfirmasi Keluar'.
                 color: const Color(0xFF67343A).withValues(alpha: 0.1),
                 shape: BoxShape.circle,
-                // WARNA: garis tepi komponen.
                 border: Border.all(
-                  // WARNA: garis tepi kartu/komponen.
+                  // WARNA: garis tepi lingkaran ikon logout di bagian atas dialog 'Konfirmasi Keluar'.
                   color: const Color(0xFF67343A).withValues(alpha: 0.2),
                   width: 1.2,
                 ),
               ),
               child: const Icon(
                 Icons.logout_rounded,
-                // WARNA: garis tepi kartu/komponen.
+                // WARNA: warna ikon logout di dalam lingkaran atas dialog 'Konfirmasi Keluar'.
                 color: Color(0xFF67343A),
                 size: 26,
               ),
@@ -316,7 +316,7 @@ class _ProfilePageState extends State<ProfilePage> {
               style: GoogleFonts.playfairDisplay(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                // WARNA: teks 'Konfirmasi Keluar'.
+                // WARNA: warna teks judul 'Konfirmasi Keluar' pada dialog logout.
                 color: const Color(0xFF302622),
               ),
             ),
@@ -327,7 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
           textAlign: TextAlign.center,
           style: GoogleFonts.plusJakartaSans(
             fontSize: 12.5,
-            // WARNA: teks judul/isi pada bagian ini.
+            // WARNA: warna teks pesan pertanyaan konfirmasi pada dialog logout.
             color: const Color(0xFF6B564A),
             height: 1.45,
           ),
@@ -338,10 +338,10 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    // WARNA: teks/ikon tombol 'Batal'.
+                    // WARNA: warna teks tombol 'Batal' di kiri bawah dialog 'Konfirmasi Keluar'.
                     foregroundColor: const Color(0xFF302622),
                     side: const BorderSide(
-                      // WARNA: garis tepi kartu/komponen.
+                      // WARNA: garis tepi tombol 'Batal' di kiri bawah dialog 'Konfirmasi Keluar'.
                       color: Color(0xFFEADBCE),
                       width: 1.2,
                     ),
@@ -356,7 +356,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
-                      // WARNA: teks 'Batal'.
+                      // WARNA: warna teks label 'Batal' di dalam tombol batal dialog logout.
                       color: const Color(0xFF302622),
                     ),
                   ),
@@ -366,9 +366,9 @@ class _ProfilePageState extends State<ProfilePage> {
               Expanded(
                 child: FilledButton(
                   style: FilledButton.styleFrom(
-                    // WARNA: latar tombol.
+                    // WARNA: latar belakang tombol 'Keluar' di kanan bawah dialog 'Konfirmasi Keluar'.
                     backgroundColor: const Color(0xFF67343A),
-                    // WARNA: teks/ikon tombol 'Keluar'.
+                    // WARNA: warna ripple/teks tombol 'Keluar' di kanan bawah dialog 'Konfirmasi Keluar'.
                     foregroundColor: const Color(0xFFEDE2CF),
                     padding: const EdgeInsets.symmetric(vertical: 11),
                     elevation: 0,
@@ -382,7 +382,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: GoogleFonts.plusJakartaSans(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
-                      // WARNA: teks 'Keluar'.
+                      // WARNA: warna teks label 'Keluar' di dalam tombol konfirmasi logout.
                       color: const Color(0xFFEDE2CF),
                     ),
                   ),
@@ -411,7 +411,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // WARNA: latar halaman.
+      // WARNA: latar belakang utama halaman Profil Pengguna.
       backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
         title: Text(
@@ -419,13 +419,13 @@ class _ProfilePageState extends State<ProfilePage> {
           style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         elevation: 0,
-        // WARNA: latar AppBar.
+        // WARNA: latar belakang AppBar halaman Profil Pengguna.
         backgroundColor: const Color(0xFF67343A),
-        // WARNA: teks/ikon tombol.
+        // WARNA: warna teks judul 'Profil Pengguna' pada AppBar.
         foregroundColor: const Color(0xFFEDE2CF),
         actions: [
           IconButton(
-            // WARNA: teks 'Profil Pengguna'.
+            // WARNA: warna ikon segarkan (refresh) di pojok kanan atas AppBar halaman Profil Pengguna.
             icon: const Icon(Icons.refresh_rounded, color: Color(0xFFEDE2CF)),
             tooltip: 'Segarkan',
             onPressed: _load,
@@ -434,13 +434,13 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: _loading
           ? const Center(
-              // WARNA: ikon refresh_rounded.
+              // WARNA: warna spinner loading saat memuat data profil dari SQLite.
               child: CircularProgressIndicator(color: Color(0xFF67343A)),
             )
           : RefreshIndicator(
-              // WARNA: ikon pada komponen ini.
+              // WARNA: warna panah indikator tarik-untuk-refresh pada halaman Profil Pengguna.
               color: const Color(0xFF67343A),
-              // WARNA: latar spinner tarik-refresh.
+              // WARNA: warna latar lingkaran indikator tarik-untuk-refresh pada halaman Profil Pengguna.
               backgroundColor: const Color(0xFFEDE2CF),
               onRefresh: _load,
               child: SingleChildScrollView(
@@ -459,18 +459,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         horizontal: 16,
                       ),
                       decoration: BoxDecoration(
-                        // WARNA: latar kartu/komponen.
+                        // WARNA: latar belakang kartu atas profil (tempat foto profil, username, dan lencana anggota) — putih.
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
-                        // WARNA: garis tepi komponen.
                         border: Border.all(
-                          // WARNA: garis tepi kartu/komponen.
+                          // WARNA: garis tepi kartu header profil bagian atas.
                           color: const Color(0xFFEADBCE),
                           width: 1.2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            // WARNA: bayangan kartu.
+                            // WARNA: bayangan tipis di bawah kartu header profil bagian atas.
                             color: const Color(0xFF302622)
                                 .withValues(alpha: 0.05),
                             blurRadius: 12,
@@ -492,7 +491,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       gradient: LinearGradient(
-                                        // WARNA: gradasi komponen ini.
+                                        // WARNA: gradasi bingkai cincin melingkar di sekeliling foto profil (marun -> cokelat -> krem emas).
                                         colors: const [
                                             Color(0xFF67343A),
                                             Color(0xFF9A704F),
@@ -503,7 +502,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          // WARNA: bayangan kartu.
+                                          // WARNA: bayangan di bawah lingkaran foto profil pengguna.
                                           color: const Color(0xFF302622)
                                               .withValues(alpha: 0.16),
                                           blurRadius: 10,
@@ -513,7 +512,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ),
                                     child: CircleAvatar(
                                       radius: 50,
-                                      // WARNA: latar komponen.
+                                      // WARNA: latar lingkaran avatar foto profil (terlihat saat user belum mengatur foto).
                                       backgroundColor: const Color(0xFFEDE2CF),
                                       backgroundImage: _photo != null
                                           ? FileImage(File(_photo!))
@@ -522,7 +521,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ? const Icon(
                                               Icons.person,
                                               size: 52,
-                                              // WARNA: ikon person.
+                                              // WARNA: warna ikon orang default di dalam avatar foto profil (saat belum ada foto).
                                               color: Color(0xFF67343A),
                                             )
                                           : null,
@@ -537,18 +536,17 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: Container(
                                       padding: const EdgeInsets.all(7.5),
                                       decoration: BoxDecoration(
-                                        // WARNA: latar kartu/komponen.
+                                        // WARNA: latar lingkaran kecil tombol kamera di pojok kanan bawah foto profil.
                                         color: const Color(0xFF67343A),
                                         shape: BoxShape.circle,
-                                        // WARNA: garis tepi komponen.
                                         border: Border.all(
-                                          // WARNA: garis tepi kartu/komponen.
+                                          // WARNA: garis tepi putih melingkari tombol kamera kecil pada foto profil.
                                           color: Colors.white,
                                           width: 2,
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            // WARNA: bayangan kartu.
+                                            // WARNA: bayangan kecil di bawah tombol kamera pada foto profil.
                                             color: Colors.black.withValues(
                                               alpha: 0.2,
                                             ),
@@ -559,7 +557,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       child: const Icon(
                                         Icons.camera_alt_rounded,
                                         size: 15,
-                                        // WARNA: ikon camera_alt_rounded.
+                                        // WARNA: warna ikon kamera kecil di pojok kanan bawah foto profil.
                                         color: Color(0xFFEDE2CF),
                                       ),
                                     ),
@@ -585,7 +583,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       style: GoogleFonts.playfairDisplay(
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
-                                        // WARNA: teks '_username'.
+                                        // WARNA: warna teks nama pengguna (username) di bawah foto profil.
                                         color: const Color(0xFF302622),
                                       ),
                                     ),
@@ -605,7 +603,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       icon: Icon(
                                         Icons.edit_rounded,
                                         size: 18,
-                                        // WARNA: ikon edit_rounded.
+                                        // WARNA: warna ikon pensil tombol edit username di sebelah kanan nama pengguna.
                                         color: const Color(0xFF9A704F),
                                       ),
                                     ),
@@ -623,10 +621,10 @@ class _ProfilePageState extends State<ProfilePage> {
                               vertical: 5,
                             ),
                             decoration: BoxDecoration(
-                              // WARNA: latar lencana anggota perpustakaan.
+                              // WARNA: latar belakang pil lencana 'ANGGOTA PERPUSTAKAAN' di kartu header profil.
                               color: const Color(0xFFEDE2CF),
                               borderRadius: BorderRadius.circular(20),
-                              // WARNA: garis tepi lencana anggota perpustakaan.
+                              // WARNA: garis tepi pil lencana 'ANGGOTA PERPUSTAKAAN' di kartu header profil.
                               border: Border.all(
                                 color: const Color(0xFF9A704F).withValues(alpha: 0.35),
                                 width: 1.2,
@@ -635,7 +633,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                // WARNA: ikon centang lencana keanggotaan.
+                                // WARNA: warna ikon perisai centang di dalam pil lencana 'ANGGOTA PERPUSTAKAAN'.
                                 const Icon(
                                   Icons.verified_user_rounded,
                                   size: 14,
@@ -648,7 +646,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 0.8,
-                                    // WARNA: teks status anggota perpustakaan.
+                                    // WARNA: warna teks 'ANGGOTA PERPUSTAKAAN' di dalam pil lencana profil.
                                     color: const Color(0xFF67343A),
                                   ),
                                 ),
@@ -665,18 +663,17 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        // WARNA: latar kartu/komponen.
+                        // WARNA: latar belakang kartu menu 'PENGATURAN & AKUN' di halaman Profil (putih).
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(18),
-                        // WARNA: garis tepi komponen.
                         border: Border.all(
-                          // WARNA: garis tepi kartu/komponen.
+                          // WARNA: garis tepi luar kartu menu 'PENGATURAN & AKUN' di halaman Profil.
                           color: const Color(0xFFEADBCE),
                           width: 1.1,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            // WARNA: bayangan kartu.
+                            // WARNA: bayangan tipis di bawah kartu menu 'PENGATURAN & AKUN' di halaman Profil.
                             color: const Color(0xFF302622)
                                 .withValues(alpha: 0.04),
                             blurRadius: 8,
@@ -694,7 +691,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                // WARNA: teks 'PENGATURAN & AKUN'.
+                                // WARNA: warna teks judul seksi 'PENGATURAN & AKUN' di bagian atas kartu menu Profil.
                                 color: const Color(0xFF9A704F),
                                 letterSpacing: 0.8,
                               ),
@@ -704,18 +701,17 @@ class _ProfilePageState extends State<ProfilePage> {
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                // WARNA: latar kartu/komponen.
+                                // WARNA: latar kotak kecil ikon baris menu 'Buku Tersimpan' di kartu Pengaturan & Akun.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                // WARNA: garis tepi komponen.
                                 border: Border.all(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: garis tepi kotak kecil ikon baris menu 'Buku Tersimpan' di kartu Pengaturan & Akun.
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.collections_bookmark_rounded,
-                                // WARNA: garis tepi kartu/komponen.
+                                // WARNA: warna ikon bookmark di dalam kotak kecil baris menu 'Buku Tersimpan'.
                                 color: Color(0xFF67343A),
                                 size: 19,
                               ),
@@ -725,7 +721,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
-                                // WARNA: teks 'Buku Tersimpan'.
+                                // WARNA: warna teks judul baris menu 'Buku Tersimpan' di kartu Pengaturan & Akun.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -733,14 +729,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               '$_savedCount buku favorit tersimpan',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
-                                // WARNA: teks 'Buku Tersimpan'.
+                                // WARNA: warna subteks jumlah buku favorit di bawah judul baris menu 'Buku Tersimpan'.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
-                              // WARNA: teks 'Buku Tersimpan'.
+                              // WARNA: warna ikon panah kanan (>) di ujung baris menu 'Buku Tersimpan'.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: () async {
@@ -753,7 +749,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               _load();
                             },
                           ),
-                          // WARNA: garis pemisah menu riwayat peminjaman.
+                          // WARNA: warna garis pembatas horizontal antara baris menu 'Buku Tersimpan' dan 'Riwayat Peminjaman'.
                           const Divider(
                             height: 1,
                             indent: 16,
@@ -764,15 +760,15 @@ class _ProfilePageState extends State<ProfilePage> {
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                // WARNA: latar kotak ikon menu riwayat peminjaman.
+                                // WARNA: latar kotak kecil ikon baris menu 'Riwayat Peminjaman' di kartu Pengaturan & Akun.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                // WARNA: garis tepi kotak ikon riwayat.
+                                // WARNA: garis tepi kotak kecil ikon baris menu 'Riwayat Peminjaman'.
                                 border: Border.all(
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
-                              // WARNA: ikon struk riwayat peminjaman.
+                              // WARNA: warna ikon struk di dalam kotak kecil baris menu 'Riwayat Peminjaman'.
                               child: const Icon(
                                 Icons.receipt_long_rounded,
                                 color: Color(0xFF67343A),
@@ -784,7 +780,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
-                                // WARNA: teks judul menu riwayat peminjaman.
+                                // WARNA: warna teks judul baris menu 'Riwayat Peminjaman' di kartu Pengaturan & Akun.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -792,14 +788,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               '$_rentalCount riwayat transaksi sewa buku',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
-                                // WARNA: subteks informasi menu riwayat peminjaman.
+                                // WARNA: warna subteks jumlah transaksi sewa di bawah judul baris menu 'Riwayat Peminjaman'.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
-                              // WARNA: ikon panah menu riwayat.
+                              // WARNA: warna ikon panah kanan (>) di ujung baris menu 'Riwayat Peminjaman'.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: () async {
@@ -816,25 +812,24 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 1,
                             indent: 16,
                             endIndent: 16,
-                            // WARNA: warna komponen.
+                            // WARNA: warna garis pembatas horizontal antara baris menu 'Riwayat Peminjaman' dan 'Perbarui Foto Profil'.
                             color: Color(0xFFEADBCE),
                           ),
                           ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                // WARNA: latar kartu/komponen.
+                                // WARNA: latar kotak kecil ikon baris menu 'Perbarui Foto Profil' di kartu Pengaturan & Akun.
                                 color: const Color(0xFFFAF7F2),
                                 borderRadius: BorderRadius.circular(10),
-                                // WARNA: garis tepi komponen.
                                 border: Border.all(
-                                  // WARNA: garis tepi kartu/komponen.
+                                  // WARNA: garis tepi kotak kecil ikon baris menu 'Perbarui Foto Profil'.
                                   color: const Color(0xFFEADBCE),
                                 ),
                               ),
                               child: const Icon(
                                 Icons.add_a_photo_outlined,
-                                // WARNA: garis tepi kartu/komponen.
+                                // WARNA: warna ikon tambah foto di dalam kotak kecil baris menu 'Perbarui Foto Profil'.
                                 color: Color(0xFF67343A),
                                 size: 19,
                               ),
@@ -844,7 +839,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               style: GoogleFonts.plusJakartaSans(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13.5,
-                                // WARNA: teks 'Perbarui Foto Profil'.
+                                // WARNA: warna teks judul baris menu 'Perbarui Foto Profil' di kartu Pengaturan & Akun.
                                 color: const Color(0xFF302622),
                               ),
                             ),
@@ -852,14 +847,14 @@ class _ProfilePageState extends State<ProfilePage> {
                               'Pilih foto baru dari kamera atau galeri ponsel',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 11.5,
-                                // WARNA: teks 'Perbarui Foto Profil'.
+                                // WARNA: warna subteks deskripsi di bawah judul baris menu 'Perbarui Foto Profil'.
                                 color: const Color(0xFF6B564A),
                               ),
                             ),
                             trailing: const Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 14,
-                              // WARNA: teks 'Perbarui Foto Profil'.
+                              // WARNA: warna ikon panah kanan (>) di ujung baris menu 'Perbarui Foto Profil'.
                               color: Color(0xFF9A704F),
                             ),
                             onTap: _showImagePickerSheet,
@@ -874,12 +869,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       width: double.infinity,
                       child: OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
-                          // WARNA: teks/ikon tombol 'Keluar dari Akun'.
+                          // WARNA: warna ikon logout dan ripple tombol 'Keluar dari Akun' di bagian bawah halaman Profil.
                           foregroundColor: const Color(0xFF67343A),
-                          // WARNA: latar tombol.
+                          // WARNA: latar belakang tombol 'Keluar dari Akun' di halaman Profil (putih).
                           backgroundColor: Colors.white,
                           side: const BorderSide(
-                            // WARNA: garis tepi kartu/komponen.
+                            // WARNA: garis tepi tombol 'Keluar dari Akun' di halaman Profil (marun oxblood).
                             color: Color(0xFF67343A),
                             width: 1.4,
                           ),
@@ -896,7 +891,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: GoogleFonts.plusJakartaSans(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
-                            // WARNA: teks 'Keluar dari Akun'.
+                            // WARNA: warna teks 'Keluar dari Akun' di dalam tombol logout halaman Profil.
                             color: const Color(0xFF67343A),
                           ),
                         ),
@@ -911,7 +906,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         const Icon(
                           Icons.shield_outlined,
                           size: 14,
-                          // WARNA: ikon shield_outlined.
+                          // WARNA: warna ikon perisai footer keamanan SHA-256 di bagian paling bawah halaman Profil.
                           color: Color(0xFF9A704F),
                         ),
                         const SizedBox(width: 6),
@@ -919,7 +914,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           'RentBook • Keamanan SHA-256 Terenkripsi',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
-                            // WARNA: teks 'RentBook • Keamanan SHA-256 Terenkripsi'.
+                            // WARNA: warna teks footer 'RentBook • Keamanan SHA-256 Terenkripsi' di bawah tombol Keluar.
                             color: const Color(0xFF9A704F),
                           ),
                         ),

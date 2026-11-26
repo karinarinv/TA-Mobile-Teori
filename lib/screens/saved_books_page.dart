@@ -49,17 +49,17 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
       SnackBar(
         duration: const Duration(milliseconds: 1800),
         behavior: SnackBarBehavior.floating,
-        // WARNA: latar notifikasi.
+        // WARNA: latar belakang SnackBar konfirmasi hapus buku dari daftar tersimpan.
         backgroundColor: const Color(0xFF302622),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Text(
           '"$title" dihapus dari daftar tersimpan.',
-          // WARNA: teks '"$title" dihapus dari daftar tersimpan.'.
+          // WARNA: warna teks pesan SnackBar hapus buku tersimpan.
           style: const TextStyle(color: Color(0xFFEDE2CF)),
         ),
         action: SnackBarAction(
           label: 'Urungkan',
-          // WARNA: teks '"$title" dihapus dari daftar tersimpan.'.
+          // WARNA: warna teks tombol aksi 'Urungkan' di SnackBar hapus buku tersimpan.
           textColor: const Color(0xFFD4BE9D),
           onPressed: () async {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -95,11 +95,11 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         Container(
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
-                            // WARNA: latar kartu/komponen.
+                            // WARNA: lingkaran latar ikon bookmark pada tampilan kosong (empty state) Buku Tersimpan.
                             color: const Color(0xFFEDE2CF),
                             shape: BoxShape.circle,
                           ),
-                          // WARNA: latar kartu/komponen.
+                          // WARNA: warna ikon bookmark besar pada tampilan kosong (empty state) Buku Tersimpan.
                           child: Icon(Icons.bookmark_border, size: 64, color: const Color(0xFF9A704F)),
                         ),
                         const SizedBox(height: 20),
@@ -110,16 +110,16 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                         const SizedBox(height: 8),
                         Text(
                           'Simpan buku favorit Anda dari halaman detail buku untuk mengaksesnya dengan cepat di sini.',
-                          // WARNA: teks 'Belum Ada Buku Tersimpan'.
+                          // WARNA: warna teks keterangan di tampilan kosong Buku Tersimpan.
                           style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
                         FilledButton.icon(
                           style: FilledButton.styleFrom(
-                            // WARNA: latar tombol.
+                            // WARNA: latar tombol 'Jelajahi Katalog Buku' di tampilan kosong Buku Tersimpan.
                             backgroundColor: const Color(0xFF67343A),
-                            // WARNA: teks/ikon tombol 'Jelajahi Katalog Buku'.
+                            // WARNA: warna teks dan ikon tombol 'Jelajahi Katalog Buku' di tampilan kosong Buku Tersimpan.
                             foregroundColor: const Color(0xFFEDE2CF),
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -178,16 +178,16 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                           img,
                                           fit: BoxFit.cover,
                                           errorBuilder: (_, __, ___) => Container(
-                                            // WARNA: warna komponen.
+                                            // WARNA: latar kotak placeholder sampul buku saat gambar gagal dimuat di kartu Buku Tersimpan.
                                             color: Colors.grey[200],
-                                            // WARNA: warna komponen.
+                                            // WARNA: ikon buku pada placeholder sampul gagal dimuat di kartu Buku Tersimpan.
                                             child: const Icon(Icons.book, color: Colors.grey),
                                           ),
                                         )
                                       : Container(
-                                          // WARNA: ikon book.
+                                          // WARNA: latar kotak placeholder sampul buku saat URL gambar kosong di kartu Buku Tersimpan.
                                           color: Colors.grey[200],
-                                          // WARNA: ikon book.
+                                          // WARNA: ikon buku pada placeholder sampul kosong di kartu Buku Tersimpan.
                                           child: const Icon(Icons.book, color: Colors.grey),
                                         ),
                                 ),
@@ -208,7 +208,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                       authors,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      // WARNA: judul buku.
+                                      // WARNA: warna teks nama penulis pada kartu item Buku Tersimpan.
                                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                     ),
                                     const SizedBox(height: 6),
@@ -217,7 +217,7 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            // WARNA: latar kartu/komponen.
+                                            // WARNA: latar lencana (badge) harga sewa per hari pada kartu Buku Tersimpan.
                                             color: const Color(0xFFEDE2CF),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
@@ -226,20 +226,20 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                                             style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.bold,
-                                              // WARNA: teks 'Rp ${_formatNumber(pricePerDay)}/hari'.
+                                              // WARNA: warna teks nominal harga sewa di dalam lencana kartu Buku Tersimpan.
                                               color: const Color(0xFF5A2A38),
                                             ),
                                           ),
                                         ),
                                         const SizedBox(width: 8),
-                                        // WARNA: teks 'Rp ${_formatNumber(pricePerDay)}/hari'.
+                                        // WARNA: warna ikon bintang rating pada kartu item Buku Tersimpan.
                                         Icon(Icons.star, size: 13, color: Colors.amber.shade800),
                                         const SizedBox(width: 2),
                                         Text(
                                           rating,
                                           style: TextStyle(
                                             fontSize: 11,
-                                            // WARNA: rating buku.
+                                            // WARNA: warna angka rating buku pada kartu item Buku Tersimpan.
                                             color: Colors.grey.shade700,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -253,14 +253,14 @@ class _SavedBooksPageState extends State<SavedBooksPage> {
                               Column(
                                 children: [
                                   IconButton(
-                                    // WARNA: warna komponen.
+                                    // WARNA: warna ikon tombol hapus bookmark (merah) di sisi kanan kartu Buku Tersimpan.
                                     icon: const Icon(Icons.bookmark_remove_outlined, color: Colors.redAccent),
                                     tooltip: 'Hapus dari Tersimpan',
                                     onPressed: () => _remove(item),
                                   ),
                                   FilledButton(
                                     style: FilledButton.styleFrom(
-                                      // WARNA: latar tombol.
+                                      // WARNA: latar tombol 'Sewa' di sisi kanan bawah kartu item Buku Tersimpan.
                                       backgroundColor: const Color(0xFF67343A),
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                       visualDensity: VisualDensity.compact,

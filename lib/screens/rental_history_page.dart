@@ -72,7 +72,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // WARNA: latar belakang halaman riwayat sewa.
+      // WARNA: latar belakang utama halaman Riwayat Peminjaman.
       backgroundColor: const Color(0xFFFAF7F2),
       appBar: AppBar(
         title: Text(
@@ -82,12 +82,13 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
       ),
       body: _isLoading
           ? const Center(
-              // WARNA: spinner loading data riwayat.
+              // WARNA: warna spinner loading saat memuat riwayat sewa dari SQLite.
               child: CircularProgressIndicator(color: Color(0xFF67343A)),
             )
           : RefreshIndicator(
+              // WARNA: warna panah indikator tarik-untuk-refresh pada halaman Riwayat Peminjaman.
               color: const Color(0xFF67343A),
-              // WARNA: latar belakang halaman riwayat sewa.
+              // WARNA: latar lingkaran indikator tarik-untuk-refresh pada halaman Riwayat Peminjaman.
       backgroundColor: const Color(0xFFFAF7F2),
               onRefresh: _loadHistory,
               child: _transactions.isEmpty
@@ -110,16 +111,16 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                 width: 88,
                 height: 88,
                 decoration: BoxDecoration(
-                  // WARNA: lingkaran latar ikon empty state.
+                  // WARNA: latar lingkaran ikon pada tampilan kosong (empty state) Riwayat Peminjaman.
                   color: const Color(0xFFEDE2CF).withValues(alpha: 0.5),
                   shape: BoxShape.circle,
-                  // WARNA: garis tepi lingkaran empty state.
+                  // WARNA: garis tepi lingkaran ikon pada tampilan kosong Riwayat Peminjaman.
                   border: Border.all(color: const Color(0xFFEADBCE), width: 1.5),
                 ),
                 child: const Icon(
                   Icons.receipt_long_outlined,
                   size: 42,
-                  // WARNA: ikon dokumen pada empty state.
+                  // WARNA: warna ikon nota di tampilan kosong Riwayat Peminjaman.
                   color: Color(0xFF9A704F),
                 ),
               ),
@@ -129,7 +130,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                 style: GoogleFonts.playfairDisplay(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  // WARNA: teks judul empty state.
+                  // WARNA: warna teks judul 'Belum Ada Riwayat Sewa' di tampilan kosong.
                   color: const Color(0xFF302622),
                 ),
               ),
@@ -139,7 +140,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 13,
-                  // WARNA: subteks deskripsi empty state.
+                  // WARNA: warna teks deskripsi di tampilan kosong Riwayat Peminjaman.
                   color: const Color(0xFF8C7362),
                   height: 1.4,
                 ),
@@ -147,9 +148,9 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
               const SizedBox(height: 24),
               FilledButton.icon(
                 style: FilledButton.styleFrom(
-                  // WARNA: latar tombol jelajah katalog.
+                  // WARNA: latar tombol 'Jelajahi Katalog Buku' di tampilan kosong Riwayat Peminjaman.
                   backgroundColor: const Color(0xFF67343A),
-                  // WARNA: teks tombol jelajah katalog.
+                  // WARNA: warna teks dan ikon tombol 'Jelajahi Katalog Buku' di tampilan kosong Riwayat Peminjaman.
                   foregroundColor: const Color(0xFFEDE2CF),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -194,10 +195,10 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        // WARNA: latar kartu ringkasan total sewa.
+        // WARNA: latar kartu header ringkasan 'Catatan Peminjaman Aktif' di bagian paling atas daftar riwayat.
         color: const Color(0xFFEDE2CF),
         borderRadius: BorderRadius.circular(16),
-        // WARNA: garis tepi kartu ringkasan sewa.
+        // WARNA: garis tepi kartu header ringkasan 'Catatan Peminjaman Aktif'.
         border: Border.all(color: const Color(0xFF9A704F).withValues(alpha: 0.3)),
       ),
       child: Row(
@@ -205,11 +206,11 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: const BoxDecoration(
-              // WARNA: lingkaran ikon ringkasan sewa.
+              // WARNA: latar lingkaran ikon buku di sebelah kiri kartu header ringkasan riwayat sewa.
               color: Color(0xFF67343A),
               shape: BoxShape.circle,
             ),
-            // WARNA: ikon buku pada ringkasan sewa.
+            // WARNA: warna ikon buku terbuka di dalam lingkaran kartu ringkasan riwayat sewa.
             child: const Icon(Icons.auto_stories_rounded, color: Color(0xFFEDE2CF), size: 22),
           ),
           const SizedBox(width: 14),
@@ -222,7 +223,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                   style: GoogleFonts.playfairDisplay(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    // WARNA: teks judul kartu ringkasan sewa.
+                    // WARNA: warna teks judul 'Catatan Peminjaman Aktif' pada kartu ringkasan riwayat.
                     color: const Color(0xFF302622),
                   ),
                 ),
@@ -231,7 +232,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                   'Total ${_transactions.length} transaksi peminjaman tercatat di memori lokal.',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11.5,
-                    // WARNA: teks informasi total sewa.
+                    // WARNA: warna teks keterangan jumlah total transaksi pada kartu ringkasan riwayat.
                     color: const Color(0xFF67343A),
                     fontWeight: FontWeight.w500,
                   ),
@@ -248,14 +249,14 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        // WARNA: latar belakang kartu item transaksi.
+        // WARNA: latar belakang kartu tiap item transaksi sewa buku (putih).
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        // WARNA: garis tepi kartu item transaksi.
+        // WARNA: garis tepi kartu tiap item transaksi sewa buku.
         border: Border.all(color: const Color(0xFFEADBCE)),
         boxShadow: [
           BoxShadow(
-            // WARNA: bayangan kartu item transaksi.
+            // WARNA: bayangan tipis di bawah kartu tiap item transaksi sewa buku.
             color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 3),
@@ -274,13 +275,13 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    // WARNA: latar ikon buku pada item transaksi.
+                    // WARNA: latar kotak kecil ikon buku di kiri atas kartu item transaksi sewa.
                     color: const Color(0xFFFAF7F2),
                     borderRadius: BorderRadius.circular(10),
-                    // WARNA: garis tepi ikon buku.
+                    // WARNA: garis tepi kotak kecil ikon buku pada kartu item transaksi sewa.
                     border: Border.all(color: const Color(0xFFEADBCE)),
                   ),
-                  // WARNA: ikon buku pada kartu transaksi.
+                  // WARNA: warna ikon buku di dalam kotak kiri atas kartu item transaksi sewa.
                   child: const Icon(Icons.book_rounded, color: Color(0xFF67343A), size: 20),
                 ),
                 const SizedBox(width: 12),
@@ -295,7 +296,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                         style: GoogleFonts.playfairDisplay(
                           fontSize: 14.5,
                           fontWeight: FontWeight.bold,
-                          // WARNA: teks judul buku transaksi sewa.
+                          // WARNA: warna teks judul buku pada kartu item transaksi sewa.
                           color: const Color(0xFF302622),
                         ),
                       ),
@@ -304,7 +305,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                         'Waktu Transaksi: ${item.formattedTimestamp}',
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 11,
-                          // WARNA: teks timestamp waktu transaksi.
+                          // WARNA: warna teks waktu transaksi di bawah judul buku pada kartu item transaksi sewa.
                           color: const Color(0xFF8C7362),
                         ),
                       ),
@@ -314,7 +315,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
               ],
             ),
             const SizedBox(height: 12),
-            // WARNA: garis pembatas rincian transaksi.
+            // WARNA: garis pembatas horizontal antara header judul dan rincian biaya/durasi pada kartu item transaksi sewa.
             const Divider(color: Color(0xFFF1EAE1), height: 1),
             const SizedBox(height: 12),
 
@@ -372,7 +373,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // WARNA: ikon rincian informasi transaksi.
+        // WARNA: warna ikon kecil di sebelah label rincian (Durasi, Batas Kembali, Metode Bayar, Total Biaya) pada kartu item transaksi sewa.
         Icon(icon, size: 15, color: const Color(0xFF9A704F)),
         const SizedBox(width: 6),
         Expanded(
@@ -383,7 +384,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                 label,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 10.5,
-                  // WARNA: label keterangan transaksi.
+                  // WARNA: warna teks label kecil (misal 'Durasi Sewa', 'Total Biaya') pada kartu item transaksi sewa.
                   color: const Color(0xFF8C7362),
                 ),
               ),
@@ -395,7 +396,7 @@ class _RentalHistoryPageState extends State<RentalHistoryPage> {
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12,
                   fontWeight: isCost ? FontWeight.bold : FontWeight.w600,
-                  // WARNA: teks nilai rincian transaksi (harga sewa atau detail).
+                  // WARNA: warna nilai rincian pada kartu item transaksi (marun oxblood untuk Total Biaya, cokelat gelap untuk durasi/batas/metode).
                   color: isCost ? const Color(0xFF67343A) : const Color(0xFF302622),
                 ),
               ),

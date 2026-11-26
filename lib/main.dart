@@ -76,65 +76,65 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(
-              // WARNA: warna komponen.
+              // WARNA: warna benih (seed) untuk menurunkan palet Material 3 global aplikasi.
               seedColor: AppColors.oxblood,
-              // WARNA: warna utama tombol dan elemen aktif.
+              // WARNA: warna primer global Material 3 (tombol FilledButton, ProgressIndicator, elemen aktif).
               primary: AppColors.oxblood,
-              // WARNA: warna aksen aplikasi.
+              // WARNA: warna sekunder global Material 3 (elemen aksen dan sorotan pendukung).
               secondary: AppColors.tobacco,
-              // WARNA: latar kartu dan panel.
+              // WARNA: warna permukaan dasar global Material 3 (dialog, bottom sheet, dan panel default).
               surface: const Color(0xFFFAF7F2),
-              // WARNA: latar kartu dan panel.
+              // WARNA: warna latar container Material 3 standar.
               surfaceContainer: const Color(0xFFFAF7F2),
-              // WARNA: latar kartu dan panel.
+              // WARNA: warna latar container Material 3 elevasi rendah.
               surfaceContainerLow: const Color(0xFFFAF7F2),
-              // WARNA: latar kartu dan panel.
+              // WARNA: warna latar container Material 3 elevasi tinggi (misal chip/pil atau panel menonjol).
               surfaceContainerHigh: const Color(0xFFEDE2CF),
-              // WARNA: latar kartu dan panel.
+              // WARNA: tint permukaan global dibuat transparan agar warna kartu tidak berubah keunguan/kemerahan.
               surfaceTint: Colors.transparent,
             ),
             cardTheme: const CardThemeData(
-              // WARNA: warna komponen.
+              // WARNA: latar belakang default semua widget Card di aplikasi.
               color: Color(0xFFFAF7F2),
-              // WARNA: warna komponen.
+              // WARNA: tint elevasi default Card dibuat transparan agar warna tetap bersih.
               surfaceTintColor: Colors.transparent,
               elevation: 1.5,
             ),
             appBarTheme: AppBarTheme(
-              // WARNA: latar AppBar.
+              // WARNA: latar belakang default AppBar di seluruh halaman yang tidak menimpanya.
               backgroundColor: AppColors.oxblood,
-              // WARNA: teks/ikon tombol.
+              // WARNA: warna default ikon kembali dan tombol aksi di AppBar.
               foregroundColor: AppColors.parchment,
               elevation: 0,
               titleTextStyle: GoogleFonts.playfairDisplay(
-                // WARNA: teks judul/isi pada bagian ini.
+                // WARNA: warna teks judul default pada AppBar di seluruh halaman.
                 color: AppColors.parchment,
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.3,
               ),
             ),
-            // WARNA: latar komponen.
+            // WARNA: latar belakang default Scaffold (halaman) di seluruh aplikasi.
             scaffoldBackgroundColor: AppColors.background,
             textTheme: GoogleFonts.plusJakartaSansTextTheme().copyWith(
               headlineLarge: GoogleFonts.playfairDisplay(
                 fontWeight: FontWeight.bold,
-                // WARNA: teks judul/isi pada bagian ini.
+                // WARNA: warna teks global gaya headlineLarge (judul utama halaman).
                 color: AppColors.walnut,
               ),
               headlineMedium: GoogleFonts.playfairDisplay(
                 fontWeight: FontWeight.bold,
-                // WARNA: teks judul/isi pada bagian ini.
+                // WARNA: warna teks global gaya headlineMedium (judul bagian besar).
                 color: AppColors.walnut,
               ),
               titleLarge: GoogleFonts.playfairDisplay(
                 fontWeight: FontWeight.bold,
-                // WARNA: teks judul/isi pada bagian ini.
+                // WARNA: warna teks global gaya titleLarge (judul dialog/kartu besar).
                 color: AppColors.walnut,
               ),
               titleMedium: GoogleFonts.playfairDisplay(
                 fontWeight: FontWeight.bold,
-                // WARNA: teks judul/isi pada bagian ini.
+                // WARNA: warna teks global gaya titleMedium (subjudul kartu).
                 color: AppColors.walnut,
               ),
             ),

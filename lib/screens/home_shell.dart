@@ -27,9 +27,9 @@ class _HomeShellState extends State<HomeShell> {
   int _i = 0;
   final _pages = const [MenuPage(), ProfilePage(), FeedbackPage()];
 
-  // WARNA: palet _cOxblood ().
+  // WARNA: konstanta marun (_cOxblood) untuk ikon & label tab bottom navigation yang sedang aktif.
   static const Color _cOxblood = Color(0xFF67343A);
-  // WARNA: palet _cMuted ().
+  // WARNA: konstanta cokelat redup (_cMuted) untuk ikon & label tab bottom navigation yang tidak aktif.
   static const Color _cMuted = Color(0xFF8C7362);
 
   @override
@@ -37,11 +37,10 @@ class _HomeShellState extends State<HomeShell> {
         body: _pages[_i],
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
-            // WARNA: latar kartu/komponen.
+            // WARNA: latar belakang wadah luar bar navigasi bawah (HomeShell).
             color: Color(0xFFFAF7F2),
-            // WARNA: garis tepi komponen.
             border: Border(
-              // WARNA: latar kartu/komponen.
+              // WARNA: garis pembatas tipis di sisi atas bar navigasi bawah.
               top: BorderSide(color: Color(0xFFEADBCE), width: 1.2),
             ),
           ),
@@ -51,12 +50,12 @@ class _HomeShellState extends State<HomeShell> {
               child: BottomNavigationBar(
                 currentIndex: _i,
                 elevation: 0,
-                // WARNA: latar menu navigasi bawah.
+                // WARNA: latar belakang widget BottomNavigationBar utama (Beranda, Profil, Saran & Kesan).
                 backgroundColor: const Color(0xFFFAF7F2),
                 type: BottomNavigationBarType.fixed,
-                // WARNA: ikon dan teks menu yang sedang dipilih.
+                // WARNA: warna label & ikon tab navigasi bawah yang sedang aktif/dipilih.
                 selectedItemColor: _cOxblood,
-                // WARNA: ikon dan teks menu yang sedang dipilih.
+                // WARNA: warna label & ikon tab navigasi bawah yang sedang tidak aktif.
                 unselectedItemColor: _cMuted,
                 selectedLabelStyle: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
@@ -95,14 +94,14 @@ class _HomeShellState extends State<HomeShell> {
       curve: Curves.easeOutCubic,
       padding: EdgeInsets.symmetric(horizontal: isSelected ? 18 : 6, vertical: 4),
       decoration: BoxDecoration(
-        // WARNA: latar kartu/komponen.
+        // WARNA: latar pil sorotan di belakang ikon tab navigasi bawah (krem saat aktif, transparan saat tidak aktif).
         color: isSelected ? const Color(0xFFEDE2CF) : Colors.transparent,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Icon(
         icon,
         size: 22,
-        // WARNA: latar kartu/komponen.
+        // WARNA: warna ikon di dalam pil tab navigasi bawah (marun saat aktif, cokelat redup saat tidak aktif).
         color: isSelected ? _cOxblood : _cMuted,
       ),
     );

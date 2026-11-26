@@ -111,20 +111,20 @@ class _BookDetailPageState extends State<BookDetailPage> {
       SnackBar(
         duration: const Duration(seconds: 4),
         behavior: SnackBarBehavior.floating,
-        // WARNA: latar notifikasi.
+        // WARNA: latar belakang SnackBar saat buku disimpan atau dihapus dari bookmark.
         backgroundColor: const Color(0xFF67343A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         content: Text(
           nowSaved
               ? '"$title" disimpan ke Buku Tersimpan.'
               : '"$title" dihapus dari Buku Tersimpan.',
-          // WARNA: teks 'nowSaved'.
+          // WARNA: warna teks pesan SnackBar simpan/hapus bookmark di halaman Detail Buku.
           style: const TextStyle(color: Color(0xFFEDE2CF), fontWeight: FontWeight.w600),
         ),
         action: nowSaved
             ? SnackBarAction(
                 label: 'Lihat',
-                // WARNA: teks 'nowSaved'.
+                // WARNA: warna teks tombol aksi 'Lihat' pada SnackBar bookmark di Detail Buku.
                 textColor: const Color(0xFFEDE2CF),
                 onPressed: () {
                   messenger.hideCurrentSnackBar();
@@ -175,7 +175,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           IconButton(
             icon: Icon(
               _isBookmarked ? Icons.bookmark : Icons.bookmark_border,
-              // WARNA: teks judul/isi pada bagian ini.
+              // WARNA: warna ikon tombol bookmark di pojok kanan atas AppBar Detail Buku (kuning emas jika tersimpan, default AppBar jika belum).
               color: _isBookmarked ? Colors.amber.shade700 : null,
             ),
             tooltip: _isBookmarked ? 'Hapus dari Tersimpan' : 'Simpan Buku',
@@ -202,7 +202,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  // WARNA: gradasi komponen ini.
+                  // WARNA: gradasi latar belakang bagian atas (area pamer cover buku 3D) di halaman Detail Buku, dari krem muda ke putih.
                   colors: [const Color(0xFFFAF7F2), Colors.white],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -219,7 +219,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
-                              // WARNA: bayangan kartu.
+                              // WARNA: bayangan di bawah sampul buku 3D pada halaman Detail Buku.
                               color: const Color(0x40000000),
                               blurRadius: 16,
                               offset: const Offset(0, 8),
@@ -233,16 +233,16 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                   img,
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => Container(
-                                    // WARNA: warna komponen.
+                                    // WARNA: latar placeholder sampul buku saat gambar gagal dimuat di halaman Detail Buku.
                                     color: Colors.grey[300],
-                                    // WARNA: warna komponen.
+                                    // WARNA: ikon buku pada placeholder sampul gagal dimuat di halaman Detail Buku.
                                     child: const Icon(Icons.book, size: 60, color: Colors.grey),
                                   ),
                                 )
                               : Container(
-                                  // WARNA: ikon book.
+                                  // WARNA: latar placeholder sampul buku saat tidak ada URL gambar di halaman Detail Buku.
                                   color: Colors.grey[300],
-                                  // WARNA: ikon book.
+                                  // WARNA: ikon buku pada placeholder sampul kosong di halaman Detail Buku.
                                   child: const Icon(Icons.book, size: 60, color: Colors.grey),
                                 ),
                         ),
@@ -253,12 +253,12 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // WARNA: ikon book.
+                      // WARNA: warna ikon rotasi layar di keterangan petunjuk efek giroskop 3D di bawah sampul buku.
                       Icon(Icons.screen_rotation, size: 14, color: const Color(0xFF9A704F)),
                       const SizedBox(width: 4),
                       Text(
                         'Miringkan HP Anda untuk efek sensor 3D',
-                        // WARNA: ikon screen_rotation.
+                        // WARNA: warna teks petunjuk 'Miringkan HP Anda untuk efek sensor 3D' di bawah sampul buku.
                         style: TextStyle(fontSize: 12, color: const Color(0xFF67343A)),
                       ),
                     ],
@@ -283,7 +283,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      // WARNA: judul buku.
+                      // WARNA: warna ikon orang di sebelah nama penulis buku pada halaman Detail Buku.
                       const Icon(Icons.person_outline, size: 18, color: Colors.grey),
                       const SizedBox(width: 6),
                       Expanded(
@@ -291,7 +291,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           authors,
                           style: TextStyle(
                             fontSize: 15,
-                            // WARNA: nama penulis buku.
+                            // WARNA: warna teks nama penulis di bawah judul buku pada halaman Detail Buku.
                             color: Colors.grey[700],
                             fontWeight: FontWeight.w500,
                           ),
@@ -307,22 +307,22 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (rating != null) ...[
-                          // WARNA: teks dari variabel 'title'.
+                          // WARNA: warna ikon/teks & latar pil badge Rating Bintang di halaman Detail Buku (kuning amber).
                           _buildBadge(Icons.star, '${rating.toStringAsFixed(1)} / 5.0', Colors.amber.shade800, Colors.amber.shade50),
                           const SizedBox(width: 8),
                         ],
                         if (category.isNotEmpty) ...[
-                          // WARNA: teks dari variabel 'authors'.
+                          // WARNA: warna ikon/teks & latar pil badge Kategori/Genre di halaman Detail Buku (marun oxblood di atas krem parchment).
                           _buildBadge(Icons.category_outlined, category, const Color(0xFF67343A), const Color(0xFFEDE2CF)),
                           const SizedBox(width: 8),
                         ],
                         if (pageCount != null) ...[
-                          // WARNA: teks dari variabel 'authors'.
+                          // WARNA: warna ikon/teks & latar pil badge Jumlah Halaman di halaman Detail Buku (hijau teal).
                           _buildBadge(Icons.menu_book_outlined, '$pageCount Hal', Colors.teal, Colors.teal.shade50),
                           const SizedBox(width: 8),
                         ],
                         if (publishedDate.isNotEmpty)
-                          // WARNA: teks dari variabel 'authors'.
+                          // WARNA: warna ikon/teks & latar pil badge Tahun/Tanggal Rilis di halaman Detail Buku (ungu deepPurple).
                           _buildBadge(Icons.calendar_today_outlined, publishedDate, Colors.deepPurple, Colors.deepPurple.shade50),
                       ],
                     ),
@@ -333,10 +333,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                     decoration: BoxDecoration(
-                      // WARNA: latar kartu/komponen.
+                      // WARNA: latar belakang kartu 'Harga Tarif Sewa' di halaman Detail Buku.
                       color: const Color(0xFFFAF7F2),
                       borderRadius: BorderRadius.circular(16),
-                      // WARNA: latar kartu/komponen.
+                      // WARNA: garis tepi kartu 'Harga Tarif Sewa' di halaman Detail Buku.
                       border: Border.all(color: const Color(0xFFEADBCE)),
                     ),
                     child: Row(
@@ -347,7 +347,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             children: [
                               const Text(
                                 'Harga Tarif Sewa',
-                                // WARNA: garis tepi kartu/komponen.
+                                // WARNA: warna teks label 'Harga Tarif Sewa' di dalam kartu tarif Detail Buku.
                                 style: TextStyle(fontSize: 12, color: Color(0xFF67343A), fontWeight: FontWeight.w600),
                               ),
                               const SizedBox(height: 4),
@@ -359,7 +359,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    // WARNA: teks 'Harga Tarif Sewa'.
+                                    // WARNA: warna teks nominal harga tarif sewa per hari di dalam kartu tarif Detail Buku.
                                     color: Color(0xFF302622),
                                   ),
                                 ),
@@ -371,16 +371,16 @@ class _BookDetailPageState extends State<BookDetailPage> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
-                            // WARNA: latar kartu/komponen.
+                            // WARNA: latar lencana pil 'Data katalog' di sebelah kanan kartu tarif sewa Detail Buku.
                             color: const Color(0xFFEDE2CF),
                             borderRadius: BorderRadius.circular(20),
-                            // WARNA: latar kartu/komponen.
+                            // WARNA: garis tepi lencana pil 'Data katalog' di kartu tarif sewa Detail Buku.
                             border: Border.all(color: const Color(0xFFD4BE9D)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              // WARNA: garis tepi kartu/komponen.
+                              // WARNA: warna ikon buku di dalam lencana pil 'Data katalog' pada kartu tarif sewa Detail Buku.
                               Icon(Icons.menu_book_rounded, size: 15, color: Color(0xFF67343A)),
                               SizedBox(width: 4),
                               Text(
@@ -388,7 +388,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
-                                  // WARNA: teks 'Data katalog'.
+                                  // WARNA: warna teks di dalam lencana pil 'Data katalog' pada kartu tarif sewa Detail Buku.
                                   color: Color(0xFF67343A),
                                 ),
                               ),
@@ -409,7 +409,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     description,
                     style: TextStyle(
                       fontSize: 14,
-                      // WARNA: teks 'Sinopsis Buku'.
+                      // WARNA: warna teks isi paragraf Sinopsis Buku pada halaman Detail Buku.
                       color: Colors.grey[800],
                       height: 1.6,
                     ),
@@ -459,11 +459,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          // WARNA: latar kartu/komponen.
+          // WARNA: latar belakang bar bawah (sticky bottom bar) halaman Detail Buku tempat tombol 'Sewa Buku'.
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              // WARNA: bayangan kartu.
+              // WARNA: bayangan tipis di sisi atas bar bawah tombol 'Sewa Buku' pada halaman Detail Buku.
               color: const Color(0x14000000),
               blurRadius: 10,
               offset: const Offset(0, -4),
@@ -477,14 +477,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // WARNA: warna komponen.
+                  // WARNA: warna label kecil 'Mulai Dari' di kiri bar bawah halaman Detail Buku.
                   const Text('Mulai Dari', style: TextStyle(fontSize: 11, color: Colors.grey)),
                   Text(
                     _formatRupiah(pricePerDay),
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      // WARNA: teks 'Mulai Dari'.
+                      // WARNA: warna angka harga sewa di kiri bar bawah halaman Detail Buku.
                       color: const Color(0xFF302622),
                     ),
                   ),
@@ -494,7 +494,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
               Expanded(
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    // WARNA: latar tombol.
+                    // WARNA: latar belakang tombol utama 'Sewa Buku' di kanan bar bawah halaman Detail Buku.
                     backgroundColor: const Color(0xFF67343A),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -518,19 +518,19 @@ class _BookDetailPageState extends State<BookDetailPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        // WARNA: latar kartu/komponen.
+        // WARNA: latar belakang tiap pil badge info buku (Rating/Kategori/Halaman/Tahun Rilis) di Detail Buku.
         color: bgColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // WARNA: latar kartu/komponen.
+          // WARNA: warna ikon di dalam pil badge info buku pada Detail Buku.
           Icon(icon, size: 15, color: color),
           const SizedBox(width: 4),
           Text(
             text,
-            // WARNA: ikon icon.
+            // WARNA: warna teks di dalam pil badge info buku pada Detail Buku.
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color),
           ),
         ],
@@ -542,10 +542,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
-        // WARNA: latar kartu/komponen.
+        // WARNA: latar belakang kotak spesifikasi buku (Penerbit, Tanggal Rilis, Bahasa, Jumlah Halaman) di Detail Buku.
         color: const Color(0xFFFAF7F2),
         borderRadius: BorderRadius.circular(12),
-        // WARNA: latar kartu/komponen.
+        // WARNA: garis tepi kotak spesifikasi buku di halaman Detail Buku.
         border: Border.all(color: const Color(0xFFEADBCE)),
       ),
       child: Column(
@@ -553,13 +553,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
         children: [
           Row(
             children: [
-              // WARNA: garis tepi kartu/komponen.
+              // WARNA: warna ikon kecil di pojok kiri atas tiap kotak spesifikasi buku pada Detail Buku.
               Icon(icon, size: 16, color: const Color(0xFF67343A)),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   label,
-                  // WARNA: ikon icon.
+                  // WARNA: warna label kecil ('Penerbit', 'Bahasa', dll) di kotak spesifikasi buku pada Detail Buku.
                   style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -570,7 +570,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           const SizedBox(height: 6),
           Text(
             value,
-            // WARNA: teks 'label'.
+            // WARNA: warna teks nilai isi spesifikasi (nama penerbit, tahun, bahasa, halaman) di kotak spesifikasi Detail Buku.
             style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: Color(0xFF302622)),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

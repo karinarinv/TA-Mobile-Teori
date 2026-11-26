@@ -16,11 +16,11 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  // WARNA: warna elemen.
+  // WARNA: latar belakang utama layar splash screen (krem parchment).
   static const _background = Color(0xFFEDE2CF);
-  // WARNA: warna elemen.
+  // WARNA: warna dasar tengah sampul buku 3D animasi splash screen (merah marun oxblood).
   static const _coverColor = Color(0xFF67343A);
-  // WARNA: warna elemen.
+  // WARNA: warna tint logo RentBook di atas sampul buku splash screen (krem parchment).
   static const _logoColor = Color(0xFFEDE2CF);
 
   // Mengendalikan seluruh animasi splash dari awal sampai selesai.
@@ -124,18 +124,18 @@ class _SplashScreenState extends State<SplashScreen>
       height: 282,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          // WARNA: gradasi komponen ini.
+          // WARNA: gradasi 3 titik pada sampul buku animasi splash screen (kiri atas terang -> tengah _coverColor -> kanan bawah gelap).
           colors: [Color(0xFF82464C), _coverColor, Color(0xFF4E252B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           stops: [0, .28, 1],
         ),
         borderRadius: BorderRadius.circular(8),
-        // WARNA: latar kartu/komponen.
+        // WARNA: garis tepi luar sampul buku animasi splash screen (krem emas).
         border: Border.all(color: const Color(0xFFD4BE9D), width: 1.5),
         boxShadow: const [
           BoxShadow(
-            // WARNA: bayangan kartu.
+            // WARNA: bayangan sampul buku animasi splash screen.
             color: Color(0x55271A16),
             blurRadius: 22,
             offset: Offset(7, 13),
@@ -178,7 +178,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // WARNA: latar halaman.
+      // WARNA: latar belakang utama Scaffold halaman splash screen.
       backgroundColor: _background,
       body: SafeArea(
         child: AnimatedBuilder(
@@ -230,7 +230,7 @@ class _SplashScreenState extends State<SplashScreen>
                   Positioned.fill(
                     child: IgnorePointer(
                       child: ColoredBox(
-                        // WARNA: warna komponen.
+                        // WARNA: lapisan fade putih transisi di akhir animasi splash sebelum masuk ke halaman tujuan.
                         color: Colors.white.withValues(alpha: _whiteFade.value),
                       ),
                     ),
@@ -249,12 +249,12 @@ class _BookCoverOrnamentPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final gold = Paint()
-      // WARNA: gambar ilustrasi burung hantu.
+      // WARNA: garis bingkai luar, ornamen sudut, dan titik tengah bawah sampul buku splash screen (krem emas).
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .76)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.2;
     final fineGold = Paint()
-      // WARNA: gambar ilustrasi burung hantu.
+      // WARNA: garis bingkai dalam tipis dan garis hias bawah pada sampul buku splash screen.
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .42)
       ..style = PaintingStyle.stroke
       ..strokeWidth = .7;
@@ -340,17 +340,17 @@ class _OpenBookPainter extends CustomPainter {
       ..cubicTo(centerX + spread * .62, bottom - 1, centerX + spread * .25, bottom + 2, centerX, bottom - 5)
       ..close();
 
-    // WARNA: gambar ilustrasi burung hantu.
+    // WARNA: bayangan lembut di bawah halaman kiri buku terbuka pada animasi splash screen.
     canvas.drawShadow(leftPage, Colors.black.withValues(alpha: .2 * progress), 8, true);
-    // WARNA: gambar ilustrasi burung hantu.
+    // WARNA: bayangan lembut di bawah halaman kanan buku terbuka pada animasi splash screen.
     canvas.drawShadow(rightPage, Colors.black.withValues(alpha: .2 * progress), 8, true);
-    // WARNA: bayangan ikon/teks.
+    // WARNA: warna kertas halaman kiri buku terbuka (putih gading hangat) pada animasi splash screen.
     canvas.drawPath(leftPage, Paint()..color = const Color(0xFFFFFCF3).withValues(alpha: progress));
-    // WARNA: bayangan ikon/teks.
+    // WARNA: warna kertas halaman kanan buku terbuka (putih gading hangat) pada animasi splash screen.
     canvas.drawPath(rightPage, Paint()..color = const Color(0xFFFFFCF3).withValues(alpha: progress));
 
     final pageEdge = Paint()
-      // WARNA: bayangan ikon/teks.
+      // WARNA: garis tepi tipis tiap lembaran kertas buku pada animasi splash screen.
       ..color = const Color(0xFFD4BE9D).withValues(alpha: .82 * progress)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
@@ -387,11 +387,11 @@ class _OpenBookPainter extends CustomPainter {
           bottom - 5,
         )
         ..close();
-      // WARNA: warna elemen.
+      // WARNA: bayangan lembaran kertas yang sedang membalik pada animasi splash screen.
       canvas.drawShadow(sheet, Colors.black.withValues(alpha: .12 * progress), 5, true);
       canvas.drawPath(
         sheet,
-        // WARNA: bayangan ikon/teks.
+        // WARNA: warna isi lembaran kertas yang sedang membalik pada animasi splash screen.
         Paint()..color = const Color(0xFFFFFDF7).withValues(alpha: .94 * progress),
       );
       canvas.drawPath(sheet, pageEdge..strokeWidth = .8..style = PaintingStyle.stroke);
@@ -404,7 +404,7 @@ class _OpenBookPainter extends CustomPainter {
     }
 
     final textRule = Paint()
-      // WARNA: gambar ilustrasi burung hantu.
+      // WARNA: garis-garis teks simulasi di halaman buku terbuka animasi splash screen.
       ..color = const Color(0xFFB9A687).withValues(alpha: .48 * progress)
       ..strokeWidth = 1;
     for (var i = 0; i < 5; i++) {
@@ -416,7 +416,7 @@ class _OpenBookPainter extends CustomPainter {
     }
 
     final binding = Paint()
-      // WARNA: gambar ilustrasi burung hantu.
+      // WARNA: garis jilid/lipatan tengah buku terbuka pada animasi splash screen.
       ..color = const Color(0xFF8D7460).withValues(alpha: .45 * progress)
       ..strokeWidth = 2;
     canvas.drawLine(Offset(centerX, top + 5), Offset(centerX, bottom - 6), binding);
